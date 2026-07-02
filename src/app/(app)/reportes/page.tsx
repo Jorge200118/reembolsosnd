@@ -1,6 +1,7 @@
 "use client";
-import { useMemo, useState } from "react";
-import { useReembolsos } from "@/lib/hooks/useReembolsos";
+import { useEffect, useMemo, useState } from "react";
+import { useReembolsos, useTodosReembolsos } from "@/lib/hooks/useReembolsos";
+import { listarTodosReembolsos } from "@/lib/supabase/queries/reembolsos";
 import { agruparPorLote, type Fila } from "@/lib/reportes/agruparPorLote";
 import { exportarExcel } from "@/lib/reportes/exportarExcel";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -29,6 +30,16 @@ const columnas: Columna<Fila>[] = [
   { header: "Estado", align: "center", cell: (r) => <EstadoBadge estado={r.estado as Estado} /> },
 ];
 
+// Debounce genérico: refleja el valor de entrada tras `delay` ms sin cambios.
+function useDebounced<T>(value: T, delay: number): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(id);
+  }, [value, delay]);
+  return debounced;
+}
+
 export default function ReportesPage() {
   const [estado, setEstado] = useState<Estado | "">("");
   const [sucursal, setSucursal] = useState("");
@@ -36,30 +47,68 @@ export default function ReportesPage() {
   const [lote, setLote] = useState("");
   const [vista, setVista] = useState<"tabla" | "lotes">("tabla");
   const [page, setPage] = useState(0);
+  const [exportando, setExportando] = useState(false);
+  const [errorExport, setErrorExport] = useState<string | null>(null);
   const pageSize = 25;
 
-  const { data, isLoading } = useReembolsos({
+  // Valores con debounce para no refetch en cada tecla de los inputs de texto.
+  const beneficiarioQ = useDebounced(beneficiario, 350);
+  const loteQ = useDebounced(lote, 350);
+
+  // Al cambiar el término de búsqueda con debounce, volvemos a la primera página.
+  useEffect(() => {
+    setPage(0);
+  }, [beneficiarioQ, loteQ]);
+
+  // Filtros server-side compartidos por la tabla, la vista por lotes y el export.
+  const filtrosBase = {
     estado: estado || undefined,
     sucursal: sucursal || undefined,
+    beneficiario: beneficiarioQ.trim() || undefined,
+    lote: loteQ.trim() || undefined,
+  };
+
+  const { data, isLoading } = useReembolsos({
+    ...filtrosBase,
     page,
     pageSize,
   });
 
-  const filas = useMemo(() => {
-    let rows = (data?.rows ?? []) as Fila[];
-    if (beneficiario.trim()) {
-      const q = beneficiario.trim().toLowerCase();
-      rows = rows.filter((r) => String(r.nombre_beneficiario ?? "").toLowerCase().includes(q));
-    }
-    if (lote.trim()) {
-      const q = lote.trim().toLowerCase();
-      rows = rows.filter((r) => String(r.numero_lote ?? "").toLowerCase().includes(q));
-    }
-    return rows;
-  }, [data, beneficiario, lote]);
-
+  // La tabla ya viene filtrada y paginada del servidor: usamos las filas tal cual.
+  const filas = (data?.rows ?? []) as Fila[];
   const totalMonto = useMemo(() => filas.reduce((s, r) => s + Number(r.monto ?? 0), 0), [filas]);
-  const lotes = useMemo(() => agruparPorLote(filas, "numero_lote"), [filas]);
+
+  // Vista por lotes: trae TODAS las filas filtradas (solo cuando está activa).
+  const {
+    data: todasFilas,
+    isLoading: cargandoTodas,
+  } = useTodosReembolsos(filtrosBase, { enabled: vista === "lotes" });
+
+  const lotes = useMemo(
+    () => agruparPorLote((todasFilas ?? []) as Fila[], "numero_lote"),
+    [todasFilas]
+  );
+  const totalReembolsosLotes = useMemo(
+    () => lotes.reduce((s, g) => s + g.reembolsos.length, 0),
+    [lotes]
+  );
+  const totalMontoLotes = useMemo(
+    () => ((todasFilas ?? []) as Fila[]).reduce((s, r) => s + Number(r.monto ?? 0), 0),
+    [todasFilas]
+  );
+
+  async function handleExportar() {
+    setErrorExport(null);
+    setExportando(true);
+    try {
+      const filasTodas = (await listarTodosReembolsos(filtrosBase)) as Fila[];
+      exportarExcel(filasTodas);
+    } catch {
+      setErrorExport("No se pudo exportar. Intenta de nuevo.");
+    } finally {
+      setExportando(false);
+    }
+  }
 
   return (
     <main className="mx-auto max-w-6xl p-4 sm:p-6">
@@ -91,9 +140,10 @@ export default function ReportesPage() {
           </div>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <button className={BTN_VERDE} disabled={filas.length === 0} onClick={() => exportarExcel(filas)}>
-            Exportar Excel
+          <button className={BTN_VERDE} disabled={exportando} onClick={handleExportar}>
+            {exportando ? "Exportando…" : "Exportar Excel"}
           </button>
+          {errorExport && <span className="text-sm text-rose-600">{errorExport}</span>}
           <div className="ml-auto flex flex-wrap gap-2">
             <button className={BTN_TAB(vista === "tabla")} onClick={() => setVista("tabla")}>Vista tabla</button>
             <button className={BTN_TAB(vista === "lotes")} onClick={() => setVista("lotes")}>Vista por lotes</button>
@@ -105,9 +155,16 @@ export default function ReportesPage() {
         <span className="text-sm text-slate-600">
           <span className="font-semibold tabular-nums text-slate-900">{(data?.total ?? 0).toLocaleString("es-MX")}</span> registros
         </span>
-        <span className="text-sm text-slate-600">
-          Total página: <span className="font-semibold tabular-nums text-slate-900"><Money monto={parseMonto(totalMonto)} /></span>
-        </span>
+        {vista === "tabla" ? (
+          <span className="text-sm text-slate-600">
+            Total página: <span className="font-semibold tabular-nums text-slate-900"><Money monto={parseMonto(totalMonto)} /></span>
+          </span>
+        ) : (
+          <span className="text-sm text-slate-600">
+            <span className="font-semibold tabular-nums text-slate-900">{totalReembolsosLotes.toLocaleString("es-MX")}</span> reembolsos ·
+            Total: <span className="font-semibold tabular-nums text-slate-900"><Money monto={parseMonto(totalMontoLotes)} /></span>
+          </span>
+        )}
       </div>
 
       {vista === "tabla" ? (
@@ -120,6 +177,8 @@ export default function ReportesPage() {
           onPageChange={setPage}
           loading={isLoading}
         />
+      ) : cargandoTodas ? (
+        <Card className="p-8 text-center text-sm text-slate-400">Cargando todos los lotes…</Card>
       ) : (
         <div className="space-y-3">
           {lotes.length === 0 ? (
