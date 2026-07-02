@@ -102,7 +102,7 @@ export default function EntregasPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl p-6">
+    <main className="mx-auto max-w-6xl p-4 sm:p-6">
       <PageHeader titulo="Entregas" subtitulo="Solicita la entrega de lotes aprobados y confirma la entrega con evidencia" />
       {msg && <p className="mb-3 rounded-lg bg-slate-100 px-3 py-1.5 text-sm text-slate-700">{msg}</p>}
 
@@ -111,7 +111,7 @@ export default function EntregasPage() {
           Aprobados · listos para solicitar entrega ({aprobados.length})
         </h2>
         {lotesAprobados.length === 0 ? (
-          <Card className="p-6 text-center text-sm text-slate-400">No hay lotes aprobados pendientes.</Card>
+          <Card className="p-4 text-center text-sm text-slate-400 sm:p-6">No hay lotes aprobados pendientes.</Card>
         ) : (
           <div className="space-y-3">
             {lotesAprobados.map((g) => (
@@ -140,7 +140,7 @@ export default function EntregasPage() {
           Esperando entrega ({solicitados.length})
         </h2>
         {lotesSolicitados.length === 0 ? (
-          <Card className="p-6 text-center text-sm text-slate-400">No hay lotes esperando entrega.</Card>
+          <Card className="p-4 text-center text-sm text-slate-400 sm:p-6">No hay lotes esperando entrega.</Card>
         ) : (
           <div className="space-y-3">
             {lotesSolicitados.map((g) => (
@@ -160,7 +160,7 @@ export default function EntregasPage() {
                       <input
                         type="file" accept="image/*"
                         onChange={(e) => setEvidenciaPorLote((p) => ({ ...p, [g.lote]: e.target.files?.[0] ?? null }))}
-                        className="text-sm text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700"
+                        className="min-w-0 max-w-full text-sm text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700"
                       />
                       <button
                         className="rounded-lg bg-slate-800 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-slate-900 disabled:opacity-40"

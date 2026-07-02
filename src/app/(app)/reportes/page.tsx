@@ -62,7 +62,7 @@ export default function ReportesPage() {
   const lotes = useMemo(() => agruparPorLote(filas, "numero_lote"), [filas]);
 
   return (
-    <main className="mx-auto max-w-6xl p-6">
+    <main className="mx-auto max-w-6xl p-4 sm:p-6">
       <PageHeader titulo="Reportes" subtitulo="Consulta, filtra y exporta los reembolsos" />
 
       <Card className="mb-3 p-4">
@@ -94,14 +94,14 @@ export default function ReportesPage() {
           <button className={BTN_VERDE} disabled={filas.length === 0} onClick={() => exportarExcel(filas)}>
             Exportar Excel
           </button>
-          <div className="ml-auto flex gap-2">
+          <div className="ml-auto flex flex-wrap gap-2">
             <button className={BTN_TAB(vista === "tabla")} onClick={() => setVista("tabla")}>Vista tabla</button>
             <button className={BTN_TAB(vista === "lotes")} onClick={() => setVista("lotes")}>Vista por lotes</button>
           </div>
         </div>
       </Card>
 
-      <div className="mb-2 flex items-baseline justify-between">
+      <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
         <span className="text-sm text-slate-600">
           <span className="font-semibold tabular-nums text-slate-900">{(data?.total ?? 0).toLocaleString("es-MX")}</span> registros
         </span>

@@ -28,41 +28,41 @@ export default function DashboardPage() {
   const maxCantidad = Math.max(1, ...filas.map((r) => r.cantidad));
 
   return (
-    <main className="mx-auto max-w-6xl p-6">
+    <main className="mx-auto max-w-6xl p-4 sm:p-6">
       <PageHeader titulo="Dashboard" subtitulo="Resumen de reembolsos por estado" />
 
       {isLoading ? (
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {Array.from({ length: 2 }).map((_, i) => <div key={i} className="h-20 animate-pulse rounded-lg border border-slate-200 bg-white" />)}
           </div>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-24 animate-pulse rounded-lg border border-slate-200 bg-white" />)}
           </div>
         </div>
       ) : (
         <>
           {/* KPIs ejecutivos */}
-          <div className="mb-4 grid grid-cols-2 gap-3">
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
               <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Total de reembolsos</div>
-              <div className="mt-1 text-3xl font-bold tabular-nums text-slate-900">{totalReembolsos.toLocaleString("es-MX")}</div>
+              <div className="mt-1 break-words text-2xl font-bold tabular-nums text-slate-900 sm:text-3xl">{totalReembolsos.toLocaleString("es-MX")}</div>
             </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
               <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Monto total</div>
-              <div className="mt-1 text-3xl font-bold tabular-nums text-slate-900">${montoTotal.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+              <div className="mt-1 break-words text-2xl font-bold tabular-nums text-slate-900 sm:text-3xl">${montoTotal.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             </div>
           </div>
 
           {/* Desglose por estado */}
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
             {filas.map((r) => {
               const ac = ACENTO[r.estado] ?? { barra: "bg-slate-400", texto: "text-slate-600" };
               const pct = totalReembolsos > 0 ? Math.round((r.cantidad / totalReembolsos) * 100) : 0;
               return (
                 <div
                   key={r.estado}
-                  className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+                  className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md sm:p-4"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
@@ -70,9 +70,9 @@ export default function DashboardPage() {
                     </span>
                     <span className={`text-[11px] font-semibold tabular-nums ${ac.texto}`}>{pct}%</span>
                   </div>
-                  <div className="mt-1.5 flex items-baseline justify-between gap-2">
+                  <div className="mt-1.5 flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-2">
                     <span className="text-2xl font-bold tabular-nums text-slate-900">{r.cantidad.toLocaleString("es-MX")}</span>
-                    <span className="text-sm font-medium tabular-nums text-slate-600"><Money monto={r.total} /></span>
+                    <span className="break-words text-sm font-medium tabular-nums text-slate-600"><Money monto={r.total} /></span>
                   </div>
                   {/* mini-barra de proporción */}
                   <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-slate-100">

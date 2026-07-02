@@ -27,7 +27,7 @@ export default function PagoComidasPage() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl p-6">
+    <main className="mx-auto max-w-5xl p-4 sm:p-6">
       <PageHeader titulo="Pago de Comidas" subtitulo="Comidas autorizadas pendientes de pago · el chofer recibe su código por WhatsApp" />
 
       <div className="mb-4 inline-flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-1 text-xs text-blue-800">
@@ -35,24 +35,24 @@ export default function PagoComidasPage() {
       </div>
 
       {!esViernes && (
-        <Card className="mb-4 border-l-4 border-l-red-400 bg-red-50 p-3">
-          <div className="flex items-center gap-3">
+        <Card className="mb-4 border-l-4 border-l-red-400 bg-red-50 p-4 sm:p-6">
+          <div className="flex items-start gap-3">
             <span className="text-2xl">🔒</span>
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="font-semibold text-red-700">Pagos deshabilitados</div>
-              <div className="text-sm text-red-600">Los pagos de comidas solo se pueden realizar los <strong>viernes</strong>.</div>
+              <div className="text-sm text-red-600 break-words">Los pagos de comidas solo se pueden realizar los <strong>viernes</strong>.</div>
             </div>
           </div>
         </Card>
       )}
 
       {isLoading ? (
-        <Card className="p-10 text-center text-slate-500">Cargando comidas…</Card>
+        <Card className="p-6 text-center text-slate-500 sm:p-10">Cargando comidas…</Card>
       ) : lista.length === 0 ? (
-        <Card className="p-10 text-center text-slate-500">No hay comidas pendientes de pago.</Card>
+        <Card className="p-6 text-center text-slate-500 sm:p-10">No hay comidas pendientes de pago.</Card>
       ) : (
         <>
-          <Card className="mb-4 border-l-4 border-l-emerald-400 bg-emerald-50/50 p-3">
+          <Card className="mb-4 border-l-4 border-l-emerald-400 bg-emerald-50/50 p-4 sm:p-6">
             <div className="flex flex-wrap items-center gap-x-2 text-sm text-slate-700">
               <strong className="text-slate-900">{totalComidas}</strong> comidas de
               <strong className="text-slate-900">{lista.length}</strong> empleados ·

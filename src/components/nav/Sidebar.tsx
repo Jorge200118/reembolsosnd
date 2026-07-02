@@ -81,15 +81,21 @@ function iniciales(nombre: string): string {
   return (a + b).toUpperCase() || "?";
 }
 
-export function Sidebar() {
-  const { sesion, logout } = useAuth();
+export function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: () => void }) {
+  const { sesion, montado, logout } = useAuth();
   const pathname = usePathname();
-  if (!sesion) return null;
+  // Hasta que monte en el cliente, no hay sesión (la cookie no se lee en SSR).
+  // Renderizar null en ambos lados evita el hydration mismatch.
+  if (!montado || !sesion) return null;
 
   const tabs = tabsDeRol(sesion.rol as Rol);
 
   return (
-    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col bg-[#0F2942] text-slate-100">
+    <aside
+      className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 shrink-0 transform flex-col bg-[#0F2942] text-slate-100 transition-transform duration-300 ${
+        open ? "translate-x-0" : "-translate-x-full"
+      } lg:sticky lg:top-0 lg:z-auto lg:translate-x-0 lg:transition-none`}
+    >
       {/* Marca */}
       <div className="flex items-center gap-2.5 px-5 pt-6 pb-5">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 font-black text-white shadow-sm">
@@ -123,6 +129,7 @@ export function Sidebar() {
             <Link
               key={t}
               href={`/${t}`}
+              onClick={onClose}
               className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
                 activo
                   ? "bg-blue-600 font-semibold text-white shadow-sm"
@@ -148,7 +155,10 @@ export function Sidebar() {
           </div>
         </div>
         <button
-          onClick={logout}
+          onClick={() => {
+            onClose?.();
+            logout();
+          }}
           className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-300 transition-colors hover:bg-white/5 hover:text-white"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

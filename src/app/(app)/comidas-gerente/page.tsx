@@ -108,13 +108,13 @@ export default function ComidasGerentePage() {
   const fallidos = resultados?.filter((r) => !r.ok) ?? [];
 
   return (
-    <main className="mx-auto max-w-6xl p-6">
+    <main className="mx-auto max-w-6xl p-4 sm:p-6">
       <PageHeader
         titulo="Registro de Comidas"
         subtitulo="Marca los empleados que llegaron y autoriza sus comidas de una vez · $120.00 c/u"
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
         {/* Lista de selección */}
         <div>
           {/* Buscador que ACOTA la lista de abajo */}
@@ -230,7 +230,7 @@ export default function ComidasGerentePage() {
 
       {/* Historial */}
       <div className="mt-8">
-        <div className="mb-3 flex items-baseline justify-between">
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Comidas autorizadas por ti</h2>
           <span className="text-xs text-slate-500">{misComidas.length}</span>
         </div>

@@ -74,14 +74,14 @@ export default function RevisionPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl p-6">
+    <main className="mx-auto max-w-6xl p-4 sm:p-6">
       <PageHeader titulo="Revisión" subtitulo="Arma el lote de pendientes y envíalo a corte por correo" />
       {msg && (
         <p className={`mb-4 rounded-lg px-3 py-2 text-sm ${resultado?.ok ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>{msg}</p>
       )}
 
       <Card className="mb-3 border-l-4 border-l-amber-400 p-4">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-4">
+        <div className="mb-3 flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:flex-wrap sm:items-center">
           <div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
             <Metrica etiqueta="Total" valor={<Money monto={parseMonto(totalMonto)} />} />
             <Metrica etiqueta="Solicitudes" valor={totalPendientes} />
@@ -91,7 +91,7 @@ export default function RevisionPage() {
           <button
             onClick={onEnviarACorte}
             disabled={isPending || pendientes.length === 0}
-            className="rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-800 disabled:opacity-40"
+            className="w-full rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-800 disabled:opacity-40 sm:w-auto"
           >
             {isPending ? "Enviando…" : "Enviar a corte (correo a Fernando)"}
           </button>
@@ -108,14 +108,14 @@ export default function RevisionPage() {
       </Card>
 
       <Card className="border-l-4 border-l-blue-400 p-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
           <div>
             <h2 className="text-base font-semibold text-slate-800">En proceso · esperando respuesta ({totalEnCorte})</h2>
             <p className="mt-0.5 text-sm text-slate-600">Estos lotes ya se enviaron a Fernando. Él responde AUTORIZO/RECHAZO por correo.</p>
           </div>
           <button
             onClick={() => queryClient.invalidateQueries({ queryKey: ["reembolsos"] })}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 sm:w-auto sm:shrink-0"
           >
             Verificar respuestas
           </button>
