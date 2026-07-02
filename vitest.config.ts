@@ -8,6 +8,17 @@ export default defineConfig({
     // credenciales disponibles.
     setupFiles: ["./vitest.setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    // Los packages del workspace (p.ej. packages/domain) tienen su propio
+    // vitest.config.ts. Excluirlos aquí evita que la app intente correr sus
+    // tests con este setup (que carga .env.local). Se preservan los defaults
+    // de vitest además de packages/**.
+    exclude: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.{idea,git,cache,output,temp}/**",
+      "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*",
+      "packages/**",
+    ],
   },
   resolve: {
     alias: {
