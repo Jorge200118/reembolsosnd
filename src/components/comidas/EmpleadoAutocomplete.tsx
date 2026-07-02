@@ -52,8 +52,8 @@ export function EmpleadoAutocomplete({ onSelect }: EmpleadoAutocompleteProps) {
                   onSelect(o);
                 }}
               >
-                <span>{o.nombre}</span>
-                <span className="text-xs text-slate-400">
+                <span className="text-slate-900">{o.nombre}</span>
+                <span className="text-xs text-slate-600">
                   {o.puesto ?? ""}{!o.tieneTelefono ? " · sin tel" : ""}
                 </span>
               </button>

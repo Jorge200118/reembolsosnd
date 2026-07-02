@@ -38,16 +38,16 @@ export function OtpCapturaModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
         <h2 className="mb-1 text-lg font-bold text-slate-800">Cobro de comidas</h2>
-        <p className="mb-4 text-sm text-slate-500">{empleadoNombre}</p>
+        <p className="mb-4 text-sm text-slate-700">{empleadoNombre}</p>
         <form onSubmit={onSubmit}>
-          <label className="mb-1 block text-sm font-medium text-slate-600">
+          <label className="mb-1 block text-sm font-medium text-slate-700">
             Código que el chofer recibió por WhatsApp
           </label>
           <input
             autoFocus
             inputMode="numeric"
             maxLength={6}
-            className="mb-3 w-full rounded-lg border px-3 py-2 text-center text-2xl tracking-widest tabular-nums"
+            className="mb-3 w-full rounded-lg border px-3 py-2 text-center text-2xl tracking-widest tabular-nums text-slate-900"
             value={codigo}
             onChange={(e) => setCodigo(e.target.value.replace(/\D/g, ""))}
             placeholder="______"
@@ -61,7 +61,7 @@ export function OtpCapturaModal({
           <div className="flex gap-2">
             <button
               type="button" onClick={onClose}
-              className="flex-1 rounded-lg border px-4 py-2 text-slate-600"
+              className="flex-1 rounded-lg border px-4 py-2 text-slate-700"
             >
               Cancelar
             </button>

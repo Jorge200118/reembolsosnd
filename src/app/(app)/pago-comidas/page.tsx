@@ -1,22 +1,25 @@
 "use client";
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { listarCajeras } from "@/lib/supabase/queries/cajeras";
+import { useQueryClient } from "@tanstack/react-query";
 import { useComidasPendientes } from "@/lib/hooks/useComidasPendientes";
 import { OtpCapturaModal } from "@/components/comidas/OtpCapturaModal";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { Chip } from "@/components/ui/Chip";
 import { Money } from "@/components/ui/Money";
 
 export default function PagoComidasPage() {
-  // null = la cajera aún no eligió manualmente → se preselecciona la primera.
-  const [cajeraElegida, setCajeraElegida] = useState<string | null>(null);
+  const { sesion } = useAuth();
+  const cajeraEmail = sesion?.email ?? "";
   const [modalChofer, setModalChofer] = useState<{ empleadoId: number; nombre: string } | null>(null);
   const queryClient = useQueryClient();
-
-  const { data: cajeras } = useQuery({ queryKey: ["cajeras"], queryFn: listarCajeras });
   const { data: comidas, isLoading } = useComidasPendientes();
 
-  // Selección efectiva derivada: la elección explícita o, si no hay, la primera cajera.
-  const cajeraEmail = cajeraElegida ?? (cajeras && cajeras.length > 0 ? cajeras[0]!.email : "");
+  const esViernes = new Date().getDay() === 5;
+  const lista = comidas ?? [];
+  const totalGeneral = lista.reduce((s, c) => s + Number(c.total), 0);
+  const totalComidas = lista.reduce((s, c) => s + c.numComidas, 0);
 
   function onExitoPago() {
     setModalChofer(null);
@@ -24,65 +27,77 @@ export default function PagoComidasPage() {
   }
 
   return (
-    <main className="mx-auto max-w-3xl p-6">
-      <h1 className="mb-1 text-2xl font-bold text-slate-800">Pago de Comidas</h1>
-      <p className="mb-6 text-sm text-slate-500">El chofer recibe su código por WhatsApp · captúralo para liberar el pago</p>
+    <main className="mx-auto max-w-5xl p-6">
+      <PageHeader titulo="Pago de Comidas" subtitulo="Comidas autorizadas pendientes de pago · el chofer recibe su código por WhatsApp" />
 
-      <div className="mb-6">
-        <label className="mb-1 block text-sm font-medium text-slate-600">Cajera</label>
-        <select
-          className="rounded-lg border px-3 py-2"
-          value={cajeraEmail}
-          onChange={(e) => setCajeraElegida(e.target.value)}
-        >
-          <option value="">Selecciona…</option>
-          {(cajeras ?? []).map((c) => (
-            <option key={c.email} value={c.email}>{c.nombre}</option>
-          ))}
-        </select>
+      <div className="mb-4 inline-flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-1 text-xs text-blue-800">
+        <span className="font-semibold uppercase tracking-wide">Cajera:</span> {sesion?.nombre ?? "—"}
       </div>
 
+      {!esViernes && (
+        <Card className="mb-4 border-l-4 border-l-red-400 bg-red-50 p-3">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🔒</span>
+            <div>
+              <div className="font-semibold text-red-700">Pagos deshabilitados</div>
+              <div className="text-sm text-red-600">Los pagos de comidas solo se pueden realizar los <strong>viernes</strong>.</div>
+            </div>
+          </div>
+        </Card>
+      )}
+
       {isLoading ? (
-        <p className="text-slate-400">Cargando comidas…</p>
-      ) : (comidas ?? []).length === 0 ? (
-        <p className="rounded-lg bg-slate-50 p-6 text-center text-slate-400">No hay comidas pendientes de pago.</p>
+        <Card className="p-10 text-center text-slate-500">Cargando comidas…</Card>
+      ) : lista.length === 0 ? (
+        <Card className="p-10 text-center text-slate-500">No hay comidas pendientes de pago.</Card>
       ) : (
-        <div className="overflow-hidden rounded-2xl border">
-          <table className="w-full">
-            <thead className="bg-slate-50 text-left text-sm text-slate-600">
-              <tr>
-                <th className="p-3">Chofer</th>
-                <th className="p-3 text-center">Comidas</th>
-                <th className="p-3 text-right">Total</th>
-                <th className="p-3 text-center">Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(comidas ?? []).map((c) => (
-                <tr key={`${c.empleadoId}-${c.nombre}`} className="border-t">
-                  <td className="p-3 font-medium">{c.nombre}</td>
-                  <td className="p-3 text-center">{c.numComidas}</td>
-                  <td className="p-3 text-right"><Money monto={c.total} /></td>
-                  <td className="p-3 text-center">
-                    {c.estatus === "ok" && c.empleadoId != null ? (
-                      <button
-                        className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-40"
-                        disabled={cajeraEmail === ""}
-                        onClick={() => setModalChofer({ empleadoId: c.empleadoId as number, nombre: c.nombre })}
-                      >
-                        Cobrar con código
-                      </button>
-                    ) : (
-                      <span className="text-xs text-amber-600">
-                        {c.estatus === "sin_telefono" ? "Sin teléfono" : "Sin empleado vinculado"}
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          <Card className="mb-4 border-l-4 border-l-emerald-400 bg-emerald-50/50 p-3">
+            <div className="flex flex-wrap items-center gap-x-2 text-sm text-slate-700">
+              <strong className="text-slate-900">{totalComidas}</strong> comidas de
+              <strong className="text-slate-900">{lista.length}</strong> empleados ·
+              <span className="font-semibold text-slate-900"><Money monto={String(totalGeneral)} /></span> total
+            </div>
+          </Card>
+
+          <Card className="overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="border-b border-slate-200 bg-slate-50">
+                  <tr>
+                    <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Chofer</th>
+                    <th className="px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">Comidas</th>
+                    <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Total</th>
+                    <th className="px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {lista.map((c) => (
+                    <tr key={`${c.empleadoId}-${c.nombre}`} className="border-b border-slate-100 last:border-0 hover:bg-blue-50/40">
+                      <td className="px-4 py-2.5 font-medium text-slate-900">{c.nombre}</td>
+                      <td className="px-4 py-2.5 text-center tabular-nums text-slate-900">{c.numComidas}</td>
+                      <td className="px-4 py-2.5 text-right tabular-nums"><Money monto={c.total} /></td>
+                      <td className="px-4 py-2.5 text-center">
+                        {c.estatus === "ok" && c.empleadoId != null ? (
+                          <button
+                            className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-40"
+                            disabled={cajeraEmail === "" || !esViernes}
+                            title={!esViernes ? "Solo los viernes" : undefined}
+                            onClick={() => setModalChofer({ empleadoId: c.empleadoId as number, nombre: c.nombre })}
+                          >
+                            Cobrar con código
+                          </button>
+                        ) : (
+                          <Chip tono="ambar">{c.estatus === "sin_telefono" ? "Sin teléfono" : "Sin empleado"}</Chip>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </>
       )}
 
       {modalChofer && (
