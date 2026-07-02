@@ -17,7 +17,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, [open]);
 
   return (
-    <div className="flex min-h-screen overflow-x-hidden bg-slate-100">
+    <div className="flex min-h-screen overflow-x-hidden bg-slate-100 lg:overflow-x-visible">
       {/* Sidebar: drawer en móvil, fijo en desktop */}
       <Sidebar open={open} onClose={close} />
 
