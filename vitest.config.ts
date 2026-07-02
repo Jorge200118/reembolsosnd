@@ -3,6 +3,9 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
+    // jsdom permite testear componentes React (render + DOM). Los tests que
+    // no usan el DOM (p.ej. reembolsos.test.ts) funcionan igual bajo jsdom.
+    environment: "jsdom",
     // Carga .env.local antes de importar los módulos de test, para que el
     // cliente de Supabase (que lee process.env al importarse) tenga las
     // credenciales disponibles.
