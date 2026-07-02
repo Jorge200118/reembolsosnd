@@ -1,0 +1,15 @@
+[build]
+  # Monorepo pnpm: instalar en todo el workspace y luego compilar Next.
+  command = "pnpm install --frozen-lockfile && pnpm run build"
+  # Next.js con el plugin de Netlify sirve desde .next (no cambiar a "out").
+  publish = ".next"
+
+[build.environment]
+  # Fijar las mismas versiones que usas en local para builds reproducibles.
+  NODE_VERSION = "24"
+  PNPM_VERSION = "11.9.0"
+
+# El plugin oficial de Next.js habilita SSR, middleware/proxy y rutas dinámicas.
+# Netlify normalmente lo agrega solo al detectar Next 16; lo dejamos explícito.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
