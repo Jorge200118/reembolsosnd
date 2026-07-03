@@ -11,11 +11,11 @@ describe("roles", () => {
     expect(normalizarRol("  Caja_Chica ")).toBe("caja_chica");
   });
 
-  it("admin ve 6 pestañas incluyendo entregas y dashboard", () => {
+  it("admin ve 5 pestañas incluyendo entregas y dashboard, sin pago-comidas", () => {
     const tabs = tabsDeRol("admin");
     expect(tabs).toContain("entregas");
     expect(tabs).toContain("dashboard");
-    expect(tabs).toContain("pago-comidas");
+    expect(tabs).not.toContain("pago-comidas");
     expect(tabs).not.toContain("comidas-gerente");
   });
 

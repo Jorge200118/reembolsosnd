@@ -29,7 +29,6 @@ export const ROL_TABS: Record<Rol, readonly TabId[]> = {
     "entregas",
     "reportes",
     "dashboard",
-    "pago-comidas",
   ],
   caja_chica: ["nuevo-reembolso", "revision", "reportes", "pago-comidas"],
   gerente: ["comidas-gerente"],
