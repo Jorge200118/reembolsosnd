@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { normalizarRol } from "@devoluciones/domain";
 import { login as loginEdge, type Sesion } from "@/lib/edge/login";
 import { guardarSesion, leerSesion, borrarSesion } from "@/lib/auth/session";
@@ -20,6 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // sesión solo tras montar, para que el primer render cliente coincida con el SSR.
   const [sesion, setSesion] = useState<Sesion | null>(null);
   const [montado, setMontado] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setSesion(leerSesion());
@@ -44,7 +46,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     borrarSesion();
     setSesion(null);
-  }, []);
+    router.replace("/login");
+  }, [router]);
 
   return <AuthContext.Provider value={{ sesion, montado, login, logout }}>{children}</AuthContext.Provider>;
 }

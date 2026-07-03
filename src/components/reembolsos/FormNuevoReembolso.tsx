@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { CONCEPTOS, AUTORIZADORES } from "@devoluciones/domain";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useCrearReembolso } from "@/lib/hooks/useCrearReembolso";
@@ -30,6 +30,16 @@ export function FormNuevoReembolso() {
   const [archivos, setArchivos] = useState<File[]>([]);
   const [error, setError] = useState("");
 
+  // Las cajas chicas no pueden capturar COMIDAS: los viáticos de choferes
+  // se registran desde el módulo de Comidas (con OTP del gerente).
+  const conceptosDisponibles = useMemo(
+    () =>
+      sesion?.rol === "caja_chica"
+        ? CONCEPTOS.filter((c) => c.concepto !== "COMIDAS")
+        : CONCEPTOS,
+    [sesion?.rol],
+  );
+
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -39,6 +49,9 @@ export function FormNuevoReembolso() {
       setError("Completa todos los campos obligatorios"); return;
     }
     if (!(m > 0)) { setError("El monto debe ser mayor a 0"); return; }
+    if (sesion.rol === "caja_chica" && concepto === "COMIDAS") {
+      setError("Las comidas se registran desde el módulo de Comidas, no aquí."); return;
+    }
     if (fecha > maxFecha()) { setError("La fecha no puede ser mayor a mañana"); return; }
     const errArch = validarArchivos(archivos);
     if (errArch) { setError(errArch); return; }
@@ -88,7 +101,7 @@ export function FormNuevoReembolso() {
         <label className={labelClass}>Concepto *</label>
         <select className={inputClass} value={concepto} onChange={(e) => setConcepto(e.target.value)}>
           <option value="">Selecciona…</option>
-          {CONCEPTOS.map((c) => <option key={c.concepto} value={c.concepto}>{c.concepto}</option>)}
+          {conceptosDisponibles.map((c) => <option key={c.concepto} value={c.concepto}>{c.concepto}</option>)}
         </select>
       </div>
       <div className="mb-4">
