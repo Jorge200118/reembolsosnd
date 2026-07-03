@@ -16,7 +16,8 @@ export default function PagoComidasPage() {
   const queryClient = useQueryClient();
   const { data: comidas, isLoading } = useComidasPendientes();
 
-  const esViernes = new Date().getDay() === 5;
+  const diaSemana = new Date().getDay();
+  const esDiaHabil = diaSemana >= 1 && diaSemana <= 5;
   const lista = comidas ?? [];
   const totalGeneral = lista.reduce((s, c) => s + Number(c.total), 0);
   const totalComidas = lista.reduce((s, c) => s + c.numComidas, 0);
@@ -34,13 +35,13 @@ export default function PagoComidasPage() {
         <span className="font-semibold uppercase tracking-wide">Cajera:</span> {sesion?.nombre ?? "—"}
       </div>
 
-      {!esViernes && (
+      {!esDiaHabil && (
         <Card className="mb-4 border-l-4 border-l-red-400 bg-red-50 p-4 sm:p-6">
           <div className="flex items-start gap-3">
             <span className="text-2xl">🔒</span>
             <div className="min-w-0 flex-1">
               <div className="font-semibold text-red-700">Pagos deshabilitados</div>
-              <div className="text-sm text-red-600 break-words">Los pagos de comidas solo se pueden realizar los <strong>viernes</strong>.</div>
+              <div className="text-sm text-red-600 break-words">Los pagos de comidas solo se pueden realizar de <strong>lunes a viernes</strong>.</div>
             </div>
           </div>
         </Card>
@@ -81,8 +82,8 @@ export default function PagoComidasPage() {
                         {c.estatus === "ok" && c.empleadoId != null ? (
                           <button
                             className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-40"
-                            disabled={cajeraEmail === "" || !esViernes}
-                            title={!esViernes ? "Solo los viernes" : undefined}
+                            disabled={cajeraEmail === "" || !esDiaHabil}
+                            title={!esDiaHabil ? "Solo de lunes a viernes" : undefined}
                             onClick={() => setModalChofer({ empleadoId: c.empleadoId as number, nombre: c.nombre })}
                           >
                             Cobrar con código
