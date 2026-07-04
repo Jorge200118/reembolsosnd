@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useReembolsos } from "@/lib/hooks/useReembolsos";
 import { useSolicitarEntrega, useMarcarEntregado } from "@/lib/hooks/useEntregas";
-import { agruparPorLote, type Fila } from "@/lib/reportes/agruparPorLote";
+import { agruparPorLote, type Fila, type GrupoLote } from "@/lib/reportes/agruparPorLote";
 import { imprimirComprobanteLote } from "@/lib/entregas/comprobanteImprimible";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -50,6 +50,7 @@ export default function EntregasPage() {
   const entregar = useMarcarEntregado();
   const queryClient = useQueryClient();
   const [msg, setMsg] = useState("");
+  const [busqueda, setBusqueda] = useState("");
   const [evidenciaPorLote, setEvidenciaPorLote] = useState<Record<string, File | null>>({});
 
   const aprobados = useMemo(() => (aprobadosQ.data?.rows ?? []) as Fila[], [aprobadosQ.data]);
@@ -57,6 +58,23 @@ export default function EntregasPage() {
 
   const lotesAprobados = useMemo(() => agruparPorLote(aprobados, "numero_lote"), [aprobados]);
   const lotesSolicitados = useMemo(() => agruparPorLote(solicitados, "numero_lote"), [solicitados]);
+
+  // Filtrado en cliente por número de lote, sucursal o número de solicitud.
+  const filtrar = useMemo(() => {
+    const q = busqueda.trim().toLowerCase();
+    return (grupos: GrupoLote[]) => {
+      if (!q) return grupos;
+      return grupos.filter((g) => {
+        const lote = g.lote.toLowerCase();
+        const sucursal = g.sucursal.toLowerCase();
+        const solicitud = (g.numeroSolicitud ?? "").toLowerCase();
+        return lote.includes(q) || sucursal.includes(q) || solicitud.includes(q);
+      });
+    };
+  }, [busqueda]);
+
+  const aprobadosVisibles = useMemo(() => filtrar(lotesAprobados), [filtrar, lotesAprobados]);
+  const solicitadosVisibles = useMemo(() => filtrar(lotesSolicitados), [filtrar, lotesSolicitados]);
 
   function refrescar() {
     queryClient.invalidateQueries({ queryKey: ["reembolsos"] });
@@ -106,15 +124,40 @@ export default function EntregasPage() {
       <PageHeader titulo="Entregas" subtitulo="Solicita la entrega de lotes aprobados y confirma la entrega con evidencia" />
       {msg && <p className="mb-3 rounded-lg bg-slate-100 px-3 py-1.5 text-sm text-slate-700">{msg}</p>}
 
+      <div className="mb-4 flex items-center gap-2">
+        <div className="relative flex-1 sm:max-w-sm">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+          </span>
+          <input
+            type="search"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            placeholder="Buscar por lote, sucursal o solicitud…"
+            className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-100"
+          />
+        </div>
+        {busqueda && (
+          <span className="text-xs text-slate-500">
+            {aprobadosVisibles.length + solicitadosVisibles.length} lote(s)
+          </span>
+        )}
+      </div>
+
       <section className="mb-6">
         <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-700">
           Aprobados · listos para solicitar entrega ({aprobados.length})
         </h2>
-        {lotesAprobados.length === 0 ? (
-          <Card className="p-4 text-center text-sm text-slate-400 sm:p-6">No hay lotes aprobados pendientes.</Card>
+        {aprobadosVisibles.length === 0 ? (
+          <Card className="p-4 text-center text-sm text-slate-400 sm:p-6">
+            {busqueda ? "Ningún lote aprobado coincide con la búsqueda." : "No hay lotes aprobados pendientes."}
+          </Card>
         ) : (
           <div className="space-y-3">
-            {lotesAprobados.map((g) => (
+            {aprobadosVisibles.map((g) => (
               <LoteCard
                 key={g.lote}
                 lote={g.lote}
@@ -139,11 +182,13 @@ export default function EntregasPage() {
         <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-amber-700">
           Esperando entrega ({solicitados.length})
         </h2>
-        {lotesSolicitados.length === 0 ? (
-          <Card className="p-4 text-center text-sm text-slate-400 sm:p-6">No hay lotes esperando entrega.</Card>
+        {solicitadosVisibles.length === 0 ? (
+          <Card className="p-4 text-center text-sm text-slate-400 sm:p-6">
+            {busqueda ? "Ningún lote esperando entrega coincide con la búsqueda." : "No hay lotes esperando entrega."}
+          </Card>
         ) : (
           <div className="space-y-3">
-            {lotesSolicitados.map((g) => (
+            {solicitadosVisibles.map((g) => (
               <LoteCard
                 key={g.lote}
                 lote={g.lote}

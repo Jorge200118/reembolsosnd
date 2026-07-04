@@ -32,21 +32,38 @@ function Metrica({ etiqueta, valor }: { etiqueta: string; valor: React.ReactNode
 export default function RevisionPage() {
   const { sesion } = useAuth();
   const [page, setPage] = useState(0);
+  const [busqueda, setBusqueda] = useState("");
   const pageSize = 20;
-  const pendientesQ = useReembolsos({ estado: "pendiente", page, pageSize });
+  const pendientesQ = useReembolsos({ estado: "pendiente", page: 0, pageSize: 500 });
   const enCorteQ = useReembolsos({ estado: "en_corte", page: 0, pageSize: 1 });
   const { mutate, isPending, data: resultado } = useEnviarACorte();
   const queryClient = useQueryClient();
   const [msg, setMsg] = useState("");
 
   const pendientes = useMemo(() => (pendientesQ.data?.rows ?? []) as Fila[], [pendientesQ.data]);
-  const totalPendientes = pendientesQ.data?.total ?? 0;
   const totalEnCorte = enCorteQ.data?.total ?? 0;
 
   const totalMonto = useMemo(() => pendientes.reduce((s, r) => s + Number(r.monto ?? 0), 0), [pendientes]);
   const totalComprobantes = useMemo(
     () => pendientes.reduce((s, r) => s + (Array.isArray(r.archivos) ? r.archivos.length : 0), 0),
     [pendientes],
+  );
+
+  // Filtrado en cliente por beneficiario o concepto sobre todos los pendientes.
+  const filtrados = useMemo(() => {
+    const q = busqueda.trim().toLowerCase();
+    if (!q) return pendientes;
+    return pendientes.filter((r) => {
+      const beneficiario = String(r.nombre_beneficiario ?? "").toLowerCase();
+      const concepto = String(r.concepto ?? "").toLowerCase();
+      return beneficiario.includes(q) || concepto.includes(q);
+    });
+  }, [pendientes, busqueda]);
+
+  const totalPendientes = filtrados.length;
+  const paginaActual = useMemo(
+    () => filtrados.slice(page * pageSize, page * pageSize + pageSize),
+    [filtrados, page, pageSize],
   );
 
   function onEnviarACorte() {
@@ -84,7 +101,7 @@ export default function RevisionPage() {
         <div className="mb-3 flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:flex-wrap sm:items-center">
           <div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
             <Metrica etiqueta="Total" valor={<Money monto={parseMonto(totalMonto)} />} />
-            <Metrica etiqueta="Solicitudes" valor={totalPendientes} />
+            <Metrica etiqueta="Solicitudes" valor={pendientes.length} />
             <Metrica etiqueta="Comprobantes" valor={`${totalComprobantes} img`} />
             <Metrica etiqueta="Se enviará" valor="1 correo" />
           </div>
@@ -96,8 +113,28 @@ export default function RevisionPage() {
             {isPending ? "Enviando…" : "Enviar a corte (correo a Fernando)"}
           </button>
         </div>
+        <div className="mb-3 flex items-center gap-2">
+          <div className="relative flex-1 sm:max-w-xs">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </span>
+            <input
+              type="search"
+              value={busqueda}
+              onChange={(e) => { setBusqueda(e.target.value); setPage(0); }}
+              placeholder="Buscar por beneficiario o concepto…"
+              className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
+            />
+          </div>
+          {busqueda && (
+            <span className="text-xs text-slate-500">{totalPendientes} resultado(s)</span>
+          )}
+        </div>
         <DataTable
-          rows={pendientes}
+          rows={paginaActual}
           columnas={columnas}
           total={totalPendientes}
           page={page}
