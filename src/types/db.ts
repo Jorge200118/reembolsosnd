@@ -1437,16 +1437,19 @@ export type Database = {
       rnd_reembolsos: {
         Row: {
           archivos: Json | null
+          autorizado_por: string | null
           concepto: string
           created_at: string | null
           documentos_adicionales: Json | null
           estado: string | null
           evidencia_entrega: Json | null
           fecha: string
+          fecha_autorizacion: string | null
           fecha_entrega: string | null
           fecha_registro: string | null
           id: string
           monto: number
+          motivo_rechazo: string | null
           nombre_beneficiario: string
           numero_lote: string | null
           numero_solicitud: string | null
@@ -1459,16 +1462,19 @@ export type Database = {
         }
         Insert: {
           archivos?: Json | null
+          autorizado_por?: string | null
           concepto: string
           created_at?: string | null
           documentos_adicionales?: Json | null
           estado?: string | null
           evidencia_entrega?: Json | null
           fecha: string
+          fecha_autorizacion?: string | null
           fecha_entrega?: string | null
           fecha_registro?: string | null
           id?: string
           monto: number
+          motivo_rechazo?: string | null
           nombre_beneficiario: string
           numero_lote?: string | null
           numero_solicitud?: string | null
@@ -1481,16 +1487,19 @@ export type Database = {
         }
         Update: {
           archivos?: Json | null
+          autorizado_por?: string | null
           concepto?: string
           created_at?: string | null
           documentos_adicionales?: Json | null
           estado?: string | null
           evidencia_entrega?: Json | null
           fecha?: string
+          fecha_autorizacion?: string | null
           fecha_entrega?: string | null
           fecha_registro?: string | null
           id?: string
           monto?: number
+          motivo_rechazo?: string | null
           nombre_beneficiario?: string
           numero_lote?: string | null
           numero_solicitud?: string | null
