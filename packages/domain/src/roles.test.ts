@@ -30,3 +30,14 @@ describe("roles", () => {
     expect(tabsDeRol("gerente")).toEqual(["comidas-gerente"]);
   });
 });
+
+describe("rol autorizador", () => {
+  it("normaliza 'autorizador' a 'autorizador'", () => {
+    expect(normalizarRol("autorizador")).toBe("autorizador");
+    expect(normalizarRol("  Autorizador ")).toBe("autorizador");
+  });
+  it("el autorizador solo ve el tab autorizaciones", () => {
+    expect(ROL_TABS.autorizador).toEqual(["autorizaciones"]);
+    expect(tabsDeRol("autorizador")).toEqual(["autorizaciones"]);
+  });
+});

@@ -1,4 +1,4 @@
-export const ROLES = ["admin", "caja_chica", "gerente"] as const;
+export const ROLES = ["admin", "caja_chica", "gerente", "autorizador"] as const;
 export type Rol = (typeof ROLES)[number];
 
 export type TabId =
@@ -8,7 +8,8 @@ export type TabId =
   | "reportes"
   | "dashboard"
   | "comidas-gerente"
-  | "pago-comidas";
+  | "pago-comidas"
+  | "autorizaciones";
 
 /**
  * Normaliza el rol crudo de rnd_usuarios. 'administracion' era un rol roto
@@ -19,6 +20,7 @@ export function normalizarRol(raw: string): Rol {
   const r = raw.trim().toLowerCase();
   if (r === "administracion" || r === "admin") return "admin";
   if (r === "gerente") return "gerente";
+  if (r === "autorizador") return "autorizador";
   return "caja_chica";
 }
 
@@ -32,6 +34,7 @@ export const ROL_TABS: Record<Rol, readonly TabId[]> = {
   ],
   caja_chica: ["nuevo-reembolso", "revision", "reportes", "pago-comidas"],
   gerente: ["comidas-gerente"],
+  autorizador: ["autorizaciones"],
 };
 
 export function tabsDeRol(rol: Rol): readonly TabId[] {
