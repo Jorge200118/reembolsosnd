@@ -83,7 +83,7 @@ export default function RevisionPage() {
       { reembolsosPendientes: lista, numeroLote: lote, emailRemitente: sesion.email, nombreRemitente: sesion.nombre, sucursalUsuario: sesion.sucursal },
       {
         onSuccess: (res) => {
-          setMsg(res.ok ? `✅ Correo enviado. Lote ${res.numeroLoteCompleto} · ${res.actualizados} en corte.` : `⚠ ${res.error}`);
+          setMsg(res.ok ? `✅ Lote ${res.numeroLoteCompleto} enviado a corte · ${res.actualizados} en corte.` : `⚠ ${res.error}`);
           if (res.ok) queryClient.invalidateQueries({ queryKey: ["reembolsos"] });
         },
       },
@@ -92,7 +92,7 @@ export default function RevisionPage() {
 
   return (
     <main className="mx-auto max-w-6xl p-4 sm:p-6">
-      <PageHeader titulo="Revisión" subtitulo="Arma el lote de pendientes y envíalo a corte por correo" />
+      <PageHeader titulo="Revisión" subtitulo="Arma el lote de pendientes y envíalo a corte" />
       {msg && (
         <p className={`mb-4 rounded-lg px-3 py-2 text-sm ${resultado?.ok ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>{msg}</p>
       )}
@@ -103,14 +103,14 @@ export default function RevisionPage() {
             <Metrica etiqueta="Total" valor={<Money monto={parseMonto(totalMonto)} />} />
             <Metrica etiqueta="Solicitudes" valor={pendientes.length} />
             <Metrica etiqueta="Comprobantes" valor={`${totalComprobantes} img`} />
-            <Metrica etiqueta="Se enviará" valor="1 correo" />
+            <Metrica etiqueta="Lotes" valor="1 corte" />
           </div>
           <button
             onClick={onEnviarACorte}
             disabled={isPending || pendientes.length === 0}
             className="w-full rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-800 disabled:opacity-40 sm:w-auto"
           >
-            {isPending ? "Enviando…" : "Enviar a corte (correo a Fernando)"}
+            {isPending ? "Enviando…" : "Enviar a corte"}
           </button>
         </div>
         <div className="mb-3 flex items-center gap-2">
@@ -148,7 +148,7 @@ export default function RevisionPage() {
         <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
           <div>
             <h2 className="text-base font-semibold text-slate-800">En proceso · esperando respuesta ({totalEnCorte})</h2>
-            <p className="mt-0.5 text-sm text-slate-600">Estos lotes ya se enviaron a Fernando. Él responde AUTORIZO/RECHAZO por correo.</p>
+            <p className="mt-0.5 text-sm text-slate-600">Estos lotes están en corte, pendientes de autorización por el Lic Fernando en su módulo.</p>
           </div>
           <button
             onClick={() => queryClient.invalidateQueries({ queryKey: ["reembolsos"] })}
