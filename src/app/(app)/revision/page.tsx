@@ -76,11 +76,10 @@ export default function RevisionPage() {
       concepto: String(r.concepto ?? ""),
       fecha: String(r.fecha ?? ""),
       monto: Number(r.monto),
-      archivos: (r.archivos as unknown[]) ?? [],
     }));
     setMsg("");
     mutate(
-      { reembolsosPendientes: lista, numeroLote: lote, emailRemitente: sesion.email, nombreRemitente: sesion.nombre, sucursalUsuario: sesion.sucursal },
+      { reembolsosPendientes: lista, numeroLote: lote, nombreRemitente: sesion.nombre },
       {
         onSuccess: (res) => {
           setMsg(res.ok ? `✅ Lote ${res.numeroLoteCompleto} enviado a corte · ${res.actualizados} en corte.` : `⚠ ${res.error}`);

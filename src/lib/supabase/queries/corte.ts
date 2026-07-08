@@ -6,15 +6,12 @@ export interface ReembolsoLite {
   concepto: string;
   fecha: string;
   monto: number;
-  archivos?: unknown[] | null;
 }
 
 export interface EnviarACorteInput {
   reembolsosPendientes: ReembolsoLite[];
   numeroLote: string;      // solo dígitos, validado en la UI
-  emailRemitente: string;  // sesion.email
-  nombreRemitente: string; // sesion.nombre
-  sucursalUsuario: string | null; // sesion.sucursal
+  nombreRemitente: string; // sesion.nombre — usado para el sufijo del número de lote
 }
 
 export interface EnviarACorteResult {
@@ -47,7 +44,6 @@ export async function enviarACorte(input: EnviarACorteInput): Promise<EnviarACor
   }
   const loteCompleto = numeroLoteCompleto(input.numeroLote, input.nombreRemitente);
 
-  // Ya NO se manda correo a Fernando: el lote aparece en su módulo de Autorizaciones.
   let actualizados = 0;
   for (const r of input.reembolsosPendientes) {
     const { error } = await supabase

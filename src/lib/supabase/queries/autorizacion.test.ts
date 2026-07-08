@@ -1,14 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // El cliente Supabase se mockea: cada .update(vals) registra vals y .eq() resuelve
-// sin error. Así el test verifica el comportamiento (qué se escribe), no el mock.
+// según `forzarError`. Así el test verifica el comportamiento (qué se escribe y qué
+// pasa cuando las escrituras fallan), no el mock.
 const updates: Array<Record<string, unknown>> = [];
+let forzarError = false;
 vi.mock("@/lib/supabase/client", () => ({
   supabase: {
     from: () => ({
       update: (vals: Record<string, unknown>) => {
         updates.push(vals);
-        return { eq: () => Promise.resolve({ error: null }) };
+        return { eq: () => Promise.resolve({ error: forzarError ? { message: "boom" } : null }) };
       },
     }),
   },
@@ -18,6 +20,7 @@ import { autorizarLote, rechazarLote } from "./autorizacion";
 
 beforeEach(() => {
   updates.length = 0;
+  forzarError = false;
 });
 
 describe("autorizarLote", () => {
@@ -32,6 +35,13 @@ describe("autorizarLote", () => {
   it("devuelve error si no hay ids", async () => {
     const res = await autorizarLote([], "Lic Fernando");
     expect(res.ok).toBe(false);
+  });
+  it("devuelve ok:false si todas las escrituras fallan", async () => {
+    forzarError = true;
+    const res = await autorizarLote(["a", "b"], "Lic Fernando");
+    expect(res.ok).toBe(false);
+    expect(res.actualizados).toBe(0);
+    expect(res.error).toBeTruthy();
   });
 });
 

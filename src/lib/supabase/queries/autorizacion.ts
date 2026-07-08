@@ -21,6 +21,8 @@ export async function autorizarLote(
       .eq("id", id);
     if (!error) actualizados++;
   }
+  // Si ninguna fila se pudo actualizar, es un fallo (no un éxito con 0).
+  if (actualizados === 0) return { ok: false, actualizados, error: "No se pudo actualizar ningún reembolso" };
   return { ok: true, actualizados };
 }
 
@@ -40,5 +42,7 @@ export async function rechazarLote(
       .eq("id", id);
     if (!error) actualizados++;
   }
+  // Si ninguna fila se pudo actualizar, es un fallo (no un éxito con 0).
+  if (actualizados === 0) return { ok: false, actualizados, error: "No se pudo actualizar ningún reembolso" };
   return { ok: true, actualizados };
 }
