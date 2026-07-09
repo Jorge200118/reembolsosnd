@@ -9,12 +9,20 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { LoteCard } from "@/components/ui/LoteCard";
 import { Money } from "@/components/ui/Money";
-import { parseMonto, normalizarArchivos } from "@devoluciones/domain";
+import { ComprobantesModal } from "@/components/ui/ComprobantesModal";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { parseMonto, formatMXN, normalizarArchivos } from "@devoluciones/domain";
 
 const BTN_OK = "rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-40";
 const BTN_NO = "rounded-lg bg-red-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-40";
 
-function TablaDetalle({ reembolsos }: { reembolsos: Fila[] }) {
+function TablaDetalle({
+  reembolsos,
+  onVerComprobantes,
+}: {
+  reembolsos: Fila[];
+  onVerComprobantes: (reembolso: Fila) => void;
+}) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -40,14 +48,13 @@ function TablaDetalle({ reembolsos }: { reembolsos: Fila[] }) {
                   {archivos.length === 0 ? (
                     <span className="text-slate-400">—</span>
                   ) : (
-                    <div className="flex flex-wrap gap-1.5">
-                      {archivos.map((a, i) => (
-                        <a key={i} href={a.url} target="_blank" rel="noopener noreferrer"
-                           className="rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100">
-                          Ver {archivos.length > 1 ? i + 1 : ""}
-                        </a>
-                      ))}
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => onVerComprobantes(r)}
+                      className="rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100"
+                    >
+                      Ver{archivos.length > 1 ? ` (${archivos.length})` : ""}
+                    </button>
                   )}
                 </td>
               </tr>
@@ -67,8 +74,8 @@ export default function AutorizacionesPage() {
   const queryClient = useQueryClient();
   const [msg, setMsg] = useState("");
   const [busqueda, setBusqueda] = useState("");
-  const [motivoAbierto, setMotivoAbierto] = useState<Record<string, boolean>>({});
-  const [motivoPorLote, setMotivoPorLote] = useState<Record<string, string>>({});
+  const [verComprobantesDe, setVerComprobantesDe] = useState<Fila | null>(null);
+  const [confirmar, setConfirmar] = useState<{ tipo: "autorizar" | "rechazar"; grupo: GrupoLote } | null>(null);
 
   const enCorte = useMemo(() => (enCorteQ.data?.rows ?? []) as Fila[], [enCorteQ.data]);
   const lotes = useMemo(() => agruparPorLote(enCorte, "numero_lote"), [enCorte]);
@@ -87,24 +94,25 @@ export default function AutorizacionesPage() {
   }
 
   function onAutorizar(g: GrupoLote) {
-    if (!confirm(`¿Autorizar el lote ${g.lote}?\n\n${g.reembolsos.length} reembolsos · Total $${g.total.toLocaleString()}`)) return;
     const ids = g.reembolsos.map((r) => String(r.id));
     setMsg("");
     autorizar.mutate({ ids, autorizadoPor: sesion?.nombre ?? "Autorizador" }, {
       onSuccess: (res) => {
         setMsg(res.ok ? `✅ Lote ${g.lote} autorizado (${res.actualizados} reembolsos)` : `⚠ ${res.error}`);
         if (res.ok) refrescar();
+        setConfirmar(null);
       },
     });
   }
 
-  function onRechazar(g: GrupoLote) {
+  function onRechazar(g: GrupoLote, motivo?: string) {
     const ids = g.reembolsos.map((r) => String(r.id));
     setMsg("");
-    rechazar.mutate({ ids, autorizadoPor: sesion?.nombre ?? "Autorizador", motivo: motivoPorLote[g.lote] }, {
+    rechazar.mutate({ ids, autorizadoPor: sesion?.nombre ?? "Autorizador", motivo }, {
       onSuccess: (res) => {
         setMsg(res.ok ? `Lote ${g.lote} rechazado (${res.actualizados} reembolsos)` : `⚠ ${res.error}`);
-        if (res.ok) { setMotivoAbierto((p) => ({ ...p, [g.lote]: false })); refrescar(); }
+        if (res.ok) refrescar();
+        setConfirmar(null);
       },
     });
   }
@@ -145,38 +153,60 @@ export default function AutorizacionesPage() {
               chipTono="cyan"
               accion={
                 <div className="flex flex-wrap gap-2">
-                  <button className={BTN_OK} disabled={autorizar.isPending} onClick={() => onAutorizar(g)}>
+                  <button className={BTN_OK} disabled={autorizar.isPending} onClick={() => setConfirmar({ tipo: "autorizar", grupo: g })}>
                     Autorizar
                   </button>
-                  <button className={BTN_NO} disabled={rechazar.isPending}
-                          onClick={() => setMotivoAbierto((p) => ({ ...p, [g.lote]: !p[g.lote] }))}>
+                  <button className={BTN_NO} disabled={rechazar.isPending} onClick={() => setConfirmar({ tipo: "rechazar", grupo: g })}>
                     Rechazar
                   </button>
                 </div>
               }
               detalle={
-                <div className="space-y-3">
-                  <TablaDetalle reembolsos={g.reembolsos} />
-                  {motivoAbierto[g.lote] && (
-                    <div className="flex flex-wrap items-center gap-2 rounded-lg bg-white p-2.5">
-                      <input
-                        type="text"
-                        value={motivoPorLote[g.lote] ?? ""}
-                        onChange={(e) => setMotivoPorLote((p) => ({ ...p, [g.lote]: e.target.value }))}
-                        placeholder="Motivo del rechazo (opcional)"
-                        className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
-                      />
-                      <button className={BTN_NO} disabled={rechazar.isPending} onClick={() => onRechazar(g)}>
-                        Confirmar rechazo
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <TablaDetalle reembolsos={g.reembolsos} onVerComprobantes={setVerComprobantesDe} />
               }
             />
           ))}
         </div>
       )}
+
+      {verComprobantesDe && (() => {
+        const r = verComprobantesDe;
+        const nombre = String(r.nombre_beneficiario ?? "");
+        const monto = formatMXN(parseMonto(r.monto as number));
+        const concepto = String(r.concepto ?? "");
+        const fecha = r.fecha ? new Date(String(r.fecha) + "T12:00:00").toLocaleDateString("es-MX") : "";
+        const subtitulo = [concepto, fecha].filter(Boolean).join(" · ");
+        return (
+          <ComprobantesModal
+            titulo={`${nombre} - ${monto}`}
+            subtitulo={subtitulo || undefined}
+            archivos={normalizarArchivos(r.archivos)}
+            onClose={() => setVerComprobantesDe(null)}
+          />
+        );
+      })()}
+
+      {confirmar && (() => {
+        const g = confirmar.grupo;
+        const n = g.reembolsos.length;
+        const total = g.total.toLocaleString("es-MX");
+        const esAutorizar = confirmar.tipo === "autorizar";
+        return (
+          <ConfirmDialog
+            titulo={esAutorizar ? `Autorizar lote ${g.lote}` : `Rechazar lote ${g.lote}`}
+            mensaje={<span>{n} reembolsos · Total <strong>${total}</strong></span>}
+            textoConfirmar={esAutorizar ? "Autorizar" : "Rechazar"}
+            colorConfirmar={esAutorizar ? "verde" : "rojo"}
+            conMotivo={!esAutorizar}
+            isPending={autorizar.isPending || rechazar.isPending}
+            onCancelar={() => setConfirmar(null)}
+            onConfirmar={(motivo) => {
+              if (esAutorizar) onAutorizar(g);
+              else onRechazar(g, motivo);
+            }}
+          />
+        );
+      })()}
     </main>
   );
 }
