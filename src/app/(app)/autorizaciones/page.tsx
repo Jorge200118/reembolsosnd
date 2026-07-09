@@ -133,10 +133,18 @@ export default function AutorizacionesPage() {
       </div>
 
       <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-blue-700">
-        Pendientes de autorizar ({lotes.length})
+        Pendientes de autorizar ({enCorteQ.isLoading ? "…" : lotes.length})
       </h2>
 
-      {visibles.length === 0 ? (
+      {enCorteQ.isLoading ? (
+        <Card className="flex flex-col items-center justify-center gap-3 p-10 text-sm text-slate-500">
+          <svg className="h-8 w-8 animate-spin text-blue-600" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.4 0 0 5.4 0 12h4z" />
+          </svg>
+          Cargando lotes…
+        </Card>
+      ) : visibles.length === 0 ? (
         <Card className="p-4 text-center text-sm text-slate-400 sm:p-6">
           {busqueda ? "Ningún lote coincide con la búsqueda." : "No hay lotes pendientes de autorizar."}
         </Card>
