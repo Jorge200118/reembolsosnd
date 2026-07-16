@@ -108,18 +108,17 @@ Deno.serve(async (req: Request) => {
       const salt = crypto.randomUUID();
       const hash = await hashOtp(salt, codigo);
 
-      const { error: errUp } = await supabase.from("rnd_comida_otp").upsert({
-        empleado_id: empleadoId,
-        semana,
-        otp_hash: hash,
-        otp_salt: salt,
-        estado: "generado",
-        intentos: 0,
-        expira_en: expiraEn,
-        reembolso_ids: info.reembolsoIds,
-        telefono: info.telefono,
-      }, { onConflict: "empleado_id,semana" });
-      if (errUp) { console.error("upsert otp err", errUp); continue; }
+      const { error: errUp } = await supabase.rpc("registrar_otp_comida", {
+        p_empleado_id: empleadoId,
+        p_semana: semana,
+        p_codigo: codigo,
+        p_otp_hash: hash,
+        p_otp_salt: salt,
+        p_expira_en: expiraEn,
+        p_reembolso_ids: info.reembolsoIds,
+        p_telefono: info.telefono,
+      });
+      if (errUp) { console.error("registrar_otp err", errUp); continue; }
 
       const mensaje =
         `*ACEROS CABOS - Pago de Comidas*\n\nTu código para cobrar tus comidas de la semana es:\n\n*${codigo}*\n\n` +
