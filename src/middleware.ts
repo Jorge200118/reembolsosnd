@@ -6,6 +6,7 @@ import {
   type Rol,
   type TabId,
 } from "@devoluciones/domain";
+import { verificarEmpSesion, NOMBRE_COOKIE_EMP } from "@/lib/auth/empleadoSesion";
 
 // Protege las rutas de la app. Dos capas:
 //  1) Autenticación: si no hay cookie de sesión válida, redirige a /login.
@@ -37,7 +38,33 @@ function leerRol(req: NextRequest): Rol | null {
   }
 }
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
+  const path = req.nextUrl.pathname;
+
+  // --- Mundo EMPLEADO: rutas /empleado con sesión emp_sesion firmada (HMAC) ---
+  // Independiente del mundo de personal. Las públicas (login/registro) no se custodian.
+  if (path.startsWith("/empleado")) {
+    const esPublica =
+      path.startsWith("/empleado/login") ||
+      path.startsWith("/empleado/registro") ||
+      path.startsWith("/empleado/reset");
+    const token = req.cookies.get(NOMBRE_COOKIE_EMP)?.value;
+    const secret = process.env.EMP_SESION_SECRET ?? "";
+    const sesion = token && secret ? await verificarEmpSesion(token, secret) : null;
+    if (!sesion && !esPublica) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/empleado/login";
+      return NextResponse.redirect(url);
+    }
+    if (sesion && esPublica) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/empleado";
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
+  }
+
+  // --- Mundo PERSONAL (lógica existente, sin cambios) ---
   const rol = leerRol(req);
   const tieneSesion = rol !== null;
   const esLogin = req.nextUrl.pathname.startsWith("/login");

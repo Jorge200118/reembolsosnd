@@ -1,0 +1,15 @@
+{
+  "name": "Vales AC — Aceros del Pacífico",
+  "short_name": "Vales AC",
+  "description": "Consulta tus vales de comida y tu código para cobrar.",
+  "start_url": "/empleado",
+  "scope": "/empleado",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef2f7",
+  "theme_color": "#0f2942",
+  "lang": "es-MX",
+  "icons": [
+    { "src": "/icons/vales.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

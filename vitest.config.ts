@@ -10,7 +10,7 @@ export default defineConfig({
     // cliente de Supabase (que lee process.env al importarse) tenga las
     // credenciales disponibles.
     setupFiles: ["./vitest.setup.ts"],
-    include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    include: ["src/**/*.{test,spec}.{ts,tsx}", "supabase/functions/**/*.{test,spec}.ts"],
     // Los packages del workspace (p.ej. packages/domain) tienen su propio
     // vitest.config.ts. Excluirlos aquí evita que la app intente correr sus
     // tests con este setup (que carga .env.local). Se preservan los defaults
