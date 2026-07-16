@@ -17,5 +17,5 @@ export async function POST(req: Request) {
     body: JSON.stringify({ empleado_id: sesion.empleadoId, regenerar: Boolean(regenerar) }),
   });
   const data = await res.json();
-  return NextResponse.json({ ok: true, ...data });
+  return NextResponse.json({ ok: true, nombre: sesion.nombre, ...data });
 }
