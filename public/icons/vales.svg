@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0f2942"/>
+  <text x="50%" y="52%" dominant-baseline="central" text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif" font-weight="700"
+        font-size="230" fill="#ffffff" font-style="italic">AC</text>
+  <rect x="120" y="360" width="272" height="26" rx="13" fill="#2563eb"/>
+</svg>
