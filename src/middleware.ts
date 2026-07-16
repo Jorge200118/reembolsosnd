@@ -45,7 +45,9 @@ export async function middleware(req: NextRequest) {
   // Independiente del mundo de personal. Las públicas (login/registro) no se custodian.
   if (path.startsWith("/empleado")) {
     const esPublica =
-      path.startsWith("/empleado/login") || path.startsWith("/empleado/registro");
+      path.startsWith("/empleado/login") ||
+      path.startsWith("/empleado/registro") ||
+      path.startsWith("/empleado/reset");
     const token = req.cookies.get(NOMBRE_COOKIE_EMP)?.value;
     const secret = process.env.EMP_SESION_SECRET ?? "";
     const sesion = token && secret ? await verificarEmpSesion(token, secret) : null;
