@@ -1,0 +1,119 @@
+/* ===== Sistema visual — app de empleados (colores Aceros del Pacífico) ===== */
+.carnet {
+  --marino: #0f2942;        /* azul marino de la marca */
+  --marino-2: #163a5f;
+  --azul: #2563eb;          /* azul de acento */
+  --azul-hondo: #1d4ed8;
+  --fondo: #eef2f7;
+  --card: #ffffff;
+  --tinta: #0f2942;
+  --tinta-suave: #5b6b82;
+  --linea: rgba(15, 41, 66, 0.12);
+  --error: #b91c1c;
+
+  min-height: 100dvh;
+  background:
+    radial-gradient(120% 80% at 50% -10%, #ffffff 0%, var(--fondo) 55%, #e2e9f2 100%);
+  color: var(--tinta);
+  font-family: var(--font-work), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.carnet-wrap {
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 28px 22px 40px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.carnet h1, .carnet h2, .carnet .serif {
+  font-family: var(--font-fraunces), Georgia, serif;
+}
+
+.carnet-stencil {
+  font-family: var(--font-work), sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--tinta-suave);
+}
+
+/* Marca / logo */
+.carnet-logo {
+  width: 66px; height: 66px; border-radius: 16px;
+  background: var(--marino); color: #ffffff;
+  font-family: var(--font-fraunces), serif; font-weight: 600; font-size: 26px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 20px auto 14px;
+  box-shadow: 0 10px 26px -12px rgba(15, 41, 66, 0.55);
+}
+.carnet-marca { text-align: center; font-size: 30px; font-weight: 600; font-style: italic; line-height: 1; color: var(--marino); }
+.carnet-sub { text-align: center; margin-top: 8px; }
+
+/* Tarjeta */
+.carnet-card {
+  background: var(--card);
+  border: 1px solid var(--linea);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 4px 0 #dde5ef, 0 18px 40px -26px rgba(15, 41, 66, 0.4);
+}
+
+/* Campos */
+.carnet-field { margin-bottom: 16px; }
+.carnet-field label { display: block; margin-bottom: 7px; }
+.carnet-input {
+  width: 100%;
+  background: #f8fafc;
+  border: 1.5px solid var(--linea);
+  border-bottom: 2.5px solid rgba(15, 41, 66, 0.25);
+  border-radius: 10px;
+  padding: 13px 14px;
+  font-family: var(--font-work), sans-serif;
+  font-size: 16px;
+  color: var(--tinta);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.carnet-input:focus { border-color: var(--azul); }
+.carnet-input::placeholder { color: #9aa8bb; }
+.carnet-input.nip { letter-spacing: 0.4em; font-size: 18px; }
+
+/* Botón principal */
+.carnet-btn {
+  width: 100%;
+  background: var(--azul);
+  color: #ffffff;
+  font-family: var(--font-fraunces), serif;
+  font-weight: 600;
+  font-size: 17px;
+  border: none;
+  border-radius: 12px;
+  padding: 15px;
+  cursor: pointer;
+  box-shadow: 0 8px 0 var(--azul-hondo);
+  transition: transform 0.05s, box-shadow 0.05s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.carnet-btn:active { transform: translateY(4px); box-shadow: 0 4px 0 var(--azul-hondo); }
+.carnet-btn:disabled { opacity: 0.6; cursor: default; box-shadow: 0 8px 0 var(--azul-hondo); }
+
+.carnet-link {
+  display: block; text-align: center; margin-top: 18px;
+  color: var(--azul); font-weight: 600; font-size: 14px; text-decoration: none;
+}
+.carnet-link:hover { text-decoration: underline; }
+
+/* Mensaje inline de error (NADA de alert) */
+.carnet-error {
+  margin-top: 4px; margin-bottom: 12px;
+  background: rgba(185, 28, 28, 0.08);
+  border: 1px solid rgba(185, 28, 28, 0.28);
+  color: var(--error);
+  border-radius: 10px; padding: 10px 12px; font-size: 14px; font-weight: 500;
+}
+
+.carnet-foot { margin-top: auto; text-align: center; padding-top: 24px; }
