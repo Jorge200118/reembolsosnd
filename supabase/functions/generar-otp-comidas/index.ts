@@ -5,6 +5,7 @@
 // Idempotente por (empleado_id, semana).
 // ================================
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { normalizarNombre } from "../_shared/nombres.ts";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -19,11 +20,6 @@ async function hashOtp(salt: string, codigo: string): Promise<string> {
   const data = new TextEncoder().encode(salt + codigo);
   const buf = await crypto.subtle.digest("SHA-256", data);
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-function normalizarNombre(s: string): string {
-  return s.trim().toUpperCase().replace(/\s+/g, " ")
-    .normalize("NFD").replace(/[̀-ͯ]/g, "");
 }
 
 Deno.serve(async (req: Request) => {
@@ -48,7 +44,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: comidas, error: errC } = await supabase
       .from("rnd_reembolsos")
-      .select("id, nombre_beneficiario, monto")
+      .select("id, nombre_beneficiario, monto, empleado_id")
       .eq("concepto", "COMIDAS")
       .eq("estado", "comida_pendiente");
     if (errC) throw errC;
@@ -62,21 +58,35 @@ Deno.serve(async (req: Request) => {
       .eq("activo", true);
     if (errE) throw errE;
 
+    // Índice por nombre normalizado SOLO para filas legadas sin empleado_id.
     const porNombre = new Map<string, { id: number; telefono: string | null }>();
     for (const e of empleados ?? []) {
       const full = normalizarNombre(`${e.nombre} ${e.apellido}`);
       porNombre.set(full, { id: e.id as number, telefono: e.telefono_whatsapp as string | null });
     }
+    // Índice de empleados por id (para teléfono cuando la comida ya trae empleado_id).
+    const empById = new Map<number, { telefono: string | null }>();
+    for (const e of empleados ?? []) {
+      empById.set(e.id as number, { telefono: e.telefono_whatsapp as string | null });
+    }
 
     const porEmpleado = new Map<number, { telefono: string | null; reembolsoIds: string[]; monto: number }>();
-    const sinMatch: string[] = [];
+    const sinMatch: string[] = []; // nombres de comidas legadas que no cruzan
     for (const c of comidas) {
-      const emp = porNombre.get(normalizarNombre(String(c.nombre_beneficiario)));
-      if (!emp) { sinMatch.push(String(c.nombre_beneficiario)); continue; }
-      const entry = porEmpleado.get(emp.id) ?? { telefono: emp.telefono, reembolsoIds: [], monto: 0 };
+      let empId: number | null = (c.empleado_id as number | null) ?? null;
+      let telefono: string | null = null;
+      if (empId !== null) {
+        telefono = empById.get(empId)?.telefono ?? null;
+      } else {
+        const emp = porNombre.get(normalizarNombre(String(c.nombre_beneficiario)));
+        if (!emp) { sinMatch.push(String(c.nombre_beneficiario)); continue; }
+        empId = emp.id;
+        telefono = emp.telefono;
+      }
+      const entry = porEmpleado.get(empId) ?? { telefono, reembolsoIds: [], monto: 0 };
       entry.reembolsoIds.push(String(c.id));
       entry.monto += Number(c.monto);
-      porEmpleado.set(emp.id, entry);
+      porEmpleado.set(empId, entry);
     }
 
     let generados = 0;
@@ -128,7 +138,8 @@ Deno.serve(async (req: Request) => {
 
     return new Response(JSON.stringify({
       ok: true, semana, generados,
-      sin_telefono: sinTelefono.length, sin_match: sinMatch.length,
+      sin_telefono: sinTelefono,           // lista de empleado_id
+      sin_match: sinMatch,                 // lista de nombres
     }), { headers: CORS_HEADERS });
 
   } catch (err) {
