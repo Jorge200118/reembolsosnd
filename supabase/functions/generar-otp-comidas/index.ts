@@ -135,6 +135,22 @@ Deno.serve(async (req: Request) => {
       generados++;
     }
 
+    // Aviso push "código listo" a los choferes con suscripción. Encadenado aquí
+    // (no en un cron aparte) para garantizar que los OTP ya están escritos antes
+    // de avisar. Fire-and-forget: no altera la respuesta ni aborta si falla.
+    try {
+      await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/enviar-push`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+        },
+        body: JSON.stringify({ tipo: "codigo_listo" }),
+      });
+    } catch (pushErr) {
+      console.error("push codigo_listo err", pushErr);
+    }
+
     return new Response(JSON.stringify({
       ok: true, semana, generados,
       sin_telefono: sinTelefono,           // lista de empleado_id
