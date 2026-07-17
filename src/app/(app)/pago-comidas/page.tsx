@@ -12,7 +12,7 @@ import { Money } from "@/components/ui/Money";
 export default function PagoComidasPage() {
   const { sesion } = useAuth();
   const cajeraEmail = sesion?.email ?? "";
-  const [modalChofer, setModalChofer] = useState<{ empleadoId: number; nombre: string } | null>(null);
+  const [modalEmpleado, setModalEmpleado] = useState<{ empleadoId: number; nombre: string } | null>(null);
   const queryClient = useQueryClient();
   const { data: comidas, isLoading } = useComidasPendientes();
 
@@ -23,13 +23,13 @@ export default function PagoComidasPage() {
   const totalComidas = lista.reduce((s, c) => s + c.numComidas, 0);
 
   function onExitoPago() {
-    setModalChofer(null);
+    setModalEmpleado(null);
     queryClient.invalidateQueries({ queryKey: ["comidas-pendientes"] });
   }
 
   return (
     <main className="mx-auto max-w-5xl p-4 sm:p-6">
-      <PageHeader titulo="Pago de Comidas" subtitulo="Comidas autorizadas pendientes de pago · el chofer recibe su código por WhatsApp" />
+      <PageHeader titulo="Pago de Comidas" subtitulo="Comidas autorizadas pendientes de pago · el empleado recibe su código por WhatsApp" />
 
       <div className="mb-4 inline-flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-1 text-xs text-blue-800">
         <span className="font-semibold uppercase tracking-wide">Cajera:</span> {sesion?.nombre ?? "—"}
@@ -66,7 +66,7 @@ export default function PagoComidasPage() {
               <table className="w-full text-sm">
                 <thead className="border-b border-slate-200 bg-slate-50">
                   <tr>
-                    <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Chofer</th>
+                    <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Empleado</th>
                     <th className="px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">Comidas</th>
                     <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Total</th>
                     <th className="px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">Acción</th>
@@ -84,7 +84,7 @@ export default function PagoComidasPage() {
                             className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-40"
                             disabled={cajeraEmail === "" || !esDiaHabil}
                             title={!esDiaHabil ? "Solo de lunes a viernes" : undefined}
-                            onClick={() => setModalChofer({ empleadoId: c.empleadoId as number, nombre: c.nombre })}
+                            onClick={() => setModalEmpleado({ empleadoId: c.empleadoId as number, nombre: c.nombre })}
                           >
                             Cobrar con código
                           </button>
@@ -101,12 +101,12 @@ export default function PagoComidasPage() {
         </>
       )}
 
-      {modalChofer && (
+      {modalEmpleado && (
         <OtpCapturaModal
-          empleadoId={modalChofer.empleadoId}
-          empleadoNombre={modalChofer.nombre}
+          empleadoId={modalEmpleado.empleadoId}
+          empleadoNombre={modalEmpleado.nombre}
           cajeraEmail={cajeraEmail}
-          onClose={() => setModalChofer(null)}
+          onClose={() => setModalEmpleado(null)}
           onExito={onExitoPago}
         />
       )}

@@ -108,7 +108,7 @@ Deno.serve(async (req: Request) => {
     if (empleado.telefono_whatsapp && empleado.telefono_whatsapp.trim() !== "") {
       const mensaje =
         `*ACEROS CABOS - Comida Autorizada*\n\nHola ${nombreCompleto}, se te ha autorizado una comida por *$120.00*.\n\n` +
-        `Autorizó: ${quien_autoriza.trim()}\nFecha: ${fechaComida}\n\nEl pago se realizará el viernes con tu código.`;
+        `Autorizó: ${quien_autoriza.trim()}\nFecha: ${fechaComida}\n\nEl pago se realiza de lunes a viernes con tu código.`;
       try {
         await fetch(WHATSAPP_URL, {
           method: "POST",
