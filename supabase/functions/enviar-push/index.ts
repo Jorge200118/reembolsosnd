@@ -15,21 +15,28 @@ const CORS = {
 
 const admin = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
 
-// Autoriza si el bearer es un JWT con role=service_role. verify_jwt ya validó la
-// firma en la plataforma, así que basta decodificar el claim: la anon key trae
-// role=anon y nadie puede forjar service_role sin el JWT secret. No depende de
-// que el token sea byte-idéntico al del env (el del Vault difiere pero es válido).
+// Autoriza el service_role por DOS vías, para cubrir las dos formas de llamar:
+//  1) edge->edge (crear-comida, generar-otp-comidas): mandan el SUPABASE_SERVICE_ROLE_KEY
+//     que el runtime inyecta; es el MISMO valor que ve esta función, así que basta
+//     comparar tal cual. Funciona sea JWT legacy o llave nueva sb_secret.
+//  2) crons pg_net: mandan la llave del Vault (JWT legacy con role=service_role), que
+//     difiere del env; se valida por el claim role (verify_jwt ya validó la firma).
+// La anon key no coincide con el env ni trae role=service_role → sigue bloqueada.
 function esServiceRole(auth: string | null): boolean {
   if (!auth || !auth.startsWith("Bearer ")) return false;
-  const parts = auth.slice(7).split(".");
-  if (parts.length < 2) return false;
-  try {
-    let b64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-    b64 += "=".repeat((4 - (b64.length % 4)) % 4);
-    return JSON.parse(atob(b64)).role === "service_role";
-  } catch {
-    return false;
+  const token = auth.slice(7);
+  if (token && token === SERVICE_ROLE) return true;
+  const parts = token.split(".");
+  if (parts.length >= 2) {
+    try {
+      let b64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+      b64 += "=".repeat((4 - (b64.length % 4)) % 4);
+      if (JSON.parse(atob(b64)).role === "service_role") return true;
+    } catch {
+      // no es un JWT decodificable; cae a false
+    }
   }
+  return false;
 }
 
 // ApplicationServer se arma UNA vez por cold start; si falla, NO se cachea el rechazo.
