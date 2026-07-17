@@ -14,10 +14,11 @@ export interface CrearComidasLoteInput {
   quienAutoriza: string;
   usuarioRegistro: string;
   sucursalSesion: string | null;
+  fecha?: string; // "YYYY-MM-DD"; si se omite, la edge function usa hoy en Mazatlán
 }
 
 // Autoriza varias comidas de una sola acción. Llama a crearComida por cada
-// empleado (la edge function valida duplicado del día internamente), y devuelve
+// empleado (la edge function valida duplicado de la fecha internamente), y devuelve
 // el detalle por empleado para mostrar cuáles se registraron y cuáles no.
 async function crearComidasLote(input: CrearComidasLoteInput): Promise<ResultadoComidaLote[]> {
   const resultados: ResultadoComidaLote[] = [];
@@ -27,6 +28,7 @@ async function crearComidasLote(input: CrearComidasLoteInput): Promise<Resultado
       quienAutoriza: input.quienAutoriza,
       usuarioRegistro: input.usuarioRegistro,
       sucursalUsuario: emp.sucursal ?? input.sucursalSesion ?? undefined,
+      fecha: input.fecha,
     };
     try {
       const r = await crearComida(payload);

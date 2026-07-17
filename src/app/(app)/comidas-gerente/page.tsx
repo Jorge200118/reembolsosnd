@@ -15,6 +15,12 @@ type Emp = { id: number; nombre: string; sucursal: string | null; tieneTelefono:
 
 const MONTO_COMIDA = 120;
 
+// Hoy en Mazatlán como "YYYY-MM-DD". No sirve toISOString() aquí: da UTC, y
+// después de las 5pm local ya devuelve el día siguiente.
+function hoyMazatlan(): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Mazatlan" }).format(new Date());
+}
+
 // Normaliza para búsqueda: minúsculas + sin acentos.
 function norm(s: string): string {
   return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
@@ -44,6 +50,13 @@ export default function ComidasGerentePage() {
 
   const [busqueda, setBusqueda] = useState("");
   const [seleccionados, setSeleccionados] = useState<Map<number, Emp>>(new Map());
+
+  // Normalmente hoy. Se puede echar para atrás si a un gerente se le pasó
+  // capturar un vale de un día pasado. Futuras no: el input las corta y la
+  // edge function las rechaza.
+  const hoy = useMemo(() => hoyMazatlan(), []);
+  const [fecha, setFecha] = useState(hoy);
+  const esRetroactiva = fecha !== hoy;
 
   // Empleados de la sucursal del gerente.
   const sucursalQ = useQuery({
@@ -80,8 +93,13 @@ export default function ComidasGerentePage() {
     });
   }
 
+  function cambiarFecha(v: string) {
+    reset();
+    setFecha(v);
+  }
+
   function autorizar() {
-    if (!sesion || numSel === 0) return;
+    if (!sesion || numSel === 0 || !fecha || fecha > hoy) return;
     const empleados = [...seleccionados.values()];
     mutate(
       {
@@ -89,6 +107,7 @@ export default function ComidasGerentePage() {
         quienAutoriza: sesion.nombre,
         usuarioRegistro: sesion.email,
         sucursalSesion: sesion.sucursal,
+        fecha,
       },
       {
         onSuccess: (res: ResultadoComidaLote[]) => {
@@ -179,6 +198,36 @@ export default function ComidasGerentePage() {
               )}
             </div>
 
+            {/* Fecha del lote. Por defecto hoy; se echa para atrás si se pasó un vale. */}
+            <div className="mb-3">
+              <label htmlFor="fecha-comidas" className="mb-1.5 block text-xs font-medium text-slate-600">
+                Fecha de las comidas
+              </label>
+              <input
+                id="fecha-comidas"
+                type="date"
+                max={hoy}
+                value={fecha}
+                onChange={(e) => cambiarFecha(e.target.value)}
+                className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
+                  esRetroactiva
+                    ? "border-amber-400 bg-amber-50 text-amber-900 focus:border-amber-500 focus:ring-amber-200"
+                    : "border-slate-300 bg-white text-slate-900 focus:border-blue-600 focus:ring-blue-200"
+                }`}
+              />
+              {esRetroactiva && (
+                <p className="mt-1.5 flex items-start gap-1.5 text-xs text-amber-700">
+                  <svg className="mt-px shrink-0" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg>
+                  <span>
+                    Estás registrando comidas de un día pasado.{" "}
+                    <button type="button" onClick={() => cambiarFecha(hoy)} className="font-semibold underline underline-offset-2 hover:text-amber-800">
+                      Volver a hoy
+                    </button>
+                  </span>
+                </p>
+              )}
+            </div>
+
             {numSel === 0 ? (
               <p className="py-6 text-center text-sm text-slate-400">Marca empleados en la lista.</p>
             ) : (
@@ -219,7 +268,7 @@ export default function ComidasGerentePage() {
 
             <button
               onClick={autorizar}
-              disabled={isPending || numSel === 0 || !sesion}
+              disabled={isPending || numSel === 0 || !sesion || !fecha || fecha > hoy}
               className="mt-4 w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:opacity-40"
             >
               {isPending ? "Registrando…" : numSel === 0 ? "Autorizar comidas" : `Autorizar ${numSel} comida${numSel > 1 ? "s" : ""}`}

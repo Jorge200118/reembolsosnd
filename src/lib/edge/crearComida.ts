@@ -6,6 +6,7 @@ export interface CrearComidaInput {
   quienAutoriza: string;
   usuarioRegistro?: string;
   sucursalUsuario?: string;
+  fecha?: string; // "YYYY-MM-DD"; si se omite, la edge function usa hoy en Mazatlán
 }
 
 export interface CrearComidaResult {
@@ -24,6 +25,7 @@ export async function crearComida(input: CrearComidaInput): Promise<CrearComidaR
       quien_autoriza: input.quienAutoriza,
       usuario_registro: input.usuarioRegistro,
       sucursal_usuario: input.sucursalUsuario,
+      fecha: input.fecha,
     }),
   });
   const data = await res.json();
