@@ -13,7 +13,7 @@ const TXT_DENEGADO_IOS =
 const TXT_DENEGADO_OTRO =
   "Toca el candado en la barra de dirección › Notificaciones › Permitir.";
 const TXT_SUBTITULO =
-  "Te avisamos cuando esté tu código y antes de que cierre el comedor.";
+  "Te avisamos cuando esté tu código y antes de que cierre la caja.";
 
 interface Estado {
   soportado: boolean;

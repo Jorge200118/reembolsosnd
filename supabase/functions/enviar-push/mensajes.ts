@@ -18,6 +18,6 @@ export function mensaje(tipo: Tipo, row: SubRow): { title: string; body: string;
     case "comida_nueva":
       return { title: "Vales AC", body: `Se te acumuló una comida, ya son $${fmtMonto(row.monto)}.`, url: "/empleado", tag };
     case "recordatorio":
-      return { title: "Vales AC", body: "Aún no usas tu código de hoy, cóbralo antes de que cierre el comedor.", url: "/empleado", tag };
+      return { title: "Vales AC", body: "Aún no usas tu código de hoy, cóbralo en caja antes de que cierre.", url: "/empleado", tag };
   }
 }
