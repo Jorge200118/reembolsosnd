@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/empleado/Toast";
+import { AvisosCard } from "@/components/empleado/AvisosCard";
 
 interface Comida { id: string; fecha: string; monto: number; }
 interface Panel {
@@ -88,6 +89,8 @@ export default function HomeEmpleado() {
         <div className="carnet-hola">Hola, {nombreCorto}<small>Aceros del Pacífico</small></div>
         <button className="carnet-salir" type="button" onClick={salir}>Salir</button>
       </div>
+
+      <AvisosCard />
 
       {comidas.length === 0 ? (
         <div className="carnet-card">

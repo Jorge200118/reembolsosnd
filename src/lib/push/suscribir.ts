@@ -18,7 +18,10 @@ export async function activarAvisos(): Promise<{ ok: true } | { ok: false; motiv
   if (!sub) {
     sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC),
+      // cast: TS 5.7 tipa Uint8Array como Uint8Array<ArrayBufferLike>, que no
+      // encaja en BufferSource (ArrayBuffer) del lib.dom. El buffer real es un
+      // ArrayBuffer normal, así que el cast es seguro.
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC) as BufferSource,
     });
   }
   const raw = sub.toJSON();
