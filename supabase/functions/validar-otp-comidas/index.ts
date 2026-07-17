@@ -53,7 +53,7 @@ Deno.serve(async (req: Request) => {
 
     const hashIntento = await hashOtp(otp.otp_salt as string, codigo.trim());
 
-    const { data: resultado, error: errRpc } = await supabase.rpc("liberar_comidas_otp", {
+    const { data, error: errRpc } = await supabase.rpc("liberar_comidas_otp", {
       p_empleado_id: empleado_id,
       p_semana: semana,
       p_hash_intento: hashIntento,
@@ -61,8 +61,15 @@ Deno.serve(async (req: Request) => {
     });
     if (errRpc) throw errRpc;
 
+    // La RPC nueva devuelve jsonb {resultado, comidas, total}; la vieja devolvía
+    // texto. Se toleran ambas para no romper durante el despliegue.
+    const obj = (data && typeof data === "object") ? data as Record<string, unknown> : null;
+    const resultado = obj ? String(obj.resultado) : String(data);
+    const comidas = obj && typeof obj.comidas === "number" ? obj.comidas : null;
+    const total = obj && (typeof obj.total === "number" || typeof obj.total === "string") ? Number(obj.total) : null;
+
     const ok = resultado === "ok";
-    return new Response(JSON.stringify({ ok, resultado }), {
+    return new Response(JSON.stringify({ ok, resultado, comidas, total }), {
       status: ok ? 200 : 409,
       headers: CORS_HEADERS,
     });

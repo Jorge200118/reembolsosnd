@@ -11,7 +11,6 @@ interface Panel {
   total: number;
   codigo: string | null;
   expira_en: string | null;
-  hay_nuevas: boolean;
 }
 
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
@@ -37,13 +36,12 @@ export default function HomeEmpleado() {
   const [panel, setPanel] = useState<Panel | null>(null);
   const [cargando, setCargando] = useState(true);
   const [verCodigo, setVerCodigo] = useState(false);
-  const [regenerando, setRegenerando] = useState(false);
 
-  const cargar = useCallback(async (regenerar = false) => {
+  const cargar = useCallback(async () => {
     const res = await fetch("/api/empleado/panel", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ regenerar }),
+      body: JSON.stringify({}),
     });
     if (res.status === 401) { router.replace("/empleado/login"); return null; }
     const data = await res.json();
@@ -53,13 +51,6 @@ export default function HomeEmpleado() {
   useEffect(() => {
     cargar().then((d) => { if (d) setPanel(d); setCargando(false); });
   }, [cargar]);
-
-  async function actualizar() {
-    setRegenerando(true);
-    const d = await cargar(true);
-    if (d) { setPanel(d); mostrar("Código actualizado"); }
-    setRegenerando(false);
-  }
 
   async function copiar() {
     if (!panel?.codigo) return;
@@ -80,7 +71,7 @@ export default function HomeEmpleado() {
     return <p className="carnet-empty" style={{ marginTop: 60 }}>Cargando…</p>;
   }
 
-  const nombreCorto = (panel?.nombre ?? "").split(" ")[0] || "chofer";
+  const nombreCorto = (panel?.nombre ?? "").split(" ")[0] || "empleado";
   const comidas = panel?.comidas ?? [];
 
   return (
@@ -123,15 +114,7 @@ export default function HomeEmpleado() {
             <div className="carnet-code-vence">Vence hoy · 11:59 pm</div>
             <div className="carnet-code-cubre">Cobra tus <b>{comidas.length} comida{comidas.length !== 1 ? "s" : ""}</b> · <b>{moneda(panel?.total ?? 0)}</b></div>
           </div>
-          {panel?.hay_nuevas && (
-            <div className="carnet-nueva">Tienes una comida nueva que no está en este código.</div>
-          )}
           <button className="carnet-btn" type="button" style={{ marginTop: 12 }} onClick={copiar}>Copiar código</button>
-          {panel?.hay_nuevas && (
-            <button className="carnet-btn-2" type="button" onClick={actualizar} disabled={regenerando}>
-              {regenerando ? "Actualizando…" : "Actualizar para incluir todo"}
-            </button>
-          )}
           <button className="carnet-btn-2" type="button" onClick={() => setVerCodigo(false)}>Volver</button>
         </>
       )}
