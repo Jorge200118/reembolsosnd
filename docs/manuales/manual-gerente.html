@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Manual del Gerente · Aceros Cabos</title>
+<link rel="stylesheet" href="_estilos.css">
+</head>
+<body>
+
+<!-- ================= PORTADA ================= -->
+<section class="cover">
+  <div class="brand">
+    <div class="logo">AC</div>
+    <div><div class="n1">ACEROS CABOS</div><div class="n2">Aceros del Pacífico</div></div>
+  </div>
+  <div class="kicker">Manual de uso</div>
+  <h1>Gerente</h1>
+  <div class="sub">Autoriza las comidas de los empleados de tu sucursal.</div>
+  <div class="rolechip">Perfil: Gerente · Módulo Comidas</div>
+  <div class="foot">
+    <b>Para:</b> gerentes de sucursal &nbsp;·&nbsp; <b>Sistema:</b> Comidas AC (web)<br>
+    Tu única tarea aquí es dejar registrada la comida de quien comió. El resto lo hace el sistema.
+  </div>
+</section>
+
+<!-- ================= ÍNDICE ================= -->
+<section class="toc">
+  <div class="sec-h"><div class="sec-n">i</div><h2>Lo que aprenderás</h2></div>
+  <ol>
+    <li><b>Tu tarea en una frase</b><span>— qué haces y qué no</span></li>
+    <li><b>Entrar y tu menú</b><span>— solo verás "Comidas"</span></li>
+    <li><b>La pantalla Comidas</b><span>— sus 3 zonas</span></li>
+    <li><b>Autorizar comidas del día</b><span>— paso a paso</span></li>
+    <li><b>Casos especiales</b><span>— día pasado, sin teléfono, repetidos</span></li>
+    <li><b>Qué pasa después</b><span>— el código, la cajera y el empleado</span></li>
+    <li><b>Reglas importantes</b><span>— lo que no debes olvidar</span></li>
+  </ol>
+</section>
+
+<!-- ================= 1. TU TAREA ================= -->
+<section class="sec">
+  <div class="sec-h"><div class="sec-n">1</div><h2>Tu tarea en una frase</h2></div>
+  <div class="box info"><span class="t">Todo tu trabajo es esto:</span>
+    <b>Marcar a los empleados que comieron y autorizar su comida.</b> Cada comida vale <b>$120.00</b>. Eso es todo lo que tú haces.</div>
+
+  <div style="display:flex;gap:12px;margin-top:8px">
+    <div class="m-card" style="flex:1;border-color:#86efac;background:#f0fdf4">
+      <b style="color:#166534">✓ Lo que SÍ haces</b>
+      <ul style="margin:6px 0 0;padding-left:18px;font-size:10.2pt">
+        <li>Marcar quién comió</li>
+        <li>Elegir la fecha</li>
+        <li>Autorizar sus comidas</li>
+        <li>Ver tu historial</li>
+      </ul>
+    </div>
+    <div class="m-card" style="flex:1;border-color:#fca5a5;background:#fef2f2">
+      <b style="color:#991b1b">✗ Lo que NO haces</b>
+      <ul style="margin:6px 0 0;padding-left:18px;font-size:10.2pt">
+        <li>Generar el código</li>
+        <li>Pagar o dar efectivo</li>
+        <li>Enviar notificaciones</li>
+        <li>Borrar comidas ya hechas</li>
+      </ul>
+    </div>
+  </div>
+  <p><small>El <b>código</b> le llega solo al empleado a su teléfono. El <b>pago</b> lo hace la <b>cajera</b>. Tú solo dejas la comida "autorizada".</small></p>
+</section>
+
+<!-- ================= 2. ENTRAR Y MENÚ ================= -->
+<section class="sec">
+  <div class="sec-h"><div class="sec-n">2</div><h2>Entrar y tu menú</h2></div>
+  <p class="lead">Entra con tu <b>correo</b> y <b>contraseña</b>. Con tu perfil, el menú muestra <b>solo una opción: Comidas</b>.</p>
+
+  <div class="figure">
+    <div class="shot">
+      <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">Comidas · Aceros Cabos</span></div>
+      <div class="app">
+        <aside class="sb">
+          <div class="lg"><i>AC</i><b>ACEROS CABOS<small>Reembolsos</small></b></div>
+          <a class="on"><span class="ic"></span>Comidas</a>
+          <div class="usr"><span class="av">AR</span><span><b>Ana Robles</b><small>gerente</small></span></div>
+        </aside>
+        <div class="pane">
+          <div class="ph">Registro de Comidas</div>
+          <div class="psub">Marca los empleados que llegaron y autoriza sus comidas de una vez · $120.00 c/u</div>
+          <div class="m-note">↑ Esta es tu única pantalla.</div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">Tu menú tiene una sola opción: Comidas</div>
+  </div>
+  <p><small>Abajo del menú ves tu nombre y el botón <span class="ui ghost">Cerrar sesión</span>.</small></p>
+</section>
+
+<!-- ================= 3. LA PANTALLA ================= -->
+<section class="sec pagebreak">
+  <div class="sec-h"><div class="sec-n">3</div><h2>La pantalla "Comidas"</h2></div>
+  <p class="lead">Se llama <b>Registro de Comidas</b> y tiene <b>3 zonas</b>: la lista de empleados (izquierda), el panel para autorizar (derecha) y tu historial (abajo).</p>
+
+  <div class="figure">
+    <div class="shot">
+      <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">Menú ▸ Comidas</span></div>
+      <div class="pane">
+        <div class="ph">Registro de Comidas</div>
+        <div class="psub">Marca los empleados que llegaron y autoriza sus comidas · $120.00 c/u</div>
+        <div style="display:flex;gap:12px">
+          <!-- Zona A -->
+          <div style="flex:1.1">
+            <div class="m-input ph-txt anchor">Filtrar por nombre…<span class="mk l">1</span></div>
+            <div class="m-note" style="margin:6px 0">Empleados de mi sucursal · 12</div>
+            <div class="m-emp sel"><span class="m-check on"></span> Pedro Ramírez</div>
+            <div class="m-emp sel"><span class="m-check on"></span> Luis Torres</div>
+            <div class="m-emp"><span class="m-check"></span> Carlos Méndez <span class="m-chip chip-amber" style="margin-left:auto">sin teléfono</span></div>
+            <div class="m-emp"><span class="m-check"></span> Rosa Díaz</div>
+          </div>
+          <!-- Zona B -->
+          <div style="flex:1" class="anchor">
+            <span class="mk">2</span>
+            <div class="m-card blue">
+              <b style="font-size:11px;color:#1e40af">Por autorizar</b>
+              <span class="m-label">Fecha de las comidas</span>
+              <div class="m-input">18 / jul / 2026</div>
+              <div style="margin:8px 0 4px;font-size:9.5px">
+                <div>• Pedro Ramírez ✕</div>
+                <div>• Luis Torres ✕</div>
+              </div>
+              <div class="m-note">Autoriza: <b>Ana Robles</b></div>
+              <div style="font-size:12px;font-weight:800;color:#0f2942;margin:4px 0 8px">Total (2): $240.00</div>
+              <div class="m-btn green block">Autorizar 2 comidas</div>
+            </div>
+          </div>
+        </div>
+        <!-- Zona C -->
+        <div class="anchor" style="margin-top:10px">
+          <span class="mk bl">3</span>
+          <div class="m-note" style="font-weight:700;color:#0f2942;margin-bottom:4px">Comidas autorizadas por ti</div>
+          <table class="m-table">
+            <tr><th>Beneficiario</th><th>Fecha</th><th>Monto</th><th>Estado</th></tr>
+            <tr><td>Pedro Ramírez</td><td>17 jul</td><td>$120.00</td><td><span class="m-chip chip-yellow">Comida pendiente</span></td></tr>
+            <tr><td>Rosa Díaz</td><td>16 jul</td><td>$120.00</td><td><span class="m-chip chip-amber">Pendiente</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="cap">Las 3 zonas de la pantalla Comidas</div>
+  </div>
+
+  <ul class="legend">
+    <li><b>Zona 1 · Empleados de mi sucursal:</b> la lista de tu sucursal. Cada quien con una casilla para marcarlo. Arriba, un buscador por nombre.</li>
+    <li><b>Zona 2 · Por autorizar:</b> aquí ves a quién marcaste, eliges la <b>fecha</b>, ves el <b>total</b> y tocas el botón verde para autorizar.</li>
+    <li><b>Zona 3 · Comidas autorizadas por ti:</b> tu historial, con el estado de cada comida.</li>
+  </ul>
+  <div class="box info"><span class="t">Solo tu sucursal</span>Únicamente aparecen los empleados <b>activos de tu sucursal</b>. No puedes autorizarle comida a alguien de otra sucursal.</div>
+</section>
+
+<!-- ================= 4. AUTORIZAR ================= -->
+<section class="sec pagebreak">
+  <div class="sec-h"><div class="sec-n">4</div><h2>Autorizar comidas del día</h2></div>
+  <p class="lead">Este es el flujo de todos los días. Toma menos de un minuto.</p>
+
+  <ol class="steps">
+    <li><b>(Opcional) busca</b> un nombre en el filtro para encontrarlo más rápido.</li>
+    <li><b>Marca la casilla</b> de cada empleado que comió. Se pinta de azul y aparece a la derecha en <b>Por autorizar</b>. Puedes marcar varios.</li>
+    <li><b>Revisa la fecha.</b> Ya viene puesta la de hoy. (Puedes echarla hacia atrás si se te pasó un día; ver la sección 5.)</li>
+    <li><b>Verifica el total:</b> es el número de marcados × $120.</li>
+    <li>Toca el botón verde <span class="ui green">Autorizar N comidas</span>.</li>
+    <li><b>Revisa el resultado:</b> sale en verde cuántas se autorizaron. Si alguna falló, sale en rojo con el motivo.</li>
+  </ol>
+
+  <div class="figure" style="max-width:520px">
+    <div class="shot">
+      <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">Resultado</span></div>
+      <div class="pane" style="padding:14px">
+        <div class="m-card" style="background:#f0fdf4;border-color:#86efac;margin-bottom:8px">
+          <b style="color:#166534;font-size:11px">✓ 2 comida(s) autorizada(s)</b>
+        </div>
+        <div class="m-card" style="background:#fef2f2;border-color:#fca5a5">
+          <b style="color:#991b1b;font-size:11px">1 no se registró</b>
+          <div class="m-note" style="color:#991b1b">Carlos Méndez — Este empleado ya tiene una comida registrada hoy</div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">Al autorizar, siempre revisa el recuadro verde (éxitos) y el rojo (fallidos)</div>
+  </div>
+
+  <div class="box ok"><span class="t">Bueno saber</span>Los que sí se registraron <b>se desmarcan solos</b>. Los que fallaron se quedan marcados por si quieres reintentar. También puedes quitar a alguien con la <b>✕</b> junto a su nombre, o vaciar todo con <span class="ui ghost">Limpiar</span>.</div>
+</section>
+
+<!-- ================= 5. CASOS ESPECIALES ================= -->
+<section class="sec">
+  <div class="sec-h"><div class="sec-n">5</div><h2>Casos especiales</h2></div>
+
+  <h3 class="mini">🗓️ Registrar un día pasado</h3>
+  <p>Si se te pasó capturar un vale de un día anterior, puedes echar la fecha hacia atrás. El sistema te avisa con un recuadro <b>ámbar</b>: <i>"Estás registrando comidas de un día pasado"</i> y un enlace <span class="ui ghost">Volver a hoy</span>. <b>No se pueden poner fechas futuras.</b></p>
+
+  <h3 class="mini">📵 Empleado "sin teléfono"</h3>
+  <p>Si un empleado aparece con la etiqueta <span class="m-chip chip-amber">sin teléfono</span>, <b>sí puedes registrarle la comida</b>, pero ese empleado <b>no recibirá código ni WhatsApp</b> y la cajera no podrá pagarle hasta que tenga su número cargado.</p>
+  <div class="box warn"><span class="t">Qué hacer</span>Avisa a administración para que le carguen su WhatsApp; así podrá recibir su código y cobrar.</div>
+
+  <h3 class="mini">🔁 Empleado repetido el mismo día</h3>
+  <p>Solo se permite <b>una comida por empleado por día</b>. Si marcas a alguien que ya tiene comida hoy, esa comida falla con el aviso <i>"Este empleado ya tiene una comida registrada hoy"</i>. Las demás sí se registran.</p>
+</section>
+
+<!-- ================= 6. QUÉ PASA DESPUÉS ================= -->
+<section class="sec pagebreak">
+  <div class="sec-h"><div class="sec-n">6</div><h2>Qué pasa después de autorizar</h2></div>
+  <p class="lead">Tú solo autorizas. A partir de ahí, todo sigue solo. Así viaja una comida:</p>
+
+  <div class="flow">
+    <div class="n"><div class="who">1 · Tú (gerente)</div><b>Autorizas la comida</b><p>Se crea una comida de $120 "pendiente" para ese empleado.</p></div>
+    <div class="arw">→</div>
+    <div class="n"><div class="who">2 · Sistema</div><b>Avisa al empleado</b><p>Le manda WhatsApp: "se te autorizó una comida por $120".</p></div>
+    <div class="arw">→</div>
+    <div class="n"><div class="who">3 · Empleado</div><b>Recibe su código</b><p>Un código de 6 dígitos en su teléfono/app. Vence ese día.</p></div>
+  </div>
+  <div class="flow">
+    <div class="n"><div class="who">4 · Empleado</div><b>Va a la caja</b><p>Le muestra o dicta el código a la cajera.</p></div>
+    <div class="arw">→</div>
+    <div class="n"><div class="who">5 · Cajera</div><b>Le paga con el código</b><p>El sistema libera el pago de todas sus comidas juntas.</p></div>
+    <div class="arw">→</div>
+    <div class="n"><div class="who">6 · Sistema</div><b>Se cierra el ciclo</b><p>En tu historial esa comida pasa de "Comida pendiente" a "Pendiente".</p></div>
+  </div>
+
+  <div class="box info"><span class="t">Sobre el "código del día" (para que se lo expliques al empleado)</span>
+    <ul>
+      <li>Es un <b>número de 6 dígitos</b> que el empleado usa para cobrar en caja.</li>
+      <li>Le llega <b>solo</b>, por WhatsApp (de lunes a sábado en la mañana) y también lo puede ver en su app tocando <b>"Ver mi código"</b>.</li>
+      <li>Un solo código <b>cubre todas sus comidas pendientes</b> de una vez, sin importar el orden en que las autorizaste.</li>
+      <li><b>Tú no lo generas ni lo ves.</b> No aparece en tu pantalla.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= 7. REGLAS ================= -->
+<section class="sec">
+  <div class="sec-h"><div class="sec-n">7</div><h2>Reglas importantes</h2></div>
+  <table class="ref">
+    <tr><th>Regla</th><th>Detalle</th></tr>
+    <tr><td><b>Monto fijo</b></td><td>Cada comida vale <b>$120.00</b>, sin excepción. El total es marcados × $120.</td></tr>
+    <tr><td><b>Una por día</b></td><td>Un empleado no puede tener dos comidas el mismo día.</td></tr>
+    <tr><td><b>Sin fechas futuras</b></td><td>El calendario no deja elegir días que aún no llegan.</td></tr>
+    <tr><td><b>Días pasados sí</b></td><td>Se permiten, con aviso ámbar visible.</td></tr>
+    <tr><td><b>"Hoy" es hora de Mazatlán</b></td><td>Para que a fin del día no se registre en la fecha equivocada.</td></tr>
+    <tr><td><b>Solo tu sucursal</b></td><td>Solo empleados activos de tu sucursal.</td></tr>
+    <tr><td><b>Pago L a S</b></td><td>El pago en caja y los códigos son de lunes a sábado; por eso el aviso dice "el pago se realiza de lunes a sábado".</td></tr>
+    <tr><td><b>Revisa el resultado</b></td><td>Después de autorizar, checa el recuadro verde y el rojo antes de darlo por hecho.</td></tr>
+  </table>
+
+  <div class="box ok" style="margin-top:16px"><span class="t">En resumen</span>Marca a quien comió, revisa la fecha, toca <b>Autorizar</b> y verifica el resultado. Lo demás — código, avisos y pago — lo hace el sistema, el empleado y la cajera.</div>
+
+  <div class="footer"><span>Manual del Gerente · Aceros del Pacífico</span><span>Comidas AC</span></div>
+</section>
+
+</body>
+</html>

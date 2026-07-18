@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Manual de la Cajera · Aceros Cabos</title>
+<link rel="stylesheet" href="_estilos.css">
+</head>
+<body>
+
+<!-- ================= PORTADA ================= -->
+<section class="cover">
+  <div class="brand">
+    <div class="logo">AC</div>
+    <div><div class="n1">ACEROS CABOS</div><div class="n2">Aceros del Pacífico</div></div>
+  </div>
+  <div class="kicker">Manual de uso</div>
+  <h1>Cajera</h1>
+  <div class="sub">Reembolsos no deducibles y pago de comidas en caja.</div>
+  <div class="rolechip">Perfil: Caja Chica</div>
+  <div class="foot">
+    <b>Para:</b> personal de caja &nbsp;·&nbsp; <b>Sistema:</b> Reembolsos AC (web)<br>
+    Guarda este manual cerca de tu equipo. Cualquier duda, avisa a administración.
+  </div>
+</section>
+
+<!-- ================= ÍNDICE ================= -->
+<section class="toc">
+  <div class="sec-h"><div class="sec-n">i</div><h2>Lo que aprenderás</h2></div>
+  <ol>
+    <li><b>Entrar al sistema</b><span>— tu correo y contraseña</span></li>
+    <li><b>Tu menú</b><span>— las 4 pantallas que puedes usar</span></li>
+    <li><b>Nuevo Reembolso</b><span>— capturar un gasto con sus comprobantes</span></li>
+    <li><b>Revisión</b><span>— juntar los pendientes y enviarlos a corte</span></li>
+    <li><b>Reportes</b><span>— consultar, filtrar y exportar a Excel</span></li>
+    <li><b>Pago de Comidas</b><span>— pagar las comidas al empleado con su código</span></li>
+    <li><b>Tabla de estados</b><span>— qué significa cada color</span></li>
+    <li><b>Si algo sale mal</b><span>— mensajes y qué hacer</span></li>
+  </ol>
+</section>
+
+<!-- ================= 1. ENTRAR ================= -->
+<section class="sec">
+  <div class="sec-h"><div class="sec-n">1</div><h2>Entrar al sistema</h2></div>
+  <p class="lead">Abre la página del sistema en tu navegador. Verás la pantalla de acceso.</p>
+
+  <div class="figure">
+    <div class="shot">
+      <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">reembolsos · Aceros Cabos</span></div>
+      <div class="pane" style="max-width:340px;margin:0 auto;padding:20px 22px">
+        <div style="text-align:center;margin-bottom:6px"><span style="display:inline-flex;width:40px;height:40px;border-radius:10px;background:#2563eb;color:#fff;font-weight:900;align-items:center;justify-content:center">AC</span></div>
+        <div class="ph" style="text-align:center">Reembolsos No Deducibles</div>
+        <span class="m-label">Correo</span>
+        <div class="m-input ph-txt anchor">tucorreo@acerosdelpacifico.com.mx <span class="mk">1</span></div>
+        <span class="m-label">Contraseña</span>
+        <div class="m-input ph-txt anchor">••••••••<span class="mk">2</span></div>
+        <div style="height:12px"></div>
+        <div class="m-btn block anchor">Iniciar sesión<span class="mk br">3</span></div>
+      </div>
+    </div>
+    <div class="cap">Pantalla de acceso</div>
+  </div>
+
+  <ul class="legend">
+    <li><b>Correo:</b> el que te dio la empresa (termina en <span class="field">@acerosdelpacifico.com.mx</span>).</li>
+    <li><b>Contraseña:</b> la tuya. Si la escribes mal, sale un aviso rojo debajo.</li>
+    <li>Toca <span class="ui">Iniciar sesión</span>. El sistema te lleva directo a tu primera pantalla, <b>Nuevo Reembolso</b>.</li>
+  </ul>
+
+  <div class="box info"><span class="t">Nota</span>El sistema solo te deja entrar a tus 4 pantallas. Aunque escribas otra dirección a mano, te regresa a las tuyas. Es normal y es por seguridad.</div>
+</section>
+
+<!-- ================= 2. TU MENÚ ================= -->
+<section class="sec">
+  <div class="sec-h"><div class="sec-n">2</div><h2>Tu menú</h2></div>
+  <p class="lead">A la izquierda está el menú. Con tu perfil verás exactamente estas 4 opciones.</p>
+
+  <div class="figure">
+    <div class="shot">
+      <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">reembolsos · Aceros Cabos</span></div>
+      <div class="app">
+        <aside class="sb">
+          <div class="lg"><i>AC</i><b>ACEROS CABOS<small>Reembolsos</small></b></div>
+          <a class="on"><span class="ic"></span>Nuevo Reembolso</a>
+          <a><span class="ic"></span>Revisión</a>
+          <a><span class="ic"></span>Reportes</a>
+          <a><span class="ic"></span>Pago Comidas</a>
+          <div class="usr"><span class="av">JG</span><span><b>José García</b><small>caja_chica</small></span></div>
+        </aside>
+        <div class="pane">
+          <div class="ph">Nuevo Reembolso</div>
+          <div class="psub">Captura un reembolso no deducible con sus comprobantes</div>
+          <div class="m-note">↑ El contenido cambia según la opción que elijas del menú.</div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">Vista general: menú a la izquierda, contenido a la derecha</div>
+  </div>
+
+  <table class="ref">
+    <tr><th>Opción</th><th>Para qué sirve</th></tr>
+    <tr><td><b>Nuevo Reembolso</b></td><td>Capturar un gasto que se le va a reembolsar a alguien, con sus comprobantes.</td></tr>
+    <tr><td><b>Revisión</b></td><td>Juntar todos los pendientes y mandarlos "a corte" para que los autoricen.</td></tr>
+    <tr><td><b>Reportes</b></td><td>Buscar reembolsos, filtrarlos y bajarlos a Excel.</td></tr>
+    <tr><td><b>Pago Comidas</b></td><td>Pagar a los empleados sus comidas usando su código.</td></tr>
+  </table>
+  <p><small>Abajo del menú aparece tu nombre y el botón <span class="ui ghost">Cerrar sesión</span>. En celular, el menú se abre con el botón ☰ de arriba.</small></p>
+</section>
+
+<!-- ================= 3. NUEVO REEMBOLSO ================= -->
+<section class="sec pagebreak">
+  <div class="sec-h"><div class="sec-n">3</div><h2>Nuevo Reembolso</h2><span class="tag">Pantalla 1</span></div>
+  <p class="lead">Aquí capturas un gasto. Los campos con <b>*</b> son obligatorios. Al final se adjuntan los comprobantes.</p>
+
+  <div class="figure">
+    <div class="shot">
+      <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">Menú ▸ Nuevo Reembolso</span></div>
+      <div class="pane">
+        <div class="ph">Nuevo Reembolso</div>
+        <div class="psub">Captura un reembolso no deducible con sus comprobantes</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px 14px">
+          <div><span class="m-label">Beneficiario *</span><div class="m-input anchor">Juan Pérez<span class="mk">1</span></div></div>
+          <div><span class="m-label">Fecha *</span><div class="m-input anchor">18 / jul / 2026<span class="mk">2</span></div></div>
+          <div><span class="m-label">Monto *</span><div class="m-input anchor">450.00<span class="mk">3</span></div></div>
+          <div><span class="m-label">Concepto *</span><div class="m-input anchor">Papelería ▾<span class="mk">4</span></div></div>
+          <div><span class="m-label">Quién autoriza *</span><div class="m-input anchor">Lic. Fernando ▾<span class="mk">5</span></div></div>
+          <div><span class="m-label">Comprobantes *</span><div class="m-input anchor">📎 Adjuntar archivos<span class="mk">6</span></div></div>
+        </div>
+        <div class="m-note" style="margin-top:6px">📎 ticket-papeleria.jpg &nbsp; 📎 factura.pdf</div>
+        <div style="height:10px"></div>
+        <div class="m-btn anchor">Registrar Reembolso<span class="mk br">7</span></div>
+      </div>
+    </div>
+    <div class="cap">Formulario de captura</div>
+  </div>
+
+  <ul class="legend">
+    <li><b>Beneficiario:</b> a quién se le reembolsa el dinero.</li>
+    <li><b>Fecha:</b> viene puesta la de hoy. No se puede poner una fecha más allá de mañana.</li>
+    <li><b>Monto:</b> con centavos. Tiene que ser mayor a $0.</li>
+    <li><b>Concepto:</b> lo eliges de la lista (papelería, gasolina, etc.). <b>Comidas no aparece aquí</b> a propósito.</li>
+    <li><b>Quién autoriza:</b> empieza a escribir y sale la lista; también puedes escribir un nombre.</li>
+    <li><b>Comprobantes:</b> adjunta al menos uno (foto, PDF o Excel). Puedes subir varios.</li>
+    <li><b>Registrar Reembolso:</b> guarda todo. Aparece <span class="ui green">✅ Reembolso registrado</span> y el formulario se limpia.</li>
+  </ul>
+
+  <div class="box ok"><span class="t">El sistema lo pone solo</span>No tienes que escribir quién entrega, tu usuario ni la sucursal: todo eso se guarda automáticamente con tus datos. El reembolso nace en estado <span class="m-chip chip-amber">Pendiente</span>.</div>
+
+  <div class="box warn"><span class="t">Reglas de los comprobantes</span>
+    <ul>
+      <li>Obligatorio adjuntar <b>al menos uno</b>.</li>
+      <li>Solo se aceptan <b>fotos JPG/PNG, PDF o Excel</b> (.xls/.xlsx).</li>
+      <li>Máximo <b>10 MB</b> por archivo.</li>
+    </ul>
+  </div>
+
+  <div class="box danger"><span class="t">Las comidas NO se capturan aquí</span>Si intentas registrar una comida, sale el aviso: <i>"Las comidas se registran desde el módulo de Comidas, no aquí."</i> Las comidas las autoriza el <b>gerente</b>; tú solo las <b>pagas</b> en la pantalla Pago de Comidas.</div>
+</section>
+
+<!-- ================= 4. REVISIÓN ================= -->
+<section class="sec pagebreak">
+  <div class="sec-h"><div class="sec-n">4</div><h2>Revisión</h2><span class="tag">Pantalla 2</span></div>
+  <p class="lead">Aquí ves todos los reembolsos <b>pendientes</b> y los mandas juntos "a corte" para que el autorizador los revise.</p>
+
+  <div class="figure">
+    <div class="shot">
+      <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">Menú ▸ Revisión</span></div>
+      <div class="pane">
+        <div class="ph">Revisión</div>
+        <div class="psub">Arma el lote de pendientes y envíalo a corte</div>
+        <div class="m-card amber">
+          <div class="m-kpi">
+            <div><b>$4,320</b><small>Total</small></div>
+            <div><b>6</b><small>Solicitudes</small></div>
+            <div><b>9 img</b><small>Comprobantes</small></div>
+            <div class="anchor"><b>1 corte</b><small>Lote</small></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="m-input ph-txt" style="flex:1">Buscar por beneficiario o concepto…</div>
+            <div class="m-btn anchor">Enviar a corte<span class="mk">1</span></div>
+          </div>
+          <table class="m-table">
+            <tr><th>Beneficiario</th><th>Concepto</th><th>Monto</th><th>Estado</th></tr>
+            <tr><td>Juan Pérez</td><td>Papelería</td><td>$450.00</td><td><span class="m-chip chip-amber">Pendiente</span></td></tr>
+            <tr><td>María López</td><td>Gasolina</td><td>$1,250.00</td><td><span class="m-chip chip-amber">Pendiente</span></td></tr>
+          </table>
+        </div>
+        <div class="m-card blue anchor" style="margin-top:9px">
+          <b style="font-size:11px;color:#1e40af">En proceso · esperando respuesta (3)</b>
+          <div class="m-note" style="margin:3px 0 6px">Estos lotes están en corte, pendientes de autorización.</div>
+          <span class="m-btn sm ghost" style="background:#fff;border:1px solid #cbd5e1;color:#1e40af">Verificar respuestas</span>
+          <span class="mk br">2</span>
+        </div>
+      </div>
+    </div>
+    <div class="cap">Arriba: pendientes por enviar. Abajo: lotes ya enviados.</div>
+  </div>
+
+  <ul class="legend">
+    <li><b>Enviar a corte:</b> el paso principal. Manda <b>todos</b> los pendientes juntos.</li>
+    <li><b>Verificar respuestas:</b> refresca para ver si el autorizador ya aprobó o rechazó.</li>
+  </ul>
+
+  <h3 class="mini">Cómo enviar a corte, paso a paso</h3>
+  <ol class="steps">
+    <li>Revisa la lista de pendientes (los indicadores de arriba te dicen cuántos son y el total).</li>
+    <li>Toca <span class="ui">Enviar a corte</span>.</li>
+    <li>Aparece una ventanita que pide el <b>número de lote</b>. Escribe <b>solo números</b> (por ejemplo <span class="field">41</span>).</li>
+    <li>Listo: el sistema arma el lote como <span class="field">41-JOSE</span> (tu nombre) y todos los pendientes pasan a <span class="m-chip chip-blue">En corte</span>.</li>
+    <li>Sale el mensaje <span class="ui green">✅ Lote enviado a corte</span>. El autorizador ya lo verá en su módulo.</li>
+  </ol>
+
+  <div class="box warn"><span class="t">Ojo</span>
+    <ul>
+      <li>El número de lote debe ser <b>solo números</b>. Si escribes letras, no lo acepta.</li>
+      <li>Si no hay pendientes, el botón <b>Enviar a corte</b> no funciona.</li>
+      <li>Se envían <b>todos</b> los pendientes de una vez, no de uno en uno.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= 5. REPORTES ================= -->
+<section class="sec pagebreak">
+  <div class="sec-h"><div class="sec-n">5</div><h2>Reportes</h2><span class="tag">Pantalla 3</span></div>
+  <p class="lead">Pantalla de <b>solo consulta</b>. Sirve para buscar reembolsos, filtrarlos y bajarlos a Excel. Aquí no se cambia nada.</p>
+
+  <div class="figure">
+    <div class="shot">
+      <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">Menú ▸ Reportes</span></div>
+      <div class="pane">
+        <div class="ph">Reportes</div>
+        <div class="psub">Consulta, filtra y exporta los reembolsos</div>
+        <div class="m-card">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px" class="anchor">
+            <span class="mk l">1</span>
+            <div><span class="m-label">Estado</span><div class="m-input">Todos ▾</div></div>
+            <div><span class="m-label">Sucursal</span><div class="m-input">Todas ▾</div></div>
+            <div><span class="m-label">Beneficiario</span><div class="m-input ph-txt">Buscar…</div></div>
+            <div><span class="m-label">Lote</span><div class="m-input ph-txt">Ej: 41-JOSE</div></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+            <div class="m-btn green anchor">Exportar Excel<span class="mk">2</span></div>
+            <span class="m-chip chip-gray anchor">Vista tabla · Vista por lotes<span class="mk br">3</span></span>
+            <span class="m-note" style="margin-left:auto">128 registros · $86,540</span>
+          </div>
+          <table class="m-table">
+            <tr><th>Beneficiario</th><th>Fecha</th><th>Sucursal</th><th>Lote</th><th>Monto</th><th>Estado</th></tr>
+            <tr><td>Juan Pérez</td><td>18 jul</td><td>Cabos</td><td>41-JOSE</td><td>$450.00</td><td><span class="m-chip chip-green">Aprobado</span></td></tr>
+            <tr><td>María López</td><td>17 jul</td><td>Cabos</td><td>41-JOSE</td><td>$1,250.00</td><td><span class="m-chip chip-cyan">Solicitado</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="cap">Filtros arriba, resultados abajo</div>
+  </div>
+
+  <ul class="legend">
+    <li><b>Filtros:</b> combina <span class="field">Estado</span>, <span class="field">Sucursal</span>, <span class="field">Beneficiario</span> y <span class="field">Lote</span>. Los de texto buscan solos al dejar de escribir.</li>
+    <li><b>Exportar Excel:</b> baja un archivo <span class="field">Reporte_Reembolsos_fecha.xlsx</span> con todo el detalle.</li>
+    <li><b>Vista tabla / Vista por lotes:</b> cambia entre lista corrida o agrupado por número de lote.</li>
+  </ul>
+  <div class="box info"><span class="t">Bueno saber</span>Reportes muestra reembolsos de <b>todas las sucursales y de todos los usuarios</b>, no solo los que tú capturaste.</div>
+</section>
+
+<!-- ================= 6. PAGO DE COMIDAS ================= -->
+<section class="sec pagebreak">
+  <div class="sec-h"><div class="sec-n">6</div><h2>Pago de Comidas</h2><span class="tag">Pantalla 4</span></div>
+  <p class="lead">Aquí <b>pagas</b> a los empleados las comidas que el gerente ya autorizó. Tú no las creas: solo <b>entregas el efectivo</b> usando el código que trae el empleado.</p>
+
+  <div class="figure">
+    <div class="shot">
+      <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">Menú ▸ Pago Comidas</span></div>
+      <div class="pane">
+        <div class="ph">Pago de Comidas</div>
+        <div class="psub">Comidas autorizadas pendientes de pago · el empleado recibe su código por WhatsApp</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <span class="m-chip chip-blue">Cajera: José</span>
+          <span class="m-chip chip-green">7 comidas de 3 empleados · $840 total</span>
+        </div>
+        <table class="m-table">
+          <tr><th>Empleado</th><th>Comidas</th><th>Total</th><th>Acción</th></tr>
+          <tr><td>Pedro Ramírez</td><td>3</td><td>$360.00</td><td><span class="m-btn sm anchor">Cobrar con código<span class="mk">1</span></span></td></tr>
+          <tr><td>Luis Torres</td><td>2</td><td>$240.00</td><td><span class="m-btn sm">Cobrar con código</span></td></tr>
+          <tr><td>Carlos Méndez</td><td>2</td><td>$240.00</td><td><span class="m-chip chip-amber anchor">Sin teléfono<span class="mk br">2</span></span></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="cap">Cada empleado con sus comidas pendientes y su total</div>
+  </div>
+
+  <ul class="legend">
+    <li><b>Cobrar con código</b> (botón azul): ábrelo para pagarle; ahí capturas el código de 6 dígitos del empleado.</li>
+    <li><b>Sin teléfono / Sin empleado:</b> a ese empleado <b>no</b> se le puede pagar hasta que administración le cargue su WhatsApp.</li>
+  </ul>
+
+  <h3 class="mini">Cómo pagar, paso a paso</h3>
+  <div class="figure" style="max-width:300px;margin-left:auto;margin-right:auto">
+    <div class="shot">
+      <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">Cobro de comidas</span></div>
+      <div class="pane" style="padding:16px">
+        <div class="ph" style="font-size:13px">Cobro de comidas — Pedro Ramírez</div>
+        <span class="m-label">Código de 6 dígitos</span>
+        <div class="m-input anchor" style="justify-content:center;font-size:20px;letter-spacing:8px;font-weight:800;color:#1e293b">4 8 2 9 1 5<span class="mk">1</span></div>
+        <div style="height:8px"></div>
+        <div class="m-card" style="background:#f0fdf4;border-color:#86efac">
+          <b style="color:#166534;font-size:11px">✓ Pago liberado</b>
+          <div class="m-note" style="color:#166534">3 comidas · entrégale este efectivo: <b>$360.00</b></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <span class="m-btn" style="flex:1;text-align:center">Confirmar pago</span>
+          <span class="m-btn ghost sm" style="background:#fff;border:1px solid #cbd5e1;color:#334155">Cancelar</span>
+        </div>
+      </div>
+    </div>
+    <div class="cap">Ventana "Cobro de comidas"</div>
+  </div>
+
+  <ol class="steps">
+    <li>El empleado llega con su <b>código de 6 dígitos</b> (lo recibió por WhatsApp o lo ve en su app).</li>
+    <li>En su fila, toca <span class="ui">Cobrar con código</span>. Se abre la ventana <b>Cobro de comidas</b>.</li>
+    <li>Escribe el <b>código de 6 dígitos</b> que te dicta el empleado.</li>
+    <li>Toca <span class="ui">Confirmar pago</span> (se activa solo cuando hay 6 dígitos).</li>
+    <li>Si es correcto, sale <span class="ui green">✓ Pago liberado</span> con el <b>monto exacto</b> a entregar. <b>Entrega ese efectivo</b> y luego toca <span class="ui ghost">Listo</span>.</li>
+  </ol>
+
+  <div class="box info"><span class="t">El código del día</span>
+    <ul>
+      <li>Es <b>un código por empleado y por día</b>. El de ayer ya no sirve; cada día se genera uno nuevo y <b>vence a las 11:59 pm</b>.</li>
+      <li>Un solo código <b>cubre TODAS las comidas pendientes</b> de ese empleado de una vez (por eso ves varias comidas con un total sumado; le pagas todas juntas).</li>
+    </ul>
+  </div>
+
+  <div class="box warn"><span class="t">Solo de lunes a sábado</span>El domingo aparece <i>"Pagos deshabilitados — Los pagos de comidas solo se pueden realizar de lunes a sábado"</i> y el botón de pago se apaga.</div>
+</section>
+
+<!-- ================= 7. ESTADOS ================= -->
+<section class="sec pagebreak">
+  <div class="sec-h"><div class="sec-n">7</div><h2>Tabla de estados</h2></div>
+  <p class="lead">El color de la etiqueta te dice en qué punto va cada reembolso.</p>
+  <table class="ref">
+    <tr><th>Se ve así</th><th>Significa</th></tr>
+    <tr><td><span class="m-chip chip-amber">Pendiente</span></td><td>Recién capturado. Aún no se envía a corte. <b>(Aquí actúas tú en Revisión.)</b></td></tr>
+    <tr><td><span class="m-chip chip-blue">En corte</span></td><td>Ya se mandó en un lote. Espera que el autorizador lo revise.</td></tr>
+    <tr><td><span class="m-chip chip-green">Aprobado</span></td><td>El autorizador lo aprobó.</td></tr>
+    <tr><td><span class="m-chip chip-red">Rechazado</span></td><td>El autorizador lo rechazó.</td></tr>
+    <tr><td><span class="m-chip chip-cyan">Solicitado entrega</span></td><td>Aprobado y en proceso de entrega.</td></tr>
+    <tr><td><span class="m-chip chip-gray">Entregado</span></td><td>Ciclo terminado.</td></tr>
+    <tr><td><span class="m-chip chip-yellow">Comida pendiente</span></td><td>Comida autorizada por el gerente, esperando pago en caja.</td></tr>
+  </table>
+</section>
+
+<!-- ================= 8. SI ALGO SALE MAL ================= -->
+<section class="sec">
+  <div class="sec-h"><div class="sec-n">8</div><h2>Si algo sale mal</h2></div>
+  <p class="lead">Mensajes que puedes ver y qué significan.</p>
+
+  <h3 class="mini">Al capturar un reembolso</h3>
+  <table class="ref">
+    <tr><th>Mensaje</th><th>Qué hacer</th></tr>
+    <tr><td>"Completa todos los campos obligatorios"</td><td>Falta llenar un campo con *.</td></tr>
+    <tr><td>"El monto debe ser mayor a 0"</td><td>Escribe un monto válido.</td></tr>
+    <tr><td>"La fecha no puede ser mayor a mañana"</td><td>Corrige la fecha.</td></tr>
+    <tr><td>"Debes adjuntar al menos un comprobante"</td><td>Adjunta una foto, PDF o Excel.</td></tr>
+    <tr><td>"Archivo muy grande (máx 10MB)"</td><td>Usa un archivo más ligero.</td></tr>
+  </table>
+
+  <h3 class="mini">Al pagar una comida</h3>
+  <table class="ref">
+    <tr><th>Mensaje</th><th>Qué significa / qué hacer</th></tr>
+    <tr><td>"No hay código generado para este empleado…"</td><td>Todavía no se le ha generado código. Que abra su app.</td></tr>
+    <tr><td>"El código ya venció"</td><td>Era de otro día. Necesita el código de hoy.</td></tr>
+    <tr><td>"Este código ya se usó"</td><td>El pago ya se había liberado antes.</td></tr>
+    <tr><td>"Código incorrecto"</td><td>Revisa los 6 dígitos e intenta de nuevo.</td></tr>
+    <tr><td>"Demasiados intentos fallidos"</td><td>El empleado debe abrir su app para obtener un código nuevo.</td></tr>
+    <tr><td>"Ya no tiene comidas pendientes"</td><td>No se pagó nada; el código sigue disponible.</td></tr>
+  </table>
+
+  <div class="box ok" style="margin-top:16px"><span class="t">Regla de oro</span>Si un mensaje no te deja avanzar, no insistas a la fuerza: lee lo que dice, corrige ese punto, y si sigue igual avisa a administración.</div>
+
+  <div class="footer"><span>Manual de la Cajera · Aceros del Pacífico</span><span>Reembolsos AC</span></div>
+</section>
+
+</body>
+</html>

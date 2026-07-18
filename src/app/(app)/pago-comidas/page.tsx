@@ -17,7 +17,7 @@ export default function PagoComidasPage() {
   const { data: comidas, isLoading } = useComidasPendientes();
 
   const diaSemana = new Date().getDay();
-  const esDiaHabil = diaSemana >= 1 && diaSemana <= 5;
+  const esDiaHabil = diaSemana >= 1 && diaSemana <= 6; // lunes a sábado (0 = domingo)
   const lista = comidas ?? [];
   const totalGeneral = lista.reduce((s, c) => s + Number(c.total), 0);
   const totalComidas = lista.reduce((s, c) => s + c.numComidas, 0);
@@ -41,7 +41,7 @@ export default function PagoComidasPage() {
             <span className="text-2xl">🔒</span>
             <div className="min-w-0 flex-1">
               <div className="font-semibold text-red-700">Pagos deshabilitados</div>
-              <div className="text-sm text-red-600 break-words">Los pagos de comidas solo se pueden realizar de <strong>lunes a viernes</strong>.</div>
+              <div className="text-sm text-red-600 break-words">Los pagos de comidas solo se pueden realizar de <strong>lunes a sábado</strong>.</div>
             </div>
           </div>
         </Card>
@@ -83,7 +83,7 @@ export default function PagoComidasPage() {
                           <button
                             className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-40"
                             disabled={cajeraEmail === "" || !esDiaHabil}
-                            title={!esDiaHabil ? "Solo de lunes a viernes" : undefined}
+                            title={!esDiaHabil ? "Solo de lunes a sábado" : undefined}
                             onClick={() => setModalEmpleado({ empleadoId: c.empleadoId as number, nombre: c.nombre })}
                           >
                             Cobrar con código
