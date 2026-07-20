@@ -10,12 +10,21 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { LoteCard } from "@/components/ui/LoteCard";
 import { Money } from "@/components/ui/Money";
+import { ComprobantesModal } from "@/components/ui/ComprobantesModal";
 import { parseMonto } from "@devoluciones/domain";
 import type { AprobadoLite } from "@/lib/supabase/queries/entregas";
 
 const BTN_CYAN = "rounded-lg bg-cyan-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-cyan-700 disabled:opacity-40";
 
-function TablaDetalle({ reembolsos, conConcepto = true }: { reembolsos: Fila[]; conConcepto?: boolean }) {
+function TablaDetalle({
+  reembolsos,
+  conConcepto = true,
+  onVerComprobantes,
+}: {
+  reembolsos: Fila[];
+  conConcepto?: boolean;
+  onVerComprobantes: (reembolsos: Fila[], indice: number) => void;
+}) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -28,8 +37,12 @@ function TablaDetalle({ reembolsos, conConcepto = true }: { reembolsos: Fila[]; 
           </tr>
         </thead>
         <tbody>
-          {reembolsos.map((r) => (
-            <tr key={String(r.id)} className="border-t border-slate-200">
+          {reembolsos.map((r, i) => (
+            <tr
+              key={String(r.id)}
+              onClick={() => onVerComprobantes(reembolsos, i)}
+              className="cursor-pointer border-t border-slate-200 transition-colors hover:bg-blue-50/40"
+            >
               <td className="py-1.5 pr-4 text-slate-900">{String(r.nombre_beneficiario ?? "")}</td>
               {conConcepto && <td className="py-1.5 pr-4 text-slate-600">{String(r.concepto ?? "")}</td>}
               <td className="py-1.5 pr-4 text-right"><Money monto={parseMonto(r.monto as number)} /></td>
@@ -52,6 +65,7 @@ export default function EntregasPage() {
   const [msg, setMsg] = useState("");
   const [busqueda, setBusqueda] = useState("");
   const [evidenciaPorLote, setEvidenciaPorLote] = useState<Record<string, File | null>>({});
+  const [comprobantes, setComprobantes] = useState<{ filas: Fila[]; indice: number } | null>(null);
 
   const aprobados = useMemo(() => (aprobadosQ.data?.rows ?? []) as Fila[], [aprobadosQ.data]);
   const solicitados = useMemo(() => (solicitadosQ.data?.rows ?? []) as Fila[], [solicitadosQ.data]);
@@ -171,7 +185,7 @@ export default function EntregasPage() {
                     Solicitar entrega
                   </button>
                 }
-                detalle={<TablaDetalle reembolsos={g.reembolsos} />}
+                detalle={<TablaDetalle reembolsos={g.reembolsos} onVerComprobantes={(filas, indice) => setComprobantes({ filas, indice })} />}
               />
             ))}
           </div>
@@ -199,7 +213,7 @@ export default function EntregasPage() {
                 chipTono="ambar"
                 detalle={
                   <div className="space-y-3">
-                    <TablaDetalle reembolsos={g.reembolsos} />
+                    <TablaDetalle reembolsos={g.reembolsos} onVerComprobantes={(filas, indice) => setComprobantes({ filas, indice })} />
                     <div className="flex flex-wrap items-center gap-3 rounded-lg bg-white p-2.5">
                       <label className="text-sm font-medium text-slate-700">Evidencia del lote:</label>
                       <input
@@ -222,6 +236,14 @@ export default function EntregasPage() {
           </div>
         )}
       </section>
+
+      {comprobantes && (
+        <ComprobantesModal
+          reembolsos={comprobantes.filas}
+          indiceInicial={comprobantes.indice}
+          onClose={() => setComprobantes(null)}
+        />
+      )}
     </main>
   );
 }

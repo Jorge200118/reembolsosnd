@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/Card";
 import { DataTable, type Columna } from "@/components/ui/DataTable";
 import { Money } from "@/components/ui/Money";
 import { EstadoBadge } from "@/components/ui/EstadoBadge";
+import { ComprobantesModal } from "@/components/ui/ComprobantesModal";
 import { parseMonto, type Estado } from "@devoluciones/domain";
 import type { ReembolsoLite } from "@/lib/supabase/queries/corte";
 
@@ -33,6 +34,7 @@ export default function RevisionPage() {
   const { sesion } = useAuth();
   const [page, setPage] = useState(0);
   const [busqueda, setBusqueda] = useState("");
+  const [comprobanteIdx, setComprobanteIdx] = useState<number | null>(null);
   const pageSize = 20;
   const pendientesQ = useReembolsos({ estado: "pendiente", page: 0, pageSize: 500 });
   const enCorteQ = useReembolsos({ estado: "en_corte", page: 0, pageSize: 1 });
@@ -140,6 +142,7 @@ export default function RevisionPage() {
           pageSize={pageSize}
           onPageChange={setPage}
           loading={pendientesQ.isLoading}
+          onRowClick={(_r, i) => setComprobanteIdx(i)}
         />
       </Card>
 
@@ -157,6 +160,14 @@ export default function RevisionPage() {
           </button>
         </div>
       </Card>
+
+      {comprobanteIdx !== null && (
+        <ComprobantesModal
+          reembolsos={paginaActual}
+          indiceInicial={comprobanteIdx}
+          onClose={() => setComprobanteIdx(null)}
+        />
+      )}
     </main>
   );
 }

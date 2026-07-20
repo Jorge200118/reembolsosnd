@@ -11,7 +11,7 @@ import { LoteCard } from "@/components/ui/LoteCard";
 import { Money } from "@/components/ui/Money";
 import { ComprobantesModal } from "@/components/ui/ComprobantesModal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { parseMonto, formatMXN, normalizarArchivos } from "@devoluciones/domain";
+import { parseMonto, normalizarArchivos } from "@devoluciones/domain";
 
 const BTN_OK = "rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-40";
 const BTN_NO = "rounded-lg bg-red-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-40";
@@ -21,7 +21,7 @@ function TablaDetalle({
   onVerComprobantes,
 }: {
   reembolsos: Fila[];
-  onVerComprobantes: (reembolso: Fila) => void;
+  onVerComprobantes: (reembolsos: Fila[], indice: number) => void;
 }) {
   return (
     <div className="overflow-x-auto">
@@ -36,7 +36,7 @@ function TablaDetalle({
           </tr>
         </thead>
         <tbody>
-          {reembolsos.map((r) => {
+          {reembolsos.map((r, i) => {
             const archivos = normalizarArchivos(r.archivos);
             return (
               <tr key={String(r.id)} className="border-t border-slate-200">
@@ -50,7 +50,7 @@ function TablaDetalle({
                   ) : (
                     <button
                       type="button"
-                      onClick={() => onVerComprobantes(r)}
+                      onClick={() => onVerComprobantes(reembolsos, i)}
                       className="rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100"
                     >
                       Ver{archivos.length > 1 ? ` (${archivos.length})` : ""}
@@ -74,7 +74,7 @@ export default function AutorizacionesPage() {
   const queryClient = useQueryClient();
   const [msg, setMsg] = useState("");
   const [busqueda, setBusqueda] = useState("");
-  const [verComprobantesDe, setVerComprobantesDe] = useState<Fila | null>(null);
+  const [comprobantes, setComprobantes] = useState<{ filas: Fila[]; indice: number } | null>(null);
   const [confirmar, setConfirmar] = useState<{ tipo: "autorizar" | "rechazar"; grupo: GrupoLote } | null>(null);
 
   const enCorte = useMemo(() => (enCorteQ.data?.rows ?? []) as Fila[], [enCorteQ.data]);
@@ -170,29 +170,20 @@ export default function AutorizacionesPage() {
                 </div>
               }
               detalle={
-                <TablaDetalle reembolsos={g.reembolsos} onVerComprobantes={setVerComprobantesDe} />
+                <TablaDetalle reembolsos={g.reembolsos} onVerComprobantes={(filas, indice) => setComprobantes({ filas, indice })} />
               }
             />
           ))}
         </div>
       )}
 
-      {verComprobantesDe && (() => {
-        const r = verComprobantesDe;
-        const nombre = String(r.nombre_beneficiario ?? "");
-        const monto = formatMXN(parseMonto(r.monto as number));
-        const concepto = String(r.concepto ?? "");
-        const fecha = r.fecha ? new Date(String(r.fecha) + "T12:00:00").toLocaleDateString("es-MX") : "";
-        const subtitulo = [concepto, fecha].filter(Boolean).join(" · ");
-        return (
-          <ComprobantesModal
-            titulo={`${nombre} - ${monto}`}
-            subtitulo={subtitulo || undefined}
-            archivos={normalizarArchivos(r.archivos)}
-            onClose={() => setVerComprobantesDe(null)}
-          />
-        );
-      })()}
+      {comprobantes && (
+        <ComprobantesModal
+          reembolsos={comprobantes.filas}
+          indiceInicial={comprobantes.indice}
+          onClose={() => setComprobantes(null)}
+        />
+      )}
 
       {confirmar && (() => {
         const g = confirmar.grupo;

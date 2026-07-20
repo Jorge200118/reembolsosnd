@@ -16,6 +16,7 @@ export interface DataTableProps<T> {
   pageSize: number;
   onPageChange: (page: number) => void;
   loading?: boolean;
+  onRowClick?: (row: T, index: number) => void;
 }
 
 const alineacion = {
@@ -32,6 +33,7 @@ export function DataTable<T>({
   pageSize,
   onPageChange,
   loading,
+  onRowClick,
 }: DataTableProps<T>) {
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   return (
@@ -68,7 +70,11 @@ export function DataTable<T>({
               </tr>
             ) : (
               rows.map((row, ri) => (
-                <tr key={ri} className="border-b border-slate-100 transition-colors last:border-0 hover:bg-blue-50/40">
+                <tr
+                  key={ri}
+                  onClick={onRowClick ? () => onRowClick(row, ri) : undefined}
+                  className={`border-b border-slate-100 transition-colors last:border-0 hover:bg-blue-50/40 ${onRowClick ? "cursor-pointer" : ""}`}
+                >
                   {columnas.map((c, ci) => (
                     <td key={ci} className={`px-4 py-2.5 text-slate-900 ${alineacion[c.align ?? "left"]}`}>
                       {c.cell(row)}
