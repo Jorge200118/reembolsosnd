@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth/AuthContext";
 import { useCrearReembolso } from "@/lib/hooks/useCrearReembolso";
 import { useGuardedAction } from "@/lib/hooks/useGuardedAction";
 import { SelectorArchivos, validarArchivos } from "@/components/reembolsos/SelectorArchivos";
+import { BeneficiarioAutocomplete } from "@/components/reembolsos/BeneficiarioAutocomplete";
 
 // fecha máxima permitida = hoy + 1 día, en formato YYYY-MM-DD
 function maxFecha(): string {
@@ -89,7 +90,7 @@ export function FormNuevoReembolso() {
     <form onSubmit={enviar} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="mb-4">
         <label className={labelClass}>Beneficiario *</label>
-        <input className={inputClass} value={nombre} onChange={(e) => setNombre(e.target.value)} />
+        <BeneficiarioAutocomplete className={inputClass} value={nombre} onChange={setNombre} />
       </div>
       <div className="mb-4 grid grid-cols-2 gap-3">
         <div>
@@ -110,10 +111,10 @@ export function FormNuevoReembolso() {
       </div>
       <div className="mb-4">
         <label className={labelClass}>Quién autoriza *</label>
-        <input list="autorizadores" className={inputClass} value={autoriza} onChange={(e) => setAutoriza(e.target.value)} />
-        <datalist id="autorizadores">
-          {AUTORIZADORES.map((a) => <option key={a} value={a} />)}
-        </datalist>
+        <select className={inputClass} value={autoriza} onChange={(e) => setAutoriza(e.target.value)}>
+          <option value="">Selecciona…</option>
+          {AUTORIZADORES.map((a) => <option key={a} value={a}>{a}</option>)}
+        </select>
       </div>
       <div className="mb-4">
         <SelectorArchivos onChange={setArchivos} />
