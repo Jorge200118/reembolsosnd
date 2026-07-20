@@ -154,7 +154,16 @@ $function$;
 - [ ] **Step 3: Aplicar la migración**
 
 Aplícala vía MCP `apply_migration` con name `0016_comidas_filtro_sucursal` y el contenido del archivo.
-(La firma nueva tiene `default null`, así que las llamadas viejas sin argumento siguen funcionando: no hace falta `drop function`.)
+
+⚠ **Corrección aplicada durante la ejecución (dos hallazgos):**
+1. `create or replace` NO sustituye la función vieja de 0 argumentos (distinta firma):
+   quedan dos sobrecargas y llamar sin args da `function is not unique` — rompería el
+   frontend actual. La migración incluye `drop function if exists ...()` antes del create.
+2. Una abreviatura **desconocida** debe devolver 0 (no todo). El CTE `objetivo` distingue
+   `sin_filtro` (`p_sucursal is null` → ver todo) de `nombre_largo is null` (abreviatura
+   sin mapeo → ver nada). El `where` usa `o.sin_filtro`, no `o.nombre_largo is null`.
+
+El contenido final del archivo `0016_...sql` ya refleja ambas correcciones.
 
 - [ ] **Step 4: Verificar que el test pasa — filtro por FTE**
 
