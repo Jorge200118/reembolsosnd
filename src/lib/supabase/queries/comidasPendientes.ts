@@ -22,8 +22,13 @@ interface FilaRpc {
   estatus: EstatusComida;
 }
 
-export async function comidasPendientesPorChofer(): Promise<ComidaPendienteChofer[]> {
-  const { data, error } = await supabase.rpc("comidas_pendientes_por_chofer" as never);
+export async function comidasPendientesPorChofer(
+  sucursal?: string | null,
+): Promise<ComidaPendienteChofer[]> {
+  const { data, error } = await supabase.rpc(
+    "comidas_pendientes_por_chofer" as never,
+    { p_sucursal: sucursal ?? null } as never,
+  );
   if (error) throw error;
   const filas = (data ?? []) as unknown as FilaRpc[];
   return filas.map((r) => ({

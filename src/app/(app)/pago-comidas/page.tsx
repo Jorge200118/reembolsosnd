@@ -14,7 +14,7 @@ export default function PagoComidasPage() {
   const cajeraEmail = sesion?.email ?? "";
   const [modalEmpleado, setModalEmpleado] = useState<{ empleadoId: number; nombre: string } | null>(null);
   const queryClient = useQueryClient();
-  const { data: comidas, isLoading } = useComidasPendientes();
+  const { data: comidas, isLoading } = useComidasPendientes(sesion?.sucursal ?? undefined);
 
   const diaSemana = new Date().getDay();
   const esDiaHabil = diaSemana >= 1 && diaSemana <= 6; // lunes a sábado (0 = domingo)
