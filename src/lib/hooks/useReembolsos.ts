@@ -6,10 +6,14 @@ import {
   type FiltrosReembolso,
 } from "@/lib/supabase/queries/reembolsos";
 
-export function useReembolsos(filtros: FiltrosReembolso) {
+export function useReembolsos(
+  filtros: FiltrosReembolso,
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: ["reembolsos", filtros],
     queryFn: () => listarReembolsos(filtros),
+    enabled: options?.enabled ?? true,
   });
 }
 

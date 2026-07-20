@@ -36,7 +36,15 @@ export default function RevisionPage() {
   const [busqueda, setBusqueda] = useState("");
   const [comprobanteIdx, setComprobanteIdx] = useState<number | null>(null);
   const pageSize = 20;
-  const pendientesQ = useReembolsos({ estado: "pendiente", page: 0, pageSize: 500 });
+  // Cada caja solo revisa y envía a corte SUS propios pendientes: filtramos por
+  // el email de quien registró (usuario_registro). Sin esto, una caja veía el
+  // pozo global de pendientes (incluidos los de otras cajas) y podía mandarlos
+  // a corte. Gated en `sesion?.email` para no traer el pozo global mientras la
+  // sesión aún no carga (primer render, email undefined → filtro se saltaría).
+  const pendientesQ = useReembolsos(
+    { estado: "pendiente", usuarioRegistro: sesion?.email, page: 0, pageSize: 500 },
+    { enabled: Boolean(sesion?.email) },
+  );
   const enCorteQ = useReembolsos({ estado: "en_corte", page: 0, pageSize: 1 });
   const { mutate, isPending, data: resultado } = useEnviarACorte();
   const queryClient = useQueryClient();
