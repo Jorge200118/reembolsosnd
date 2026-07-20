@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useGuardedAction } from "@/lib/hooks/useGuardedAction";
 
 const MENSAJES: Record<string, string> = {
   datos_incorrectos: "Teléfono o código de empleado no coinciden.",
@@ -42,13 +43,16 @@ export default function ResetNip() {
     }
   }
 
+  // Guard síncrono contra doble-tap veloz (además del disabled={cargando}).
+  const enviar = useGuardedAction(resetear);
+
   return (
     <>
       <div className="carnet-logo">AC</div>
       <h1 className="carnet-marca">Nuevo NIP</h1>
       <p className="carnet-sub carnet-stencil">Recupera tu acceso</p>
 
-      <form className="carnet-card" onSubmit={resetear} style={{ marginTop: 22 }} noValidate>
+      <form className="carnet-card" onSubmit={enviar} style={{ marginTop: 22 }} noValidate>
         {listo ? (
           <p style={{ textAlign: "center", color: "#0f2942", fontWeight: 500, padding: "8px 0" }}>
             ✓ NIP actualizado. Te llevo a iniciar sesión…

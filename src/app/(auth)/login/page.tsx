@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { useGuardedAction } from "@/lib/hooks/useGuardedAction";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -23,6 +24,9 @@ export default function LoginPage() {
       setError(r.error ?? "No se pudo iniciar sesión");
     }
   }
+
+  // Guard síncrono contra doble-tap veloz (además del disabled={cargando}).
+  const enviar = useGuardedAction(onSubmit);
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0F2942] p-4">
@@ -49,7 +53,7 @@ export default function LoginPage() {
           <h2 className="mb-5 text-center text-sm font-semibold uppercase tracking-wide text-slate-500">
             Iniciar sesión
           </h2>
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={enviar} className="space-y-4">
             <div>
               <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-slate-700">
                 Correo

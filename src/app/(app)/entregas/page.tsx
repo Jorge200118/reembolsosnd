@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useReembolsos } from "@/lib/hooks/useReembolsos";
 import { useSolicitarEntrega, useMarcarEntregado } from "@/lib/hooks/useEntregas";
+import { useGuardedAction } from "@/lib/hooks/useGuardedAction";
 import { agruparPorLote, type Fila, type GrupoLote } from "@/lib/reportes/agruparPorLote";
 import { imprimirComprobanteLote } from "@/lib/entregas/comprobanteImprimible";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -133,6 +134,10 @@ export default function EntregasPage() {
     });
   }
 
+  // Guards síncronos contra doble-tap veloz (además del disabled={isPending}).
+  const solicitarLote = useGuardedAction(onSolicitarLote);
+  const entregarLote = useGuardedAction(onEntregarLote);
+
   return (
     <main className="mx-auto max-w-6xl p-4 sm:p-6">
       <PageHeader titulo="Entregas" subtitulo="Solicita la entrega de lotes aprobados y confirma la entrega con evidencia" />
@@ -181,7 +186,7 @@ export default function EntregasPage() {
                 acentoColor="border-l-emerald-500"
                 chipTono="verde"
                 accion={
-                  <button className={BTN_CYAN} disabled={solicitar.isPending} onClick={() => onSolicitarLote(g.reembolsos)}>
+                  <button className={BTN_CYAN} disabled={solicitar.isPending} onClick={() => solicitarLote(g.reembolsos)}>
                     Solicitar entrega
                   </button>
                 }
@@ -224,7 +229,7 @@ export default function EntregasPage() {
                       <button
                         className="rounded-lg bg-slate-800 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-slate-900 disabled:opacity-40"
                         disabled={entregar.isPending || !evidenciaPorLote[g.lote]}
-                        onClick={() => onEntregarLote(g.lote, g.reembolsos)}
+                        onClick={() => entregarLote(g.lote, g.reembolsos)}
                       >
                         Marcar lote como entregado
                       </button>

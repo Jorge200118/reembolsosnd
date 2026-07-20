@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCrearComidasLote, type ResultadoComidaLote } from "@/lib/hooks/useCrearComidasLote";
 import { useReembolsos } from "@/lib/hooks/useReembolsos";
+import { useGuardedAction } from "@/lib/hooks/useGuardedAction";
 import { empleadosPorSucursal } from "@/lib/supabase/queries/empleadosPorSucursal";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -122,6 +123,9 @@ export default function ComidasGerentePage() {
       },
     );
   }
+
+  // Guard síncrono contra doble-tap veloz (además del disabled={isPending}).
+  const autorizarComidas = useGuardedAction(autorizar);
 
   const numOk = resultados?.filter((r) => r.ok).length ?? 0;
   const fallidos = resultados?.filter((r) => !r.ok) ?? [];
@@ -267,7 +271,7 @@ export default function ComidasGerentePage() {
             )}
 
             <button
-              onClick={autorizar}
+              onClick={autorizarComidas}
               disabled={isPending || numSel === 0 || !sesion || !fecha || fecha > hoy}
               className="mt-4 w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:opacity-40"
             >

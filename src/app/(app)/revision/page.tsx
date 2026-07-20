@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useReembolsos } from "@/lib/hooks/useReembolsos";
 import { useEnviarACorte } from "@/lib/hooks/useEnviarACorte";
+import { useGuardedAction } from "@/lib/hooks/useGuardedAction";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { type Fila } from "@/lib/reportes/agruparPorLote";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -99,6 +100,9 @@ export default function RevisionPage() {
     );
   }
 
+  // Guard síncrono contra doble-tap veloz (además del disabled={isPending}).
+  const enviarACorte = useGuardedAction(onEnviarACorte);
+
   return (
     <main className="mx-auto max-w-6xl p-4 sm:p-6">
       <PageHeader titulo="Revisión" subtitulo="Arma el lote de pendientes y envíalo a corte" />
@@ -115,7 +119,7 @@ export default function RevisionPage() {
             <Metrica etiqueta="Lotes" valor="1 corte" />
           </div>
           <button
-            onClick={onEnviarACorte}
+            onClick={enviarACorte}
             disabled={isPending || pendientes.length === 0}
             className="w-full rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-800 disabled:opacity-40 sm:w-auto"
           >

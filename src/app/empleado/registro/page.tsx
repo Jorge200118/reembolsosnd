@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useGuardedAction } from "@/lib/hooks/useGuardedAction";
 
 const MENSAJES: Record<string, string> = {
   datos_incorrectos: "Teléfono o código de empleado no coinciden.",
@@ -45,13 +46,16 @@ export default function RegistroEmpleado() {
     }
   }
 
+  // Guard síncrono contra doble-tap veloz (además del disabled={cargando}).
+  const enviar = useGuardedAction(registrar);
+
   return (
     <>
       <div className="carnet-logo">AC</div>
       <h1 className="carnet-marca">Regístrate</h1>
       <p className="carnet-sub carnet-stencil">Solo la primera vez</p>
 
-      <form className="carnet-card" onSubmit={registrar} style={{ marginTop: 22 }} noValidate>
+      <form className="carnet-card" onSubmit={enviar} style={{ marginTop: 22 }} noValidate>
         <div className="carnet-field">
           <label className="carnet-stencil" htmlFor="tel">Teléfono</label>
           <input id="tel" className="carnet-input" type="tel" inputMode="numeric" autoComplete="tel"

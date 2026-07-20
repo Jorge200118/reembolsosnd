@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useGuardedAction } from "@/lib/hooks/useGuardedAction";
 
 export interface ConfirmDialogProps {
   titulo: string;
@@ -23,6 +24,12 @@ export function ConfirmDialog({
   onConfirmar,
 }: ConfirmDialogProps) {
   const [motivo, setMotivo] = useState("");
+
+  // Guard síncrono contra doble-tap: evita disparar la mutación dos veces
+  // en el instante entre el primer click y que isPending deshabilite el botón.
+  const confirmar = useGuardedAction(() =>
+    onConfirmar(conMotivo ? motivo.trim() : undefined),
+  );
 
   const btnConfirmar =
     colorConfirmar === "rojo"
@@ -65,7 +72,7 @@ export function ConfirmDialog({
           </button>
           <button
             type="button"
-            onClick={() => onConfirmar(conMotivo ? motivo.trim() : undefined)}
+            onClick={confirmar}
             disabled={isPending}
             className={btnConfirmar}
           >

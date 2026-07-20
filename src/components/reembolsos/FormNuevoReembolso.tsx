@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import { CONCEPTOS, AUTORIZADORES } from "@devoluciones/domain";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useCrearReembolso } from "@/lib/hooks/useCrearReembolso";
+import { useGuardedAction } from "@/lib/hooks/useGuardedAction";
 import { SelectorArchivos, validarArchivos } from "@/components/reembolsos/SelectorArchivos";
 
 // fecha máxima permitida = hoy + 1 día, en formato YYYY-MM-DD
@@ -81,8 +82,11 @@ export function FormNuevoReembolso() {
     );
   }
 
+  // Guard síncrono contra doble-tap veloz (además del disabled={isPending}).
+  const enviar = useGuardedAction(onSubmit);
+
   return (
-    <form onSubmit={onSubmit} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <form onSubmit={enviar} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="mb-4">
         <label className={labelClass}>Beneficiario *</label>
         <input className={inputClass} value={nombre} onChange={(e) => setNombre(e.target.value)} />

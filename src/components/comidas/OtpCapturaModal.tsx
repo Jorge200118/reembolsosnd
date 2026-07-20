@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useValidarOtp } from "@/lib/hooks/useValidarOtp";
+import { useGuardedAction } from "@/lib/hooks/useGuardedAction";
 import type { ResultadoOtp } from "@/lib/edge/otpComidas";
 
 const MENSAJES: Record<ResultadoOtp, string> = {
@@ -40,6 +41,9 @@ export function OtpCapturaModal({
     mutate({ empleadoId, codigo: codigo.trim(), cajeraEmail });
   }
 
+  // Guard síncrono contra doble-tap veloz (además del disabled={isPending}).
+  const enviar = useGuardedAction(onSubmit);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
@@ -65,7 +69,7 @@ export function OtpCapturaModal({
             </button>
           </div>
         ) : (
-          <form onSubmit={onSubmit}>
+          <form onSubmit={enviar}>
             <label className="mb-1 block text-sm font-medium text-slate-700">
               Código que el empleado recibió por WhatsApp
             </label>
