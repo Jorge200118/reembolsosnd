@@ -8,6 +8,9 @@
 --
 -- Criterio: filtrar por sucursal del EMPLEADO beneficiario (empleados.sucursal).
 
+-- 0) La comparación de sucursales usa unaccent() para tolerar acentos.
+create extension if not exists unaccent;
+
 -- 1) Catálogo abreviatura -> nombre largo. Fuente única de verdad.
 create table if not exists public.sucursales_map (
   abrev        text primary key,
@@ -62,9 +65,12 @@ as $function$
       (p_sucursal is null) as sin_filtro,
       case
         when p_sucursal is null then null
-        else (select upper(btrim(m.nombre_largo))
+        -- unaccent + upper + btrim: robusto a acentos/mayúsculas/espacios, por si
+        -- una sucursal futura llega como 'Culiacán' o 'CULIACÁN'. Hoy los datos no
+        -- traen acentos, así que no cambia el resultado; blinda el escalamiento.
+        else (select unaccent(upper(btrim(m.nombre_largo)))
               from sucursales_map m
-              where upper(btrim(m.abrev)) = upper(btrim(p_sucursal)))
+              where unaccent(upper(btrim(m.abrev))) = unaccent(upper(btrim(p_sucursal))))
       end as nombre_largo
   ),
   base as (
@@ -92,7 +98,7 @@ as $function$
       or exists (
         select 1 from empleados e
         where e.id = b.emp_id
-          and upper(btrim(e.sucursal)) = o.nombre_largo
+          and unaccent(upper(btrim(e.sucursal))) = o.nombre_largo
       )
   )
   select
@@ -101,7 +107,7 @@ as $function$
     (select e.telefono_whatsapp from empleados e where e.id = f.emp_id) as telefono,
     count(*) as num_comidas,
     sum(f.monto) as total,
-    array_agg(f.reembolso_id) as reembolso_ids,
+    array_agg(f.reembolso_id order by f.reembolso_id) as reembolso_ids,
     case
       when f.emp_id is null then 'sin_match'
       when (select e.telefono_whatsapp from empleados e where e.id=f.emp_id) is null
