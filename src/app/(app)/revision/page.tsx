@@ -38,13 +38,17 @@ export default function RevisionPage() {
   const [comprobanteIdx, setComprobanteIdx] = useState<number | null>(null);
   const pageSize = 20;
   // Cada caja solo revisa y envía a corte SUS propios pendientes: filtramos por
-  // el email de quien registró (usuario_registro). Sin esto, una caja veía el
-  // pozo global de pendientes (incluidos los de otras cajas) y podía mandarlos
-  // a corte. Gated en `sesion?.email` para no traer el pozo global mientras la
-  // sesión aún no carga (primer render, email undefined → filtro se saltaría).
+  // quien ENTREGÓ el efectivo. Sin esto, una caja veía el pozo global de
+  // pendientes (incluidos los de otras cajas) y podía mandarlos a corte.
+  // Antes se filtraba por usuario_registro, que solo funciona cuando la cajera
+  // captura la solicitud: una COMIDA la registra el gerente y solo la cobra la
+  // caja, así que quedaba fuera de la Revisión de todas y el efectivo entregado
+  // jamás llegaba a corte. quien_entrega sí identifica a la caja en ambos casos.
+  // Gated en `sesion?.nombre` para no traer el pozo global mientras la sesión aún
+  // no carga (primer render, nombre undefined → filtro se saltaría).
   const pendientesQ = useReembolsos(
-    { estado: "pendiente", usuarioRegistro: sesion?.email, page: 0, pageSize: 500 },
-    { enabled: Boolean(sesion?.email) },
+    { estado: "pendiente", quienEntrega: sesion?.nombre, page: 0, pageSize: 500 },
+    { enabled: Boolean(sesion?.nombre) },
   );
   const enCorteQ = useReembolsos({ estado: "en_corte", page: 0, pageSize: 1 });
   const { mutate, isPending, data: resultado } = useEnviarACorte();

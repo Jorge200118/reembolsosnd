@@ -5,6 +5,10 @@ export interface FiltrosReembolso {
   estado?: Estado;
   sucursal?: string;
   usuarioRegistro?: string; // para forzar el filtro de caja_chica server-side
+  // Caja que entregó el efectivo (nombre, no email). Es el dueño real del
+  // pendiente para efectos de corte: una COMIDA la registra el gerente pero el
+  // dinero lo pone la caja al canjear el código. Ver 0017_comida_cobrada_por_caja.
+  quienEntrega?: string;
   beneficiario?: string;
   lote?: string;
   page: number;
@@ -35,6 +39,7 @@ function aplicarFiltros<Q extends FiltrableQuery>(
   if (f.estado) q = q.eq("estado", f.estado);
   if (f.sucursal) q = q.eq("sucursal_usuario", f.sucursal);
   if (f.usuarioRegistro) q = q.eq("usuario_registro", f.usuarioRegistro);
+  if (f.quienEntrega) q = q.eq("quien_entrega", f.quienEntrega);
   if (f.beneficiario && f.beneficiario.trim())
     q = q.ilike("nombre_beneficiario", `%${f.beneficiario.trim()}%`);
   if (f.lote && f.lote.trim())
