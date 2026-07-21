@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { buscarEmpleados, type EmpleadoBusqueda } from "@/lib/supabase/queries/empleados";
+import { buscarRndEmpleados, type RndEmpleadoBusqueda } from "@/lib/supabase/queries/rndEmpleados";
 
 export interface BeneficiarioAutocompleteProps {
   value: string;
@@ -9,10 +9,10 @@ export interface BeneficiarioAutocompleteProps {
 }
 
 // Input de texto LIBRE para el beneficiario, con sugerencias de empleados
-// activos (tabla `empleados`). No obliga a elegir de la lista: el beneficiario
+// activos de `rnd_empleados`. No obliga a elegir de la lista: el beneficiario
 // puede ser un tercero. El listado se ancla justo debajo del input (no flota).
 export function BeneficiarioAutocomplete({ value, onChange, className }: BeneficiarioAutocompleteProps) {
-  const [opciones, setOpciones] = useState<EmpleadoBusqueda[]>([]);
+  const [opciones, setOpciones] = useState<RndEmpleadoBusqueda[]>([]);
   const [abierto, setAbierto] = useState(false);
   const contenedorRef = useRef<HTMLDivElement>(null);
   // Nombre recién elegido: evita re-buscar (y reabrir) tras seleccionar.
@@ -23,7 +23,7 @@ export function BeneficiarioAutocomplete({ value, onChange, className }: Benefic
     let activo = true;
     const t = setTimeout(async () => {
       try {
-        const res = await buscarEmpleados(value);
+        const res = await buscarRndEmpleados(value);
         if (activo) { setOpciones(res); setAbierto(res.length > 0); }
       } catch { if (activo) { setOpciones([]); setAbierto(false); } }
     }, 250);
@@ -68,7 +68,7 @@ export function BeneficiarioAutocomplete({ value, onChange, className }: Benefic
               >
                 <span className="text-slate-900">{o.nombre}</span>
                 <span className="shrink-0 text-xs text-slate-600">
-                  {[o.puesto, o.sucursal].filter(Boolean).join(" · ")}
+                  {[o.codigo, o.sucursal].filter(Boolean).join(" · ")}
                 </span>
               </button>
             </li>
