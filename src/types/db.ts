@@ -1584,6 +1584,21 @@ export type Database = {
         }
         Relationships: []
       }
+      sucursales_map: {
+        Row: {
+          abrev: string
+          nombre_largo: string
+        }
+        Insert: {
+          abrev: string
+          nombre_largo: string
+        }
+        Update: {
+          abrev?: string
+          nombre_largo?: string
+        }
+        Relationships: []
+      }
       tablet_access_codes: {
         Row: {
           activo: boolean | null
