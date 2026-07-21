@@ -20,14 +20,20 @@ export interface CrearComidasLoteInput {
 // Autoriza varias comidas de una sola acción. Llama a crearComida por cada
 // empleado (la edge function valida duplicado de la fecha internamente), y devuelve
 // el detalle por empleado para mostrar cuáles se registraron y cuáles no.
-async function crearComidasLote(input: CrearComidasLoteInput): Promise<ResultadoComidaLote[]> {
+export async function crearComidasLote(input: CrearComidasLoteInput): Promise<ResultadoComidaLote[]> {
   const resultados: ResultadoComidaLote[] = [];
   for (const emp of input.empleados) {
     const payload: CrearComidaInput = {
       empleadoId: emp.id,
       quienAutoriza: input.quienAutoriza,
       usuarioRegistro: input.usuarioRegistro,
-      sucursalUsuario: emp.sucursal ?? input.sucursalSesion ?? undefined,
+      // OJO: va la sucursal de la SESIÓN (abreviatura: FTE/LMM/SJC…), nunca
+      // `emp.sucursal`. La columna `empleados.sucursal` usa el otro vocabulario,
+      // el de nombres largos (EL FUERTE/MATRIZ/SAN JOSE), y `sucursal_usuario`
+      // es un campo de abreviaturas. Preferir el del empleado ensuciaba la
+      // columna con nombres largos. Si la sesión no trae sucursal, no se manda
+      // nada y la edge function resuelve la abreviatura vía `sucursales_map`.
+      sucursalUsuario: input.sucursalSesion ?? undefined,
       fecha: input.fecha,
     };
     try {

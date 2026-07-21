@@ -40,6 +40,39 @@ function hoyMazatlan(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Mazatlan" }).format(new Date());
 }
 
+// `rnd_reembolsos.sucursal_usuario` guarda ABREVIATURAS (FTE, LMM, SJC…), que es
+// el vocabulario de `rnd_usuarios.sucursal`. Pero por aquí puede entrar el otro
+// vocabulario, el de `empleados.sucursal` (EL FUERTE, MATRIZ, SAN JOSE…), sea
+// porque un cliente viejo lo manda o por el respaldo del empleado. `sucursales_map`
+// es la fuente única de verdad del mapeo; esta función traduce contra ella.
+//
+// Devuelve la abreviatura si el valor ya lo es o si mapea desde nombre largo.
+// Si no reconoce el valor lo deja pasar tal cual: ensuciar es malo, pero perder
+// el dato de una sucursal nueva que aún no está en el catálogo es peor.
+async function abreviaturaSucursal(
+  supabase: ReturnType<typeof createClient>,
+  valor: unknown,
+): Promise<string | null> {
+  const v = String(valor ?? "").trim();
+  if (v === "") return null;
+
+  const { data, error } = await supabase.from("sucursales_map").select("abrev, nombre_largo");
+  if (error || !data) return v; // sin catálogo no inventamos: se respeta lo que llegó
+
+  // Comparación laxa (mayúsculas + espacios colapsados) para tolerar 'El Fuerte'
+  // o 'san jose '. Los acentos no se normalizan porque el catálogo no los usa.
+  const norm = (s: string) => s.toUpperCase().replace(/\s+/g, " ").trim();
+  const objetivo = norm(v);
+
+  for (const fila of data as Array<{ abrev: string; nombre_largo: string }>) {
+    if (norm(fila.abrev) === objetivo) return fila.abrev;
+  }
+  for (const fila of data as Array<{ abrev: string; nombre_largo: string }>) {
+    if (norm(fila.nombre_largo) === objetivo) return fila.abrev;
+  }
+  return v;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: CORS_HEADERS });
   if (req.method !== "POST") {
@@ -98,7 +131,10 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ ok: false, error: `Este empleado ya tiene una comida registrada ${cuando}` }), { status: 409, headers: CORS_HEADERS });
     }
 
-    // 3. Insertar la comida con el vínculo empleado_id exacto
+    // 3. Insertar la comida con el vínculo empleado_id exacto.
+    //    La sucursal se normaliza SIEMPRE a abreviatura, venga de donde venga.
+    const sucursalAbrev = await abreviaturaSucursal(supabase, sucursal_usuario ?? empleado.sucursal);
+
     const { data: comida, error: errIns } = await supabase
       .from("rnd_reembolsos")
       .insert({
@@ -111,7 +147,7 @@ Deno.serve(async (req: Request) => {
         concepto: "COMIDAS",
         estado: "comida_pendiente",
         usuario_registro: usuario_registro ?? quien_autoriza.trim(),
-        sucursal_usuario: sucursal_usuario ?? empleado.sucursal ?? null,
+        sucursal_usuario: sucursalAbrev,
         archivos: [],
       })
       .select("id")
