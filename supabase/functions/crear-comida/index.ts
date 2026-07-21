@@ -21,6 +21,20 @@ const CORS_HEADERS = {
 const WHATSAPP_URL = "https://recruiterhub-adp.ngrok.app/api/comidas/notificar";
 const MONTO_COMIDA = 120;
 
+// El gateway ahora usa la API oficial de Meta (WhatsApp Cloud API): un mensaje
+// proactivo (fuera de la ventana de 24h) OBLIGATORIAMENTE viaja en una plantilla
+// aprobada. Por eso mandamos `plantilla` + `variables`. El campo `mensaje` se
+// conserva como respaldo. Si no se declara plantilla, el gateway cae en una
+// comodín que aplana el formato (sin negritas ni saltos de línea).
+const PLANTILLA_COMIDA = "comida_autorizada";
+
+// Las variables de plantilla no admiten saltos de línea, no pueden ir vacías y
+// topan en 1024 caracteres. Normalizamos aquí en vez de confiar en el gateway.
+function varPlantilla(valor: unknown, respaldo: string): string {
+  const limpio = String(valor ?? "").replace(/\s+/g, " ").trim();
+  return (limpio === "" ? respaldo : limpio).slice(0, 1024);
+}
+
 // Hoy en Mazatlán como "YYYY-MM-DD". en-CA formatea justo en ese orden.
 function hoyMazatlan(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Mazatlan" }).format(new Date());
@@ -112,8 +126,20 @@ Deno.serve(async (req: Request) => {
       try {
         await fetch(WHATSAPP_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ telefono: empleado.telefono_whatsapp, mensaje }),
+          headers: {
+            "Content-Type": "application/json",
+            "x-comidas-secret": Deno.env.get("COMIDAS_SECRET") ?? "",
+          },
+          body: JSON.stringify({
+            telefono: empleado.telefono_whatsapp,
+            mensaje, // respaldo: texto completo con formato
+            plantilla: PLANTILLA_COMIDA,
+            variables: [
+              varPlantilla(nombreCompleto, "el empleado"), // {{1}} nombre completo
+              varPlantilla(quien_autoriza, "Gerencia"),    // {{2}} quién autorizó
+              varPlantilla(fechaComida, hoy),              // {{3}} fecha YYYY-MM-DD
+            ],
+          }),
         });
       } catch (waErr) {
         console.error("whatsapp err", waErr);

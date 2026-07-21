@@ -16,6 +16,14 @@ const CORS_HEADERS = {
 
 const WHATSAPP_URL = "https://recruiterhub-adp.ngrok.app/api/comidas/notificar";
 
+// Con la API oficial de Meta (WhatsApp Cloud API) un mensaje proactivo SOLO se
+// entrega dentro de una plantilla aprobada. Esta es de categoría Authentication:
+// el cuerpo lo define Meta ("Tu código de verificación es X").
+//
+// El código va DOS veces: en el cuerpo y en el botón de copiar. Meta rechaza el
+// envío con "131008 Required parameter is missing" si falta el del botón.
+const PLANTILLA_OTP = "codigo_pago_comidas";
+
 async function hashOtp(salt: string, codigo: string): Promise<string> {
   const data = new TextEncoder().encode(salt + codigo);
   const buf = await crypto.subtle.digest("SHA-256", data);
@@ -126,8 +134,17 @@ Deno.serve(async (req: Request) => {
       try {
         await fetch(WHATSAPP_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ telefono: info.telefono, mensaje }),
+          headers: {
+            "Content-Type": "application/json",
+            "x-comidas-secret": Deno.env.get("COMIDAS_SECRET") ?? "",
+          },
+          body: JSON.stringify({
+            telefono: info.telefono,
+            mensaje, // respaldo: texto completo con formato
+            plantilla: PLANTILLA_OTP,
+            variables: [codigo], // {{1}} código de 6 dígitos (ya viene padded)
+            boton: codigo,       // el botón de copiar necesita el mismo código
+          }),
         });
       } catch (waErr) {
         console.error("whatsapp err", waErr);
