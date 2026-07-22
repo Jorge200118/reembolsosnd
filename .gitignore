@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Brainstorming visual companion (superpowers)
 .superpowers/
+
+# Estado local del CLI de Supabase (a qué proyecto está enlazada esta máquina)
+supabase/.temp/
