@@ -620,11 +620,18 @@ git commit -m "feat(material): buscador con autocompletado contra el catalogo de
 Crea `src/components/empleado/CarritoMaterial.test.tsx` con este contenido exacto:
 
 ```tsx
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { CarritoMaterial } from "./CarritoMaterial";
 import type { LineaSolicitud } from "@/lib/materiales/tipos";
+
+// Este repo no usa `test.globals: true`, así que el auto-cleanup de
+// @testing-library/react no se registra solo y el DOM se filtra entre tests.
+// Mismo patrón que ya usa AvisosCard.test.tsx.
+afterEach(() => {
+  cleanup();
+});
 
 const LINEAS: LineaSolicitud[] = [
   { codProd: "ANG130", descripcion: "ANGULO 1/8", unidad: "PZ", cantidad: 2, costoUnitario: 180.5, existenciaAlPedir: 40 },
@@ -780,7 +787,7 @@ export function CarritoMaterial({
 npx vitest run src/components/empleado/CarritoMaterial.test.tsx
 ```
 
-Esperado: PASS, 5 tests.
+Esperado: PASS, 6 tests.
 
 - [ ] **Step 5: Commit**
 
