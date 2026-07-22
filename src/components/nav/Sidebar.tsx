@@ -81,7 +81,7 @@ const ICONOS: Record<TabId, React.ReactNode> = {
 };
 
 // Solo estas rutas existen hoy; las demás del rol se muestran deshabilitadas.
-const RUTAS_EXISTENTES: Set<TabId> = new Set(["dashboard", "revision", "reportes", "comidas-gerente", "pago-comidas", "nuevo-reembolso", "entregas", "autorizaciones"]);
+const RUTAS_EXISTENTES: Set<TabId> = new Set(["dashboard", "revision", "reportes", "comidas-gerente", "pago-comidas", "nuevo-reembolso", "entregas", "autorizaciones", "materiales-gerente", "materiales-almacen"]);
 
 function Icono({ tab }: { tab: TabId }) {
   return (
