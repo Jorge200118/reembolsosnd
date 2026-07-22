@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/empleado/Toast";
 import { BuscadorMaterial } from "@/components/empleado/BuscadorMaterial";
@@ -43,15 +42,35 @@ export default function MaterialesEmpleado() {
   const [solicitudes, setSolicitudes] = useState<SolicitudMia[]>([]);
   const [cargando, setCargando] = useState(true);
 
-  const cargar = useCallback(async () => {
+  // Solo trae datos: no toca estado. Así el efecto de abajo puede hacer el
+  // setState en su propio callback (y no dentro de una función que lo esconde),
+  // que es lo que pide react-hooks/set-state-in-effect.
+  const pedir = useCallback(async (): Promise<SolicitudMia[] | "sin-sesion"> => {
     const res = await fetch("/api/empleado/materiales");
-    if (res.status === 401) { router.replace("/empleado/login"); return; }
+    if (res.status === 401) return "sin-sesion";
     const data = await res.json();
-    if (data.ok) setSolicitudes(data.solicitudes as SolicitudMia[]);
-    setCargando(false);
-  }, [router]);
+    return data.ok ? (data.solicitudes as SolicitudMia[]) : [];
+  }, []);
 
-  useEffect(() => { void cargar(); }, [cargar]);
+  const cargar = useCallback(async () => {
+    const datos = await pedir();
+    if (datos === "sin-sesion") { router.replace("/empleado/login"); return; }
+    setSolicitudes(datos);
+    setCargando(false);
+  }, [pedir, router]);
+
+  useEffect(() => {
+    // `vivo` evita escribir estado si el empleado se sale de la pantalla antes
+    // de que conteste el servidor.
+    let vivo = true;
+    pedir().then((datos) => {
+      if (!vivo) return;
+      if (datos === "sin-sesion") { router.replace("/empleado/login"); return; }
+      setSolicitudes(datos);
+      setCargando(false);
+    });
+    return () => { vivo = false; };
+  }, [pedir, router]);
 
   function onElegir(m: Material) {
     setLineas((prev) => agregarMaterial(prev, m, 1));
@@ -98,7 +117,6 @@ export default function MaterialesEmpleado() {
     <>
       <div className="carnet-topbar">
         <div className="carnet-hola">Pedir material<small>Aceros del Pacífico</small></div>
-        <Link className="carnet-salir" href="/empleado">Volver</Link>
       </div>
 
       <div className="carnet-card">

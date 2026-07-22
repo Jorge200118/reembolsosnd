@@ -15,17 +15,28 @@ export function BuscadorMaterial({ onElegir }: { onElegir: (m: Material) => void
   const [buscando, setBuscando] = useState(false);
   const [error, setError] = useState("");
   const ultima = useRef(0);
+  const temporizador = useRef<number | null>(null);
 
-  useEffect(() => {
-    const q = texto.trim();
+  // Buscar es una reacción a que el empleado escribe, no una sincronización con
+  // un sistema externo: por eso vive en el manejador del evento y no en un
+  // useEffect (ver "You Might Not Need an Effect" de React).
+  function alEscribir(valor: string) {
+    setTexto(valor);
+    if (temporizador.current !== null) window.clearTimeout(temporizador.current);
+
+    const q = valor.trim();
     if (q.length < MINIMO) {
+      // Invalida cualquier respuesta en vuelo: si ya no hay búsqueda, no debe
+      // aterrizar una lista vieja encima.
+      ultima.current++;
       setResultados([]);
       setError("");
       setBuscando(false);
       return;
     }
+
     setBuscando(true);
-    const id = window.setTimeout(async () => {
+    temporizador.current = window.setTimeout(async () => {
       const turno = ++ultima.current;
       try {
         const res = await fetch(`/api/materiales?q=${encodeURIComponent(q)}`);
@@ -48,11 +59,16 @@ export function BuscadorMaterial({ onElegir }: { onElegir: (m: Material) => void
         if (turno === ultima.current) setBuscando(false);
       }
     }, RETRASO_MS);
-    return () => window.clearTimeout(id);
-  }, [texto]);
+  }
+
+  // Lo único que sí es sincronización: no dejar un temporizador vivo al salir.
+  useEffect(() => () => {
+    if (temporizador.current !== null) window.clearTimeout(temporizador.current);
+  }, []);
 
   function elegir(m: Material) {
     onElegir(m);
+    ultima.current++;
     setTexto("");
     setResultados([]);
   }
@@ -64,7 +80,7 @@ export function BuscadorMaterial({ onElegir }: { onElegir: (m: Material) => void
         type="search"
         inputMode="search"
         value={texto}
-        onChange={(e) => setTexto(e.target.value)}
+        onChange={(e) => alEscribir(e.target.value)}
         placeholder="Busca el material (mínimo 3 letras)"
         aria-label="Buscar material"
       />

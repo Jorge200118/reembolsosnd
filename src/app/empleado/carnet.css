@@ -187,3 +187,57 @@
 .mat-estado-entregada  { background: #d1fae5; color: #065f46; }
 .mat-estado-rechazada  { background: #fee2e2; color: #991b1b; }
 .mat-estado-cancelada  { background: #e2e8f0; color: #475569; }
+
+/* ── Barra de navegación inferior ───────────────────────────────────── */
+/* Fija abajo porque los choferes la usan con una mano: el pulgar llega al
+   borde inferior, no a la esquina superior. Se alinea con la columna de
+   contenido (460px) para que en escritorio no quede una franja gigante. */
+.carnet-barra {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  gap: 6px;
+  padding: 8px 14px calc(10px + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--linea);
+  box-shadow: 0 -8px 30px -22px rgba(15, 41, 66, 0.6);
+  z-index: 40;
+}
+
+.carnet-barra-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 7px 0 5px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--tinta-suave);
+  font-family: var(--font-work), sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.carnet-barra-item:hover { color: var(--tinta); }
+
+.carnet-barra-item.activo {
+  color: var(--azul);
+  background: rgba(37, 99, 235, 0.09);
+}
+
+/* Hueco del alto de la barra, para que el último elemento no quede tapado.
+   Lo dibuja el propio componente, así solo aparece donde hay barra. */
+.carnet-barra-espacio {
+  height: calc(74px + env(safe-area-inset-bottom));
+  flex: none;
+}

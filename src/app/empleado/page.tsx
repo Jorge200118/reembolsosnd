@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/empleado/Toast";
 import { AvisosCard } from "@/components/empleado/AvisosCard";
@@ -83,15 +82,6 @@ export default function HomeEmpleado() {
       </div>
 
       <AvisosCard />
-
-      <Link href="/empleado/materiales" className="carnet-card" style={{ display: "block", textDecoration: "none" }}>
-        <div className="carnet-cardttl">
-          <span className="carnet-stencil">Pedir material</span>
-        </div>
-        <p className="carnet-empty" style={{ margin: 0 }}>
-          Pide lo que necesitas del almacén. Tu gerente lo autoriza.
-        </p>
-      </Link>
 
       {comidas.length === 0 ? (
         <div className="carnet-card">
