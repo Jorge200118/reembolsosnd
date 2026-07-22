@@ -1293,6 +1293,248 @@ export type Database = {
           },
         ]
       }
+      radar_corridas: {
+        Row: {
+          adjuntos_procesados: number | null
+          correos_leidos: number | null
+          creado_en: string
+          docs_actualizados: number | null
+          docs_nuevos: number | null
+          error_txt: string | null
+          fin: string | null
+          id: string
+          inicio: string
+          ok: boolean | null
+          ultimo_uid: string | null
+        }
+        Insert: {
+          adjuntos_procesados?: number | null
+          correos_leidos?: number | null
+          creado_en?: string
+          docs_actualizados?: number | null
+          docs_nuevos?: number | null
+          error_txt?: string | null
+          fin?: string | null
+          id?: string
+          inicio?: string
+          ok?: boolean | null
+          ultimo_uid?: string | null
+        }
+        Update: {
+          adjuntos_procesados?: number | null
+          correos_leidos?: number | null
+          creado_en?: string
+          docs_actualizados?: number | null
+          docs_nuevos?: number | null
+          error_txt?: string | null
+          fin?: string | null
+          id?: string
+          inicio?: string
+          ok?: boolean | null
+          ultimo_uid?: string | null
+        }
+        Relationships: []
+      }
+      radar_documentos: {
+        Row: {
+          actualizado_en: string
+          archivo_pdf_local: string | null
+          archivo_xml_local: string | null
+          bms_cod_prv: string | null
+          bms_fecha: string | null
+          bms_folio: string | null
+          bms_folio_recepcion: string | null
+          bms_gestor_ligado: boolean
+          bms_pagada: boolean
+          bms_programada: boolean
+          bms_tiene_recepcion: boolean
+          bms_total: number | null
+          bucket_pdf_path: string | null
+          bucket_xml_path: string | null
+          correo_asunto: string | null
+          correo_fecha: string | null
+          correo_remitente: string | null
+          correo_uid: string | null
+          creado_en: string
+          estatus_bms: string
+          fecha_cfdi: string | null
+          folio: string | null
+          folio_normalizado: string | null
+          hash_archivo: string | null
+          hash_pdf: string | null
+          id: string
+          match_confianza: string
+          match_metodo: string
+          moneda: string | null
+          nombre_emisor: string | null
+          notas: string | null
+          proceso: string | null
+          proveedor_id: string | null
+          revisar: boolean
+          rfc_emisor: string | null
+          rfc_receptor: string | null
+          serie: string | null
+          subtotal: number | null
+          sucursal: string | null
+          tipo_comprobante: string | null
+          tipo_doc: string
+          total: number | null
+          uuid_cfdi: string | null
+        }
+        Insert: {
+          actualizado_en?: string
+          archivo_pdf_local?: string | null
+          archivo_xml_local?: string | null
+          bms_cod_prv?: string | null
+          bms_fecha?: string | null
+          bms_folio?: string | null
+          bms_folio_recepcion?: string | null
+          bms_gestor_ligado?: boolean
+          bms_pagada?: boolean
+          bms_programada?: boolean
+          bms_tiene_recepcion?: boolean
+          bms_total?: number | null
+          bucket_pdf_path?: string | null
+          bucket_xml_path?: string | null
+          correo_asunto?: string | null
+          correo_fecha?: string | null
+          correo_remitente?: string | null
+          correo_uid?: string | null
+          creado_en?: string
+          estatus_bms?: string
+          fecha_cfdi?: string | null
+          folio?: string | null
+          folio_normalizado?: string | null
+          hash_archivo?: string | null
+          hash_pdf?: string | null
+          id?: string
+          match_confianza?: string
+          match_metodo?: string
+          moneda?: string | null
+          nombre_emisor?: string | null
+          notas?: string | null
+          proceso?: string | null
+          proveedor_id?: string | null
+          revisar?: boolean
+          rfc_emisor?: string | null
+          rfc_receptor?: string | null
+          serie?: string | null
+          subtotal?: number | null
+          sucursal?: string | null
+          tipo_comprobante?: string | null
+          tipo_doc?: string
+          total?: number | null
+          uuid_cfdi?: string | null
+        }
+        Update: {
+          actualizado_en?: string
+          archivo_pdf_local?: string | null
+          archivo_xml_local?: string | null
+          bms_cod_prv?: string | null
+          bms_fecha?: string | null
+          bms_folio?: string | null
+          bms_folio_recepcion?: string | null
+          bms_gestor_ligado?: boolean
+          bms_pagada?: boolean
+          bms_programada?: boolean
+          bms_tiene_recepcion?: boolean
+          bms_total?: number | null
+          bucket_pdf_path?: string | null
+          bucket_xml_path?: string | null
+          correo_asunto?: string | null
+          correo_fecha?: string | null
+          correo_remitente?: string | null
+          correo_uid?: string | null
+          creado_en?: string
+          estatus_bms?: string
+          fecha_cfdi?: string | null
+          folio?: string | null
+          folio_normalizado?: string | null
+          hash_archivo?: string | null
+          hash_pdf?: string | null
+          id?: string
+          match_confianza?: string
+          match_metodo?: string
+          moneda?: string | null
+          nombre_emisor?: string | null
+          notas?: string | null
+          proceso?: string | null
+          proveedor_id?: string | null
+          revisar?: boolean
+          rfc_emisor?: string | null
+          rfc_receptor?: string | null
+          serie?: string | null
+          subtotal?: number | null
+          sucursal?: string | null
+          tipo_comprobante?: string | null
+          tipo_doc?: string
+          total?: number | null
+          uuid_cfdi?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "radar_documentos_proveedor_id_fkey"
+            columns: ["proveedor_id"]
+            isOneToOne: false
+            referencedRelation: "radar_proveedores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      radar_estado: {
+        Row: {
+          actualizado_en: string
+          mailbox: string
+          ultimo_uid: string | null
+        }
+        Insert: {
+          actualizado_en?: string
+          mailbox: string
+          ultimo_uid?: string | null
+        }
+        Update: {
+          actualizado_en?: string
+          mailbox?: string
+          ultimo_uid?: string | null
+        }
+        Relationships: []
+      }
+      radar_proveedores: {
+        Row: {
+          actualizado_en: string
+          cod_prv: string | null
+          creado_en: string
+          dado_alta_bms: boolean
+          id: string
+          nombre_emisor: string | null
+          primera_vez_visto: string | null
+          rfc: string
+          ultima_vez_visto: string | null
+        }
+        Insert: {
+          actualizado_en?: string
+          cod_prv?: string | null
+          creado_en?: string
+          dado_alta_bms?: boolean
+          id?: string
+          nombre_emisor?: string | null
+          primera_vez_visto?: string | null
+          rfc: string
+          ultima_vez_visto?: string | null
+        }
+        Update: {
+          actualizado_en?: string
+          cod_prv?: string | null
+          creado_en?: string
+          dado_alta_bms?: boolean
+          id?: string
+          nombre_emisor?: string | null
+          primera_vez_visto?: string | null
+          rfc?: string
+          ultima_vez_visto?: string | null
+        }
+        Relationships: []
+      }
       registros: {
         Row: {
           bloque_horario_id: number | null
@@ -1401,6 +1643,156 @@ export type Database = {
         }
         Relationships: []
       }
+      rnd_comida_otp: {
+        Row: {
+          empleado_id: number
+          estado: string
+          expira_en: string
+          generado_en: string
+          id: string
+          intentos: number
+          otp_cifrado: string | null
+          otp_hash: string
+          otp_salt: string
+          reembolso_ids: string[]
+          semana: string
+          telefono: string | null
+          usado_en: string | null
+          usado_por: string | null
+        }
+        Insert: {
+          empleado_id: number
+          estado?: string
+          expira_en: string
+          generado_en?: string
+          id?: string
+          intentos?: number
+          otp_cifrado?: string | null
+          otp_hash: string
+          otp_salt: string
+          reembolso_ids?: string[]
+          semana: string
+          telefono?: string | null
+          usado_en?: string | null
+          usado_por?: string | null
+        }
+        Update: {
+          empleado_id?: number
+          estado?: string
+          expira_en?: string
+          generado_en?: string
+          id?: string
+          intentos?: number
+          otp_cifrado?: string | null
+          otp_hash?: string
+          otp_salt?: string
+          reembolso_ids?: string[]
+          semana?: string
+          telefono?: string | null
+          usado_en?: string | null
+          usado_por?: string | null
+        }
+        Relationships: []
+      }
+      rnd_comidas_casos: {
+        Row: {
+          codigo: string | null
+          evidencia: string | null
+          fecha: string
+          generado_en: string
+          id: string
+          monto: number | null
+          nombre: string
+          num_embarque: string | null
+          puesto: string | null
+          rango_fin: string
+          rango_ini: string
+          rol: string | null
+          salida_real: string | null
+          sucursal: string | null
+          tiempo_horas: number | null
+          tipo: string
+          unidad: string | null
+          veredicto: string | null
+        }
+        Insert: {
+          codigo?: string | null
+          evidencia?: string | null
+          fecha: string
+          generado_en?: string
+          id?: string
+          monto?: number | null
+          nombre: string
+          num_embarque?: string | null
+          puesto?: string | null
+          rango_fin: string
+          rango_ini: string
+          rol?: string | null
+          salida_real?: string | null
+          sucursal?: string | null
+          tiempo_horas?: number | null
+          tipo: string
+          unidad?: string | null
+          veredicto?: string | null
+        }
+        Update: {
+          codigo?: string | null
+          evidencia?: string | null
+          fecha?: string
+          generado_en?: string
+          id?: string
+          monto?: number | null
+          nombre?: string
+          num_embarque?: string | null
+          puesto?: string | null
+          rango_fin?: string
+          rango_ini?: string
+          rol?: string | null
+          salida_real?: string | null
+          sucursal?: string | null
+          tiempo_horas?: number | null
+          tipo?: string
+          unidad?: string | null
+          veredicto?: string | null
+        }
+        Relationships: []
+      }
+      rnd_empleado_auth: {
+        Row: {
+          bloqueado_hasta: string | null
+          creado_en: string
+          empleado_id: number
+          estado: string
+          id: string
+          intentos_fallidos: number
+          nip_hash: string
+          telefono: string
+          ultimo_acceso: string | null
+        }
+        Insert: {
+          bloqueado_hasta?: string | null
+          creado_en?: string
+          empleado_id: number
+          estado?: string
+          id?: string
+          intentos_fallidos?: number
+          nip_hash: string
+          telefono: string
+          ultimo_acceso?: string | null
+        }
+        Update: {
+          bloqueado_hasta?: string | null
+          creado_en?: string
+          empleado_id?: number
+          estado?: string
+          id?: string
+          intentos_fallidos?: number
+          nip_hash?: string
+          telefono?: string
+          ultimo_acceso?: string | null
+        }
+        Relationships: []
+      }
       rnd_empleados: {
         Row: {
           activo: boolean | null
@@ -1434,6 +1826,131 @@ export type Database = {
         }
         Relationships: []
       }
+      rnd_material_lineas: {
+        Row: {
+          cantidad: number
+          cantidad_entregada: number | null
+          cod_prod: string
+          costo_unitario: number | null
+          descripcion: string
+          existencia_al_pedir: number | null
+          id: string
+          orden: number
+          solicitud_id: string
+          unidad: string | null
+        }
+        Insert: {
+          cantidad: number
+          cantidad_entregada?: number | null
+          cod_prod: string
+          costo_unitario?: number | null
+          descripcion: string
+          existencia_al_pedir?: number | null
+          id?: string
+          orden?: number
+          solicitud_id: string
+          unidad?: string | null
+        }
+        Update: {
+          cantidad?: number
+          cantidad_entregada?: number | null
+          cod_prod?: string
+          costo_unitario?: number | null
+          descripcion?: string
+          existencia_al_pedir?: number | null
+          id?: string
+          orden?: number
+          solicitud_id?: string
+          unidad?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rnd_material_lineas_solicitud_id_fkey"
+            columns: ["solicitud_id"]
+            isOneToOne: false
+            referencedRelation: "rnd_material_solicitudes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rnd_material_solicitudes: {
+        Row: {
+          autorizado_por: string | null
+          cod_estab: number | null
+          creado_en: string
+          empleado_id: number
+          empleado_nombre: string
+          entregado_por: string | null
+          estado: string
+          fecha_autorizacion: string | null
+          fecha_entrega: string | null
+          folio: string
+          id: string
+          motivo_rechazo: string | null
+          nota: string | null
+          sucursal: string
+        }
+        Insert: {
+          autorizado_por?: string | null
+          cod_estab?: number | null
+          creado_en?: string
+          empleado_id: number
+          empleado_nombre: string
+          entregado_por?: string | null
+          estado?: string
+          fecha_autorizacion?: string | null
+          fecha_entrega?: string | null
+          folio?: string
+          id?: string
+          motivo_rechazo?: string | null
+          nota?: string | null
+          sucursal: string
+        }
+        Update: {
+          autorizado_por?: string | null
+          cod_estab?: number | null
+          creado_en?: string
+          empleado_id?: number
+          empleado_nombre?: string
+          entregado_por?: string | null
+          estado?: string
+          fecha_autorizacion?: string | null
+          fecha_entrega?: string | null
+          folio?: string
+          id?: string
+          motivo_rechazo?: string | null
+          nota?: string | null
+          sucursal?: string
+        }
+        Relationships: []
+      }
+      rnd_push_suscripciones: {
+        Row: {
+          auth: string
+          creado_en: string
+          empleado_id: number
+          endpoint: string
+          p256dh: string
+          user_agent: string | null
+        }
+        Insert: {
+          auth: string
+          creado_en?: string
+          empleado_id: number
+          endpoint: string
+          p256dh: string
+          user_agent?: string | null
+        }
+        Update: {
+          auth?: string
+          creado_en?: string
+          empleado_id?: number
+          endpoint?: string
+          p256dh?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       rnd_reembolsos: {
         Row: {
           archivos: Json | null
@@ -1441,6 +1958,7 @@ export type Database = {
           concepto: string
           created_at: string | null
           documentos_adicionales: Json | null
+          empleado_id: number | null
           estado: string | null
           evidencia_entrega: Json | null
           fecha: string
@@ -1466,6 +1984,7 @@ export type Database = {
           concepto: string
           created_at?: string | null
           documentos_adicionales?: Json | null
+          empleado_id?: number | null
           estado?: string | null
           evidencia_entrega?: Json | null
           fecha: string
@@ -1491,6 +2010,7 @@ export type Database = {
           concepto?: string
           created_at?: string | null
           documentos_adicionales?: Json | null
+          empleado_id?: number | null
           estado?: string | null
           evidencia_entrega?: Json | null
           fecha?: string
@@ -1587,14 +2107,17 @@ export type Database = {
       sucursales_map: {
         Row: {
           abrev: string
+          cod_estab: number | null
           nombre_largo: string
         }
         Insert: {
           abrev: string
+          cod_estab?: number | null
           nombre_largo: string
         }
         Update: {
           abrev?: string
+          cod_estab?: number | null
           nombre_largo?: string
         }
         Relationships: []
@@ -2138,7 +2661,45 @@ export type Database = {
       }
     }
     Functions: {
+      comidas_pendientes_por_chofer: {
+        Args: { p_sucursal?: string }
+        Returns: {
+          empleado_id: number
+          estatus: string
+          nombre_beneficiario: string
+          num_comidas: number
+          reembolso_ids: string[]
+          telefono: string
+          total: number
+        }[]
+      }
+      destinatarios_push: {
+        Args: { p_empleado_id: number; p_tipo: string }
+        Returns: Json
+      }
+      empleado_login: {
+        Args: { p_nip: string; p_telefono: string }
+        Returns: Json
+      }
+      empleado_panel: {
+        Args: { p_empleado_id: number; p_regenerar?: boolean }
+        Returns: Json
+      }
+      empleado_registrar: {
+        Args: { p_codigo_empleado: string; p_nip: string; p_telefono: string }
+        Returns: Json
+      }
+      empleado_reset_nip: {
+        Args: { p_codigo_empleado: string; p_nip: string; p_telefono: string }
+        Returns: Json
+      }
       es_admin: { Args: { p_usuario_id: number }; Returns: boolean }
+      gestor_has_task_in_project: {
+        Args: { p_project_id: string }
+        Returns: boolean
+      }
+      gestor_is_admin: { Args: never; Returns: boolean }
+      gestor_is_admin_or_manager: { Args: never; Returns: boolean }
       get_empleado_nombre_completo: {
         Args: { p_empleado_id: number }
         Returns: string
@@ -2180,10 +2741,42 @@ export type Database = {
       is_room_admitted: { Args: { p_room: string }; Returns: boolean }
       is_room_host: { Args: { p_room: string }; Returns: boolean }
       is_supervisor: { Args: never; Returns: boolean }
+      leer_vapid_keys: { Args: never; Returns: string }
+      liberar_comidas_otp: {
+        Args: {
+          p_cajera_email: string
+          p_empleado_id: number
+          p_hash_intento: string
+          p_semana: string
+        }
+        Returns: Json
+      }
+      material_autorizar: {
+        Args: { p_id: string; p_usuario: string }
+        Returns: Json
+      }
+      material_cancelar: {
+        Args: { p_empleado_id: number; p_id: string }
+        Returns: Json
+      }
+      material_crear: {
+        Args: { p_empleado_id: number; p_lineas: Json; p_nota: string }
+        Returns: Json
+      }
+      material_entregar: {
+        Args: { p_entregas: Json; p_id: string; p_usuario: string }
+        Returns: Json
+      }
+      material_rechazar: {
+        Args: { p_id: string; p_motivo: string; p_usuario: string }
+        Returns: Json
+      }
       meeting_agenda_patch: {
         Args: { p_path: string[]; p_room: string; p_value: Json }
         Returns: Json
       }
+      nombre_usuario_por_email: { Args: { p_email: string }; Returns: string }
+      norm_tel: { Args: { p: string }; Returns: string }
       obtener_usuarios_activos_sucursal: {
         Args: { p_sucursal: string }
         Returns: {
@@ -2202,6 +2795,46 @@ export type Database = {
           email: string
           full_name: string
           user_id: string
+        }[]
+      }
+      push_borrar_endpoint: { Args: { p_endpoint: string }; Returns: undefined }
+      push_desuscribir: {
+        Args: { p_empleado_id: number; p_endpoint: string }
+        Returns: undefined
+      }
+      push_suscribir: {
+        Args: {
+          p_auth: string
+          p_empleado_id: number
+          p_endpoint: string
+          p_p256dh: string
+          p_user_agent: string
+        }
+        Returns: undefined
+      }
+      registrar_otp_comida: {
+        Args: {
+          p_codigo: string
+          p_empleado_id: number
+          p_expira_en: string
+          p_otp_hash: string
+          p_otp_salt: string
+          p_reembolso_ids: string[]
+          p_semana: string
+          p_telefono: string
+        }
+        Returns: undefined
+      }
+      revelar_codigo_comida: {
+        Args: { p_empleado_id: number; p_semana: string }
+        Returns: string
+      }
+      rnd_dashboard_por_estado: {
+        Args: never
+        Returns: {
+          cantidad: number
+          estado: string
+          total: number
         }[]
       }
       validar_registro_empleado: {
