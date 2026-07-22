@@ -30,18 +30,21 @@ function useAccion<T>(ruta: string) {
   });
 }
 
+// Ninguna manda `usuario`: el nombre de quien actúa lo saca el servidor de la
+// cookie firmada. Mandarlo desde aquí sería dejar que el cliente decida qué
+// queda escrito en `autorizado_por` / `entregado_por`.
+
 export function useAutorizarMaterial() {
-  return useAccion<{ id: string; usuario: string }>("/api/materiales/autorizar");
+  return useAccion<{ id: string }>("/api/materiales/autorizar");
 }
 
 export function useRechazarMaterial() {
-  return useAccion<{ id: string; usuario: string; motivo?: string }>("/api/materiales/rechazar");
+  return useAccion<{ id: string; motivo?: string }>("/api/materiales/rechazar");
 }
 
 export function useEntregarMaterial() {
   return useAccion<{
     id: string;
-    usuario: string;
     entregas: { lineaId: string; cantidadEntregada: number }[];
   }>("/api/materiales/entregar");
 }

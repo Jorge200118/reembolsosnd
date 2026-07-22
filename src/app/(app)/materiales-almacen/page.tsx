@@ -45,7 +45,7 @@ export default function MaterialesAlmacenPage() {
     }));
     setMsg("");
     entregar.mutate(
-      { id: s.id, usuario: sesion?.nombre ?? "Almacén", entregas },
+      { id: s.id, entregas },
       {
         onSuccess: (r) => {
           setMsg(r.ok ? `✅ ${s.folio} entregada` : `⚠ ${r.error}`);

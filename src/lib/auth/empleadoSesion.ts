@@ -1,37 +1,16 @@
 // Firma/verifica la cookie de sesión del empleado con HMAC-SHA256.
 // Compatible con Edge runtime (middleware) y Node (route handlers).
+//
+// OJO: el dato firmado es el payload pelón, sin prefijo de dominio. Se deja así
+// a propósito para no invalidar las sesiones que los choferes ya traen en el
+// teléfono. La cookie del escritorio (sesionEscritorio.ts) sí lleva prefijo, y
+// como esta valida además la forma (empleadoId numérico), un token no se puede
+// pasar por el otro.
+import { b64urlEncode, b64urlToBytes, hmac, timingSafeEqual } from "@/lib/auth/firma";
+
 export interface EmpSesion {
   empleadoId: number;
   nombre: string;
-}
-
-function b64urlEncode(bytes: Uint8Array): string {
-  const s = btoa(String.fromCharCode(...bytes));
-  return s.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-function b64urlToBytes(s: string): Uint8Array {
-  const pad = s.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((s.length + 3) % 4);
-  return Uint8Array.from(atob(pad), (c) => c.charCodeAt(0));
-}
-
-async function hmac(data: string, secret: string): Promise<Uint8Array> {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(data));
-  return new Uint8Array(sig);
-}
-
-function timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean {
-  if (a.length !== b.length) return false;
-  let out = 0;
-  for (let i = 0; i < a.length; i++) out |= a[i]! ^ b[i]!;
-  return out === 0;
 }
 
 export async function firmarEmpSesion(s: EmpSesion, secret: string): Promise<string> {
@@ -45,10 +24,14 @@ export async function verificarEmpSesion(token: string, secret: string): Promise
   if (parts.length !== 2) return null;
   const payload = parts[0]!;
   const sig = parts[1]!;
+  const firma = b64urlToBytes(sig);
+  if (!firma) return null;
   const esperado = await hmac(payload, secret);
-  if (!timingSafeEqual(b64urlToBytes(sig), esperado)) return null;
+  if (!timingSafeEqual(firma, esperado)) return null;
+  const datos = b64urlToBytes(payload);
+  if (!datos) return null;
   try {
-    const obj = JSON.parse(new TextDecoder().decode(b64urlToBytes(payload)));
+    const obj = JSON.parse(new TextDecoder().decode(datos));
     if (typeof obj?.empleadoId !== "number" || typeof obj?.nombre !== "string") return null;
     return { empleadoId: obj.empleadoId, nombre: obj.nombre };
   } catch {

@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { llamarRpcMaterial } from "@/lib/materiales/rpc";
 import { avisarEmpleado } from "@/lib/materiales/avisar";
+import { actorDeMaterial } from "@/lib/materiales/actor";
+
+// Quién entrega y sobre qué sucursal salen de la cookie firmada, no del body.
 
 interface EntregaEntrante {
   lineaId?: unknown;
@@ -8,11 +11,10 @@ interface EntregaEntrante {
 }
 
 export async function POST(req: Request) {
-  const { id, usuario, entregas } = (await req.json().catch(() => ({}))) as {
-    id?: unknown;
-    usuario?: unknown;
-    entregas?: unknown;
-  };
+  const quien = await actorDeMaterial("materiales-almacen");
+  if (!quien.ok) return NextResponse.json({ ok: false, error: quien.error }, { status: quien.status });
+
+  const { id, entregas } = (await req.json().catch(() => ({}))) as { id?: unknown; entregas?: unknown };
   if (typeof id !== "string" || !id) {
     return NextResponse.json({ ok: false, error: "Falta la solicitud" }, { status: 400 });
   }
@@ -27,8 +29,9 @@ export async function POST(req: Request) {
 
   const r = await llamarRpcMaterial("material_entregar", {
     p_id: id,
-    p_usuario: typeof usuario === "string" ? usuario : null,
+    p_usuario: quien.actor.nombre,
     p_entregas: normalizadas,
+    p_sucursal: quien.actor.sucursal,
   });
   if (r.ok) await avisarEmpleado(id, "material_entregada");
   return NextResponse.json(r, { status: r.ok ? 200 : 400 });

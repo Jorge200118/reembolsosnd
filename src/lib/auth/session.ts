@@ -1,28 +1,43 @@
-import type { Sesion } from "@/lib/edge/login";
+// Cara de cliente de la sesión del personal. Ya no toca `document.cookie`: la
+// cookie es httpOnly y la firma el servidor (ver sesionEscritorio.ts), así que
+// aquí solo se conversa con los route handlers.
+import type { Sesion } from "@/lib/auth/sesionEscritorio";
 
-const COOKIE = "rnd_sesion";
-
-// Guarda la sesión en una cookie (7 días). No es criptográficamente segura —
-// es el mismo nivel de confianza que el localStorage del HTML viejo, pero permite
-// que el middleware proteja rutas. NO guardar la contraseña.
-export function guardarSesion(s: Sesion) {
-  const val = encodeURIComponent(JSON.stringify(s));
-  document.cookie = `${COOKIE}=${val}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+export async function iniciarSesion(
+  email: string,
+  password: string,
+): Promise<{ ok: boolean; sesion?: Sesion; error?: string }> {
+  try {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = (await res.json()) as { ok?: boolean; sesion?: Sesion; error?: string };
+    if (!data.ok || !data.sesion) return { ok: false, error: data.error ?? "No se pudo iniciar sesión" };
+    return { ok: true, sesion: data.sesion };
+  } catch {
+    return { ok: false, error: "No hay conexión" };
+  }
 }
 
-export function leerSesion(): Sesion | null {
-  if (typeof document === "undefined") return null;
-  const m = document.cookie.split("; ").find((c) => c.startsWith(`${COOKIE}=`));
-  if (!m) return null;
+export async function leerSesion(): Promise<Sesion | null> {
   try {
-    return JSON.parse(decodeURIComponent(m.split("=")[1] ?? "")) as Sesion;
+    const res = await fetch("/api/sesion", { cache: "no-store" });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { ok?: boolean; sesion?: Sesion };
+    return data.ok && data.sesion ? data.sesion : null;
   } catch {
     return null;
   }
 }
 
-export function borrarSesion() {
-  document.cookie = `${COOKIE}=; path=/; max-age=0`;
+export async function borrarSesion(): Promise<void> {
+  try {
+    await fetch("/api/logout", { method: "POST" });
+  } catch {
+    // Si falla, la cookie expira sola; el estado local ya se limpió igual.
+  }
 }
 
-export const NOMBRE_COOKIE = COOKIE;
+export type { Sesion };

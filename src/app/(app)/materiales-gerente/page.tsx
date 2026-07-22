@@ -35,7 +35,6 @@ export default function MaterialesGerentePage() {
   const historial = useMemo(() => historialQ.data ?? [], [historialQ.data]);
 
   function resolver(tipo: "autorizar" | "rechazar", s: SolicitudGuardada, motivo?: string) {
-    const usuario = sesion?.nombre ?? "Gerente";
     setMsg("");
     // Dos ramas explícitas en vez de una mutación genérica: los cuerpos son
     // distintos (rechazar lleva motivo) y forzar un tipo común pedía un cast.
@@ -45,8 +44,8 @@ export default function MaterialesGerentePage() {
         setConfirmar(null);
       },
     };
-    if (tipo === "autorizar") autorizar.mutate({ id: s.id, usuario }, opciones);
-    else rechazar.mutate({ id: s.id, usuario, motivo }, opciones);
+    if (tipo === "autorizar") autorizar.mutate({ id: s.id }, opciones);
+    else rechazar.mutate({ id: s.id, motivo }, opciones);
   }
 
   const lista = verHistorial ? historial : pendientes;

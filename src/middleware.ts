@@ -1,12 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import {
-  ROL_TABS,
-  normalizarRol,
-  tabsDeRol,
-  type Rol,
-  type TabId,
-} from "@devoluciones/domain";
+import { ROL_TABS, tabsDeRol, type Rol, type TabId } from "@devoluciones/domain";
 import { verificarEmpSesion, NOMBRE_COOKIE_EMP } from "@/lib/auth/empleadoSesion";
+import { verificarSesion, NOMBRE_COOKIE } from "@/lib/auth/sesionEscritorio";
 
 // Protege las rutas de la app. Dos capas:
 //  1) Autenticación: si no hay cookie de sesión válida, redirige a /login.
@@ -14,8 +9,9 @@ import { verificarEmpSesion, NOMBRE_COOKIE_EMP } from "@/lib/auth/empleadoSesion
 //     lo rebota a su primer tab permitido. El Sidebar oculta tabs por rol, pero
 //     eso no basta: sin esto cualquier usuario logueado podía abrir /pago-comidas
 //     (u otra ruta) escribiendo la URL a mano.
-// La cookie se llama rnd_sesion (ver lib/auth/session.ts): su valor es
-// encodeURIComponent(JSON.stringify({ email, nombre, rol, rolCrudo, sucursal })).
+// La cookie rnd_sesion va FIRMADA con HMAC (ver lib/auth/sesionEscritorio.ts):
+// una firma que no cuadre es lo mismo que no traer sesión. Antes era JSON pelón
+// y bastaba editarla en el navegador para cambiarse el rol.
 // El módulo es TS puro (sin APIs de Node), compatible con el runtime Edge.
 
 // Conjunto de todos los TabId conocidos, derivado de ROL_TABS para no
@@ -24,18 +20,12 @@ const TABS_CONOCIDOS = new Set<string>(
   Object.values(ROL_TABS).flat(),
 );
 
-function leerRol(req: NextRequest): Rol | null {
-  const cookie = req.cookies.get("rnd_sesion")?.value;
-  if (!cookie) return null;
-  try {
-    const sesion = JSON.parse(decodeURIComponent(cookie)) as { rol?: unknown };
-    // rol ya viene normalizado en la cookie, pero re-normalizamos por defensa
-    // (cookie manipulable). normalizarRol cae a caja_chica ante valores raros.
-    if (typeof sesion.rol !== "string") return null;
-    return normalizarRol(sesion.rol);
-  } catch {
-    return null;
-  }
+async function leerRol(req: NextRequest): Promise<Rol | null> {
+  const token = req.cookies.get(NOMBRE_COOKIE)?.value;
+  const secret = process.env.EMP_SESION_SECRET ?? "";
+  if (!token || !secret) return null;
+  const sesion = await verificarSesion(token, secret);
+  return sesion?.rol ?? null;
 }
 
 export async function middleware(req: NextRequest) {
@@ -65,7 +55,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // --- Mundo PERSONAL (lógica existente, sin cambios) ---
-  const rol = leerRol(req);
+  const rol = await leerRol(req);
   const tieneSesion = rol !== null;
   const esLogin = req.nextUrl.pathname.startsWith("/login");
 
