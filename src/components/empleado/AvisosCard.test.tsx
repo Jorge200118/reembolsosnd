@@ -10,6 +10,7 @@ vi.mock("@/lib/push/soporte", () => ({
 vi.mock("@/lib/push/suscribir", () => ({
   activarAvisos: vi.fn(),
   desactivarAvisos: vi.fn(),
+  asegurarSuscripcion: vi.fn(),
 }));
 
 // Toast: capturamos `mostrar` para verificar el feedback.
@@ -19,7 +20,7 @@ vi.mock("@/components/empleado/Toast", () => ({
 }));
 
 import { pushSoportado, esStandalone, esIOS } from "@/lib/push/soporte";
-import { activarAvisos, desactivarAvisos } from "@/lib/push/suscribir";
+import { activarAvisos, desactivarAvisos, asegurarSuscripcion } from "@/lib/push/suscribir";
 import { AvisosCard } from "./AvisosCard";
 
 // ── Utilidades de entorno (navigator/Notification según cada caso) ────────
@@ -35,6 +36,9 @@ function prepararEntorno(o: Opts) {
   vi.mocked(pushSoportado).mockReturnValue(o.soportado);
   vi.mocked(esStandalone).mockReturnValue(o.standalone);
   vi.mocked(esIOS).mockReturnValue(o.ios);
+  // Por defecto la auto-reparación no logra suscribir; cada test que la ejerce
+  // la sobrescribe. Así los estados que no dependen de ella no cambian.
+  vi.mocked(asegurarSuscripcion).mockResolvedValue(false);
 
   vi.stubGlobal("Notification", {
     permission: o.permiso,
@@ -107,12 +111,33 @@ describe("AvisosCard — máquina de estados (§9.5)", () => {
     expect(screen.queryByRole("button", botonActivar)).toBeNull();
   });
 
-  // Fila 5
-  it("granted sin suscribir: muestra 'Activar avisos' SIN subtítulo", async () => {
+  // Fila 5 (con la auto-reparación fallando: el permiso está dado pero no se
+  // pudo re-suscribir, así que cae al botón manual).
+  it("granted sin suscribir y sin poder auto-reparar: muestra 'Activar avisos' SIN subtítulo", async () => {
     prepararEntorno({ soportado: true, standalone: false, ios: false, permiso: "granted", yaSuscrito: false });
     render(<AvisosCard />);
     expect(await screen.findByRole("button", botonActivar)).toBeInTheDocument();
     expect(screen.queryByText(/cuando esté tu código/i)).toBeNull();
+  });
+
+  // El arreglo de "se apagan solas": permiso concedido pero la suscripción se
+  // cayó → la app se re-suscribe sola al abrir, sin que el usuario toque nada.
+  it("granted sin suscribir pero la auto-reparación funciona: aparece 'Avisos activados' solo", async () => {
+    prepararEntorno({ soportado: true, standalone: false, ios: false, permiso: "granted", yaSuscrito: false });
+    vi.mocked(asegurarSuscripcion).mockResolvedValue(true);
+    render(<AvisosCard />);
+    expect(await screen.findByText(/Avisos activados/i)).toBeInTheDocument();
+    expect(screen.queryByRole("button", botonActivar)).toBeNull();
+    expect(vi.mocked(asegurarSuscripcion)).toHaveBeenCalled();
+  });
+
+  // No debe re-suscribir sin permiso: eso exigiría un prompt, que solo puede ir
+  // dentro del gesto de "Activar". En 'default' la tarjeta solo ofrece el botón.
+  it("default: NO intenta auto-reparar sola", async () => {
+    prepararEntorno({ soportado: true, standalone: false, ios: false, permiso: "default", yaSuscrito: false });
+    render(<AvisosCard />);
+    await screen.findByRole("button", botonActivar);
+    expect(vi.mocked(asegurarSuscripcion)).not.toHaveBeenCalled();
   });
 
   // Fila 6

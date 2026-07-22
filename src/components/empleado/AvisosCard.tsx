@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { pushSoportado, esStandalone, esIOS } from "@/lib/push/soporte";
-import { activarAvisos, desactivarAvisos } from "@/lib/push/suscribir";
+import { activarAvisos, desactivarAvisos, asegurarSuscripcion } from "@/lib/push/suscribir";
 import { useToast } from "@/components/empleado/Toast";
 
 // Textos exactos por estado (spec §9.5). Se renderizan como expresión {TXT}
@@ -73,7 +73,15 @@ export function AvisosCard() {
         try {
           const reg = await navigator.serviceWorker.ready;
           const sub = await reg.pushManager.getSubscription();
-          yaSuscrito = sub != null;
+          if (sub) {
+            yaSuscrito = true;
+          } else if (permiso === "granted") {
+            // Auto-reparación: el permiso sigue concedido pero la suscripción se
+            // cayó sola (Chrome la rota cada tanto). Se vuelve a suscribir en
+            // silencio para que la tarjeta no aparezca "apagada" ni se pierdan
+            // los avisos. No pide permiso —ya está dado—, así que es seguro aquí.
+            yaSuscrito = await asegurarSuscripcion();
+          }
         } catch {
           yaSuscrito = false;
         }

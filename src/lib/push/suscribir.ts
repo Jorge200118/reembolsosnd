@@ -9,29 +9,62 @@ export function urlBase64ToUint8Array(base64String: string): Uint8Array {
   return out;
 }
 
-// Pide permiso (DEBE ir dentro del gesto de click), suscribe y manda al backend.
-export async function activarAvisos(): Promise<{ ok: true } | { ok: false; motivo: "denied" | "error" }> {
-  const permiso = await Notification.requestPermission();
-  if (permiso !== "granted") return { ok: false, motivo: "denied" };
-  const reg = await navigator.serviceWorker.ready;
-  let sub = await reg.pushManager.getSubscription();
-  if (!sub) {
-    sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      // cast: TS 5.7 tipa Uint8Array como Uint8Array<ArrayBufferLike>, que no
-      // encaja en BufferSource (ArrayBuffer) del lib.dom. El buffer real es un
-      // ArrayBuffer normal, así que el cast es seguro.
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC) as BufferSource,
-    });
-  }
+// Registra en el backend la suscripción del navegador. El empleado_id lo pone
+// el servidor desde la cookie firmada; aquí solo viajan los datos del endpoint.
+async function registrar(sub: PushSubscription): Promise<boolean> {
   const raw = sub.toJSON();
   const res = await fetch("/api/empleado/suscribir", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ endpoint: raw.endpoint, p256dh: raw.keys?.p256dh, auth: raw.keys?.auth, user_agent: navigator.userAgent }),
+    body: JSON.stringify({
+      endpoint: raw.endpoint,
+      p256dh: raw.keys?.p256dh,
+      auth: raw.keys?.auth,
+      user_agent: navigator.userAgent,
+    }),
   });
-  if (!res.ok) return { ok: false, motivo: "error" };
-  return { ok: true };
+  return res.ok;
+}
+
+async function obtenerOSuscribir(): Promise<PushSubscription> {
+  const reg = await navigator.serviceWorker.ready;
+  const existente = await reg.pushManager.getSubscription();
+  if (existente) return existente;
+  return reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    // cast: TS 5.7 tipa Uint8Array como Uint8Array<ArrayBufferLike>, que no
+    // encaja en BufferSource (ArrayBuffer) del lib.dom. El buffer real es un
+    // ArrayBuffer normal, así que el cast es seguro.
+    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC) as BufferSource,
+  });
+}
+
+// Pide permiso (DEBE ir dentro del gesto de click), suscribe y manda al backend.
+export async function activarAvisos(): Promise<{ ok: true } | { ok: false; motivo: "denied" | "error" }> {
+  const permiso = await Notification.requestPermission();
+  if (permiso !== "granted") return { ok: false, motivo: "denied" };
+  try {
+    const sub = await obtenerOSuscribir();
+    return (await registrar(sub)) ? { ok: true } : { ok: false, motivo: "error" };
+  } catch {
+    return { ok: false, motivo: "error" };
+  }
+}
+
+// Auto-reparación SILENCIOSA. Chrome rota/expira la suscripción de push cada
+// cierto tiempo; sin esto el empleado aparece "sin avisos" y deja de recibirlos
+// aunque nunca los apagó. Se llama al abrir la app SOLO cuando el permiso ya
+// está concedido: subscribe() con el permiso dado NO abre ningún diálogo, así
+// que no molesta a nadie. Nunca pide permiso —eso sigue exigiendo el gesto de
+// activarAvisos()—; si el permiso no está concedido, no hace nada.
+export async function asegurarSuscripcion(): Promise<boolean> {
+  if (typeof Notification === "undefined" || Notification.permission !== "granted") return false;
+  try {
+    const sub = await obtenerOSuscribir();
+    return await registrar(sub);
+  } catch {
+    return false;
+  }
 }
 
 export async function desactivarAvisos(): Promise<void> {
