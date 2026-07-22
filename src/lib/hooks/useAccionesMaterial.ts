@@ -46,5 +46,7 @@ export function useEntregarMaterial() {
   return useAccion<{
     id: string;
     entregas: { lineaId: string; cantidadEntregada: number }[];
+    codigo: string;
+    evidenciaPath: string;
   }>("/api/materiales/entregar");
 }

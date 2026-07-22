@@ -14,7 +14,9 @@ export async function POST(req: Request) {
   const quien = await actorDeMaterial("materiales-almacen");
   if (!quien.ok) return NextResponse.json({ ok: false, error: quien.error }, { status: quien.status });
 
-  const { id, entregas } = (await req.json().catch(() => ({}))) as { id?: unknown; entregas?: unknown };
+  const { id, entregas, codigo, evidenciaPath } = (await req.json().catch(() => ({}))) as {
+    id?: unknown; entregas?: unknown; codigo?: unknown; evidenciaPath?: unknown;
+  };
   if (typeof id !== "string" || !id) {
     return NextResponse.json({ ok: false, error: "Falta la solicitud" }, { status: 400 });
   }
@@ -32,6 +34,8 @@ export async function POST(req: Request) {
     p_usuario: quien.actor.nombre,
     p_entregas: normalizadas,
     p_sucursal: quien.actor.sucursal,
+    p_codigo: typeof codigo === "string" ? codigo : "",
+    p_evidencia_path: typeof evidenciaPath === "string" ? evidenciaPath : "",
   });
   if (r.ok) await avisarEmpleado(id, "material_entregada");
   return NextResponse.json(r, { status: r.ok ? 200 : 400 });

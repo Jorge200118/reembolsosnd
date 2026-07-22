@@ -8,6 +8,8 @@ import { Card } from "@/components/ui/Card";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { SolicitudCard } from "@/components/materiales/SolicitudCard";
 import { TablaLineas } from "@/components/materiales/TablaLineas";
+import { CapturaEntrega } from "@/components/materiales/CapturaEntrega";
+import { esCodigoCompleto } from "@/lib/materiales/codigo";
 import type { SolicitudGuardada } from "@/lib/materiales/totales";
 
 const BTN_OK = "rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-40";
@@ -26,6 +28,9 @@ export default function MaterialesAlmacenPage() {
   // lo que no se toque va con la cantidad pedida (el caso normal: se surtió todo).
   const [capturas, setCapturas] = useState<Record<string, Record<string, number>>>({});
   const [confirmar, setConfirmar] = useState<SolicitudGuardada | null>(null);
+  const [foto, setFoto] = useState<File | null>(null);
+  const [codigo, setCodigo] = useState("");
+  const [subiendo, setSubiendo] = useState(false);
 
   const autorizadas = useMemo(() => autorizadasQ.data ?? [], [autorizadasQ.data]);
   const entregadas = useMemo(() => entregadasQ.data ?? [], [entregadasQ.data]);
@@ -37,22 +42,43 @@ export default function MaterialesAlmacenPage() {
     }));
   }
 
-  function confirmarEntrega(s: SolicitudGuardada) {
+  // La foto se sube al confirmar, no al elegirla: si el almacenista cancela,
+  // no queda un archivo huérfano en el bucket. Y va ANTES de la RPC, porque
+  // una entrega sin evidencia es justo lo que este cambio impide.
+  async function confirmarEntrega(s: SolicitudGuardada) {
+    if (!foto) { setMsg("⚠ Falta la foto de la entrega"); return; }
     const capturado = capturas[s.id] ?? {};
     const entregas = s.rnd_material_lineas.map((l) => ({
       lineaId: l.id,
       cantidadEntregada: capturado[l.id] ?? l.cantidad,
     }));
     setMsg("");
-    entregar.mutate(
-      { id: s.id, entregas },
-      {
-        onSuccess: (r) => {
-          setMsg(r.ok ? `✅ ${s.folio} entregada` : `⚠ ${r.error}`);
-          setConfirmar(null);
+    setSubiendo(true);
+    try {
+      const { prepararArchivo } = await import("@/lib/files/comprimir");
+      // Se usa el `tipo` que devuelve prepararArchivo, no blob.type: al
+      // comprimir a JPEG el tipo correcto lo sabe el helper, y un Blob recién
+      // creado puede venir con type vacío.
+      const { blob, tipo, nombre } = await prepararArchivo(foto);
+      const fd = new FormData();
+      fd.append("solicitudId", s.id);
+      fd.append("foto", new File([blob], nombre, { type: tipo }));
+      const res = await fetch("/api/materiales/evidencia", { method: "POST", body: fd });
+      const sub = await res.json();
+      if (!sub.ok) { setMsg(`⚠ ${sub.error ?? "No se pudo subir la foto"}`); return; }
+
+      entregar.mutate(
+        { id: s.id, entregas, codigo, evidenciaPath: sub.path },
+        {
+          onSuccess: (r) => {
+            setMsg(r.ok ? `✅ ${s.folio} entregada` : `⚠ ${r.error}`);
+            if (r.ok) { setConfirmar(null); setFoto(null); setCodigo(""); }
+          },
         },
-      },
-    );
+      );
+    } finally {
+      setSubiendo(false);
+    }
   }
 
   const lista = verEntregadas ? entregadas : autorizadas;
@@ -121,20 +147,24 @@ export default function MaterialesAlmacenPage() {
           <ConfirmDialog
             titulo={`Entregar ${s.folio}`}
             mensaje={
-              <span>
-                {s.empleado_nombre} · {s.rnd_material_lineas.length} materiales
-                {incompletas > 0 && (
-                  <>
-                    {" · "}
-                    <strong>{incompletas}</strong> se surten incompletos
-                  </>
-                )}
-              </span>
+              <>
+                <span>
+                  {s.empleado_nombre} · {s.rnd_material_lineas.length} materiales
+                  {incompletas > 0 && (<>{" · "}<strong>{incompletas}</strong> se surten incompletos</>)}
+                </span>
+                <CapturaEntrega
+                  codigo={codigo}
+                  onCodigo={setCodigo}
+                  onFoto={setFoto}
+                  nombreQuienRecoge={s.empleado_nombre}
+                />
+              </>
             }
             textoConfirmar="Marcar entregado"
             colorConfirmar="verde"
-            isPending={entregar.isPending}
-            onCancelar={() => setConfirmar(null)}
+            isPending={entregar.isPending || subiendo}
+            deshabilitarConfirmar={!foto || !esCodigoCompleto(codigo)}
+            onCancelar={() => { setConfirmar(null); setFoto(null); setCodigo(""); }}
             onConfirmar={() => confirmarEntrega(s)}
           />
         );
