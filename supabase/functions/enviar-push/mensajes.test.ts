@@ -28,3 +28,24 @@ describe("push mensajes", () => {
       .toContain("Aún no usas tu código");
   });
 });
+
+describe("mensajes de material", () => {
+  it("cada tipo de material tiene su texto y lleva a la pantalla de material", () => {
+    const row = { empleado_id: 7, endpoint: "e", p256dh: "p", auth: "a" };
+    for (const tipo of ["material_autorizada", "material_rechazada", "material_entregada"] as const) {
+      const m = mensaje(tipo, row);
+      expect(m.title).toBe("Vales AC");
+      expect(m.body.length).toBeGreaterThan(10);
+      expect(m.url).toBe("/empleado/materiales");
+    }
+  });
+
+  it("los tags de material son cortos y distintos entre sí", () => {
+    const tags = new Set(
+      (["material_autorizada", "material_rechazada", "material_entregada"] as const)
+        .map((t) => topicCorto(t, 7)),
+    );
+    expect(tags.size).toBe(3);
+    for (const t of tags) expect(t.length).toBeLessThanOrEqual(32);
+  });
+});
