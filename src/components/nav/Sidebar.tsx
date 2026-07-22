@@ -13,7 +13,7 @@ const ETIQUETAS: Record<TabId, string> = {
   "comidas-gerente": "Comidas",
   "pago-comidas": "Pago Comidas",
   "autorizaciones": "Autorizaciones",
-  "materiales-gerente": "Material",
+  "materiales-gerente": "Uso interno",
   "materiales-almacen": "Almacén",
 };
 

@@ -18,20 +18,20 @@ describe("BarraInferior", () => {
     mockPathname.mockReturnValue("/empleado");
     render(<BarraInferior />);
     expect(screen.getByRole("link", { name: /vales/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /material/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /uso interno/i })).toBeInTheDocument();
   });
 
-  it("marca Vales como activo en la home, no Material", () => {
+  it("marca Vales como activo en la home, no Uso interno", () => {
     mockPathname.mockReturnValue("/empleado");
     render(<BarraInferior />);
     expect(screen.getByRole("link", { name: /vales/i })).toHaveAttribute("aria-current", "page");
-    expect(screen.getByRole("link", { name: /material/i })).not.toHaveAttribute("aria-current");
+    expect(screen.getByRole("link", { name: /uso interno/i })).not.toHaveAttribute("aria-current");
   });
 
-  it("marca Material como activo dentro del módulo de material", () => {
+  it("marca Uso interno como activo dentro de su módulo", () => {
     mockPathname.mockReturnValue("/empleado/materiales");
     render(<BarraInferior />);
-    expect(screen.getByRole("link", { name: /material/i })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: /uso interno/i })).toHaveAttribute("aria-current", "page");
     // "/empleado" es prefijo de todo: si se comparara con startsWith, Vales
     // saldría activo en TODAS las pantallas.
     expect(screen.getByRole("link", { name: /vales/i })).not.toHaveAttribute("aria-current");

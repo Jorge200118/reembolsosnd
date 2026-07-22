@@ -32,11 +32,14 @@ export function mensaje(tipo: Tipo, row: SubRow): { title: string; body: string;
       return { title: "Vales AC", body: `Se te acumuló una comida, ya son $${fmtMonto(row.monto)}.`, url: "/empleado", tag };
     case "recordatorio":
       return { title: "Vales AC", body: "Aún no usas tu código de hoy, cóbralo en caja antes de que cierre.", url: "/empleado", tag };
+    // El módulo se llama "Uso interno" de cara al usuario; los identificadores
+    // siguen diciendo material porque cambiarlos rompería los avisos ya
+    // suscritos y no le sirve a nadie.
     case "material_autorizada":
-      return { title: "Vales AC", body: "Tu gerente autorizó tu material, pásalo a almacén.", url: "/empleado/materiales", tag };
+      return { title: "Vales AC", body: "Tu gerente autorizó tu uso interno, pásalo a almacén.", url: "/empleado/materiales", tag };
     case "material_rechazada":
-      return { title: "Vales AC", body: "Tu solicitud de material fue rechazada, revísala.", url: "/empleado/materiales", tag };
+      return { title: "Vales AC", body: "Tu solicitud de uso interno fue rechazada, revísala.", url: "/empleado/materiales", tag };
     case "material_entregada":
-      return { title: "Vales AC", body: "Almacén marcó tu material como entregado.", url: "/empleado/materiales", tag };
+      return { title: "Vales AC", body: "Almacén ya surtió tu uso interno.", url: "/empleado/materiales", tag };
   }
 }

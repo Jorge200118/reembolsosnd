@@ -60,7 +60,7 @@ export default function MaterialesAlmacenPage() {
 
   return (
     <main className="mx-auto max-w-6xl p-4 sm:p-6">
-      <PageHeader titulo="Almacén" subtitulo="Material autorizado listo para surtir" />
+      <PageHeader titulo="Almacén" subtitulo="Uso interno autorizado, listo para surtir" />
       {msg && <p className="mb-3 rounded-lg bg-slate-100 px-3 py-1.5 text-sm text-slate-700">{msg}</p>}
 
       <div className="mb-4 flex gap-2">

@@ -7,6 +7,10 @@ import { CarritoMaterial } from "@/components/empleado/CarritoMaterial";
 import { agregarMaterial, cambiarCantidad, quitarMaterial } from "@/lib/materiales/carrito";
 import type { Material, LineaSolicitud } from "@/lib/materiales/tipos";
 
+// El módulo se llama "Uso interno" de cara al usuario. En el código sigue
+// diciendo material (rutas, tablas, archivos) porque ahí "material" es la cosa
+// que se pide, no el nombre del trámite, y renombrarlo no le sirve a nadie.
+//
 // Nombres propios (`Mia`) a propósito: esta es la forma RECORTADA que ve el
 // empleado. El escritorio usa una más ancha (con empleado_nombre, sucursal,
 // costos) que vivirá en `SolicitudGuardada`. Dos vistas, dos tipos, sin que
@@ -122,7 +126,7 @@ export default function MaterialesEmpleado() {
   return (
     <>
       <div className="carnet-topbar">
-        <div className="carnet-hola">Pedir material<small>Aceros del Pacífico</small></div>
+        <div className="carnet-hola">Uso interno<small>Aceros del Pacífico</small></div>
       </div>
 
       <div className="carnet-card">
@@ -163,7 +167,7 @@ export default function MaterialesEmpleado() {
         {cargando ? (
           <p className="carnet-empty">Cargando…</p>
         ) : solicitudes.length === 0 ? (
-          <p className="carnet-empty">Todavía no has pedido material.</p>
+          <p className="carnet-empty">Todavía no has hecho ninguna solicitud.</p>
         ) : (
           solicitudes.map((s) => (
             <div className="mat-linea" key={s.id}>
