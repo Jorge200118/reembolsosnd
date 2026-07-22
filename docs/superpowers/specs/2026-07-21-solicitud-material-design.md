@@ -1,8 +1,8 @@
 # SPEC — Módulo de Solicitud de Material (empleado → gerente → almacén)
 
-**Estado:** Propuesta — pendiente de revisión del usuario · **Solo desarrollo local** (se trabaja en `master` sin pushear) · **Cero `alert`**
-**Proyecto Supabase:** `uqncsqstpcynjxnjhrqu` · **ERP:** SQL Server `BMSCabos` en `SERVERADP\CABOS`, alcanzable solo desde la red interna
-**Fecha:** 2026-07-21
+**Estado:** En construcción — se trabaja en `master` sin pushear · **Cero `alert`**
+**Proyecto Supabase:** `uqncsqstpcynjxnjhrqu` · **ERP:** SQL Server `BMSCabos` en `SERVERADP\CABOS`, alcanzable a través de censos-web
+**Fecha:** 2026-07-21 · **Corregido el 2026-07-22** (ver §2: censos-web sí es alcanzable desde internet)
 
 ---
 
@@ -37,7 +37,9 @@ Sin transiciones hacia atrás. Toda transición se valida en Postgres, no en el 
 
 **Puente al ERP.** El catálogo no se copia ni se sincroniza: se consulta en vivo a censos-web (`C:\censos-web`), la app Node on-premise que ya está conectada a SQL Server. Se le agrega un endpoint de búsqueda protegido por llave, y Devoluciones lo consume **solo desde el servidor** (route handler de Next), nunca desde el navegador.
 
-**Consecuencia deliberada:** el módulo funciona en desarrollo, donde Next corre en la red interna. En Netlify no funcionaría, porque la nube no alcanza `SERVERADP\CABOS`. Eso es aceptable hoy y está anotado en §9 como el trabajo que falta antes de producción.
+**Corrección del 2026-07-22 — censos-web sí es alcanzable desde internet.** La versión original de este spec afirmaba que el módulo solo podría funcionar en desarrollo, porque Netlify no alcanza `SERVERADP\CABOS`. **Era falso.** Al implementar el puente se descubrió que censos-web corre bajo PM2 con un túnel permanente (`ngrok http 3800 --domain=censos-adp.ngrok.app`) y está publicado en `https://censos-adp.ngrok.app`; se comprobó desde fuera de la red (`/Auth/Login` → 200, `/api/materiales` sin llave → 401).
+
+Por lo tanto **no hay bloqueo para producción**: `CENSOS_API_URL` apunta al dominio público y la misma configuración sirve en local y en Netlify. La contrapartida, asumida a conciencia: el catálogo del ERP con costos queda accesible desde internet para quien tenga la llave compartida (256 bits aleatorios, viajando por HTTPS en un header). El resto de censos-web ya estaba igual de expuesto desde antes.
 
 **Congelado de datos.** Lo que se copia del ERP a la solicitud (código, descripción, unidad, costo unitario, existencia al pedir) se guarda tal cual en el momento de pedir. El histórico no se mueve aunque cambien los precios, y las pantallas de gerente y almacén no dependen de que SQL Server esté vivo.
 
@@ -181,7 +183,7 @@ Las migraciones sí se aplican al Supabase real, porque no hay base de desarroll
 
 ## 9. Fuera de alcance (y qué falta para producción)
 
-- **Alcanzar el ERP desde la nube.** Es el bloqueo real de producción: Netlify no ve `SERVERADP\CABOS`. Se resolverá publicando censos-web por túnel o sincronizando el catálogo a Supabase; se decide cuando el módulo ya funcione en local.
+- ~~**Alcanzar el ERP desde la nube.**~~ **Resuelto, y nunca fue un problema:** censos-web ya estaba publicado en `https://censos-adp.ngrok.app` (ver §2). No hace falta túnel nuevo ni sincronizar el catálogo. Lo que sí queda pendiente es decidir si ese endpoint debe restringirse (hoy responde a cualquiera que tenga la llave, desde cualquier parte del mundo) y qué pasa si el túnel se cae: el buscador degrada con el mensaje de §5, pero nadie se entera salvo el empleado que lo intente.
 - **Autorización línea por línea** (recortar cantidades antes de mandar a almacén). Se descartó a propósito: la captura de `cantidad_entregada` cubre el caso real de "no había todo".
 - **Descontar inventario en el ERP.** El módulo registra la entrega; no escribe en SQL Server.
 - **Código de confirmación del empleado al recibir** (estilo OTP de vales) y **foto de evidencia**. Se consideraron y se dejaron fuera de esta versión.
