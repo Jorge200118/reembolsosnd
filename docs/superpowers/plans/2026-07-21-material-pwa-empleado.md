@@ -647,6 +647,18 @@ describe("CarritoMaterial", () => {
     expect(screen.getByText(/solo hay 40/i)).toBeInTheDocument();
   });
 
+  // El ERP tiene existencias negativas de verdad: al probar el puente, 3 de 25
+  // materiales venían en negativo (ANGULO DE 1/2 X 3" estaba en -3). Decirle al
+  // empleado "solo hay -3" es basura; en cero o menos, no hay y punto.
+  it("con existencia cero o negativa dice que no hay, sin enseñar el número", () => {
+    const enNegativo: LineaSolicitud[] = [
+      { ...LINEAS[0]!, cantidad: 2, existenciaAlPedir: -3 },
+    ];
+    render(<CarritoMaterial lineas={enNegativo} onCambiarCantidad={() => {}} onQuitar={() => {}} />);
+    expect(screen.getByText(/no hay en existencia/i)).toBeInTheDocument();
+    expect(screen.queryByText(/-3/)).not.toBeInTheDocument();
+  });
+
   it("no avisa de existencia cuando el dato es desconocido", () => {
     render(<CarritoMaterial lineas={[LINEAS[1]!]} onCambiarCantidad={() => {}} onQuitar={() => {}} />);
     expect(screen.queryByText(/solo hay/i)).not.toBeInTheDocument();
@@ -711,7 +723,11 @@ export function CarritoMaterial({
       {lineas.map((l) => {
         // Se avisa, no se bloquea: la existencia es una foto y almacén tiene la
         // última palabra. Si el dato es desconocido (null) no se dice nada.
-        const excede = l.existenciaAlPedir !== null && l.cantidad > l.existenciaAlPedir;
+        // El ERP maneja existencias negativas (sobrevendido), así que cero o
+        // menos se dice como "no hay": el número crudo no le sirve a nadie.
+        const exist = l.existenciaAlPedir;
+        const agotado = exist !== null && exist <= 0;
+        const excede = exist !== null && exist > 0 && l.cantidad > exist;
         return (
           <div className="mat-linea" key={l.codProd}>
             <div className="mat-linea-txt">
@@ -720,9 +736,10 @@ export function CarritoMaterial({
                 {l.codProd}
                 {l.unidad ? ` · ${l.unidad}` : ""}
               </span>
+              {agotado && <span className="mat-aviso">No hay en existencia</span>}
               {excede && (
                 <span className="mat-aviso">
-                  Pediste {l.cantidad} y solo hay {l.existenciaAlPedir}
+                  Pediste {l.cantidad} y solo hay {exist}
                 </span>
               )}
             </div>

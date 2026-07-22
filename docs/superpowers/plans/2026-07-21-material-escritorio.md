@@ -563,6 +563,17 @@ describe("TablaLineas", () => {
     expect(screen.getByTitle("Se pidieron 10 y solo había 3")).toBeInTheDocument();
   });
 
+  // El ERP tiene existencias negativas reales (al probar el puente, 3 de 25
+  // materiales venían en negativo). Aquí SÍ se enseña el número crudo, a
+  // diferencia de la PWA: al gerente y a almacén un -3 les dice que el ERP
+  // está sobrevendido, y eso es información útil, no ruido.
+  it("con existencia negativa lo dice como agotado pero conserva el número", () => {
+    const enNegativo: LineaGuardada[] = [{ ...LINEAS[0]!, cantidad: 2, existencia_al_pedir: -3 }];
+    render(<TablaLineas lineas={enNegativo} capturable={false} entregas={{}} onCambiar={() => {}} />);
+    expect(screen.getByTitle("No había existencia (el ERP marcaba -3)")).toBeInTheDocument();
+    expect(screen.getByText("-3")).toBeInTheDocument();
+  });
+
   it("en modo captura muestra un campo por línea y avisa los cambios", () => {
     const cambiar = vi.fn();
     render(<TablaLineas lineas={LINEAS} capturable entregas={{ l1: 2, l2: 10 }} onCambiar={cambiar} />);
@@ -637,7 +648,13 @@ export function TablaLineas({
                 </td>
                 <td
                   className={`py-1.5 pr-4 text-right ${corto ? "font-semibold text-amber-700" : "text-slate-600"}`}
-                  title={corto ? `Se pidieron ${l.cantidad} y solo había ${l.existencia_al_pedir}` : undefined}
+                  title={
+                    !corto
+                      ? undefined
+                      : (l.existencia_al_pedir ?? 0) <= 0
+                        ? `No había existencia (el ERP marcaba ${l.existencia_al_pedir})`
+                        : `Se pidieron ${l.cantidad} y solo había ${l.existencia_al_pedir}`
+                  }
                 >
                   {l.existencia_al_pedir === null ? "—" : l.existencia_al_pedir}
                 </td>
