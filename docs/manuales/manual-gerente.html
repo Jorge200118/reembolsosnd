@@ -15,11 +15,11 @@
   </div>
   <div class="kicker">Manual de uso</div>
   <h1>Gerente</h1>
-  <div class="sub">Autoriza las comidas de los empleados de tu sucursal.</div>
-  <div class="rolechip">Perfil: Gerente · Módulo Comidas</div>
+  <div class="sub">Autoriza las comidas y el material que piden los empleados de tu sucursal.</div>
+  <div class="rolechip">Perfil: Gerente · Comidas y Material</div>
   <div class="foot">
     <b>Para:</b> gerentes de sucursal &nbsp;·&nbsp; <b>Sistema:</b> Comidas AC (web)<br>
-    Tu única tarea aquí es dejar registrada la comida de quien comió. El resto lo hace el sistema.
+    Registras la comida de quien comió y autorizas el material que te piden. El resto lo hace el sistema.
   </div>
 </section>
 
@@ -28,11 +28,12 @@
   <div class="sec-h"><div class="sec-n">i</div><h2>Lo que aprenderás</h2></div>
   <ol>
     <li><b>Tu tarea en una frase</b><span>— qué haces y qué no</span></li>
-    <li><b>Entrar y tu menú</b><span>— solo verás "Comidas"</span></li>
+    <li><b>Entrar y tu menú</b><span>— Comidas y Material</span></li>
     <li><b>La pantalla Comidas</b><span>— sus 3 zonas</span></li>
     <li><b>Autorizar comidas del día</b><span>— paso a paso</span></li>
     <li><b>Casos especiales</b><span>— día pasado, sin teléfono, repetidos</span></li>
     <li><b>Qué pasa después</b><span>— el código, la cajera y el empleado</span></li>
+    <li><b>Autorizar material</b><span>— la pestaña Material</span></li>
     <li><b>Reglas importantes</b><span>— lo que no debes olvidar</span></li>
   </ol>
 </section>
@@ -69,7 +70,7 @@
 <!-- ================= 2. ENTRAR Y MENÚ ================= -->
 <section class="sec">
   <div class="sec-h"><div class="sec-n">2</div><h2>Entrar y tu menú</h2></div>
-  <p class="lead">Entra con tu <b>correo</b> y <b>contraseña</b>. Con tu perfil, el menú muestra <b>solo una opción: Comidas</b>.</p>
+  <p class="lead">Entra con tu <b>correo</b> y <b>contraseña</b>. Con tu perfil, el menú muestra <b>dos opciones: Comidas y Material</b>.</p>
 
   <div class="figure">
     <div class="shot">
@@ -78,16 +79,17 @@
         <aside class="sb">
           <div class="lg"><i>AC</i><b>ACEROS CABOS<small>Reembolsos</small></b></div>
           <a class="on"><span class="ic"></span>Comidas</a>
+          <a><span class="ic"></span>Material</a>
           <div class="usr"><span class="av">AR</span><span><b>Ana Robles</b><small>gerente</small></span></div>
         </aside>
         <div class="pane">
           <div class="ph">Registro de Comidas</div>
           <div class="psub">Marca los empleados que llegaron y autoriza sus comidas de una vez · $120.00 c/u</div>
-          <div class="m-note">↑ Esta es tu única pantalla.</div>
+          <div class="m-note">↑ Tienes dos pestañas: Comidas y Material.</div>
         </div>
       </div>
     </div>
-    <div class="cap">Tu menú tiene una sola opción: Comidas</div>
+    <div class="cap">Tu menú: Comidas y Material</div>
   </div>
   <p><small>Abajo del menú ves tu nombre y el botón <span class="ui ghost">Cerrar sesión</span>.</small></p>
 </section>
@@ -233,7 +235,93 @@
 
 <!-- ================= 7. REGLAS ================= -->
 <section class="sec">
-  <div class="sec-h"><div class="sec-n">7</div><h2>Reglas importantes</h2></div>
+  <div class="sec-h"><div class="sec-n">7</div><h2>Autorizar material</h2></div>
+  <p class="lead">Además de las comidas, ahora tienes una segunda pestaña: <span class="ui">Material</span>. Ahí llegan las solicitudes de material que levantan los empleados <b>de tu sucursal</b> desde su celular, y tú decides si se surten.</p>
+
+  <div class="box info"><span class="t">Cómo funciona, en corto</span>
+    El empleado pide desde su app &nbsp;→&nbsp; <b>tú autorizas o rechazas</b> &nbsp;→&nbsp; almacén se lo entrega. Sin tu visto bueno, almacén ni siquiera la ve.</div>
+
+  <div class="figure">
+    <div class="shot">
+      <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">Menú ▸ Material</span></div>
+      <div class="app">
+        <aside class="sb">
+          <div class="lg"><i>AC</i><b>ACEROS CABOS<small>Reembolsos</small></b></div>
+          <a><span class="ic"></span>Comidas</a>
+          <a class="on"><span class="ic"></span>Material</a>
+          <div class="usr"><span class="av">AR</span><span><b>Ana Robles</b><small>gerente</small></span></div>
+        </aside>
+        <div class="pane">
+          <div class="ph">Material</div>
+          <div class="psub">Solicitudes de material de tu sucursal</div>
+
+          <div class="anchor" style="margin:8px 0">
+            <span class="mk l">1</span>
+            <span class="m-btn sm">Pendientes (1)</span>
+            <span class="m-btn sm" style="background:#fff;border:1px solid #cbd5e1;color:#334155">Historial</span>
+          </div>
+
+          <div class="m-card anchor" style="border-left:4px solid #f59e0b">
+            <span class="mk">2</span>
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+              <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+                <b style="font-size:11.5px;color:#0f2942">SM-000018</b>
+                <span class="m-chip chip-amber">TML</span>
+                <span style="font-size:10px;color:#334155">Carlos Ruiz</span>
+                <span style="font-size:10px;color:#64748b">2 materiales</span>
+                <span style="font-size:10px;color:#0f2942"><b>Estimado $4,276.20</b></span>
+              </div>
+              <div style="display:flex;gap:6px">
+                <span class="m-btn sm green">Autorizar</span>
+                <span class="m-btn sm" style="background:#dc2626">Rechazar</span>
+                <span class="m-btn sm anchor" style="background:#fff;border:1px solid #cbd5e1;color:#334155">Ver detalle<span class="mk br">3</span></span>
+              </div>
+            </div>
+            <div style="font-size:9.5px;color:#94a3b8;font-style:italic;margin-top:4px">"para la reparación del portón"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">Pestaña Material con una solicitud pendiente</div>
+  </div>
+
+  <ul class="legend">
+    <li><b>Pendientes / Historial:</b> lo que espera tu decisión, y lo que ya resolviste (autorizado, entregado, rechazado).</li>
+    <li><b>La tarjeta:</b> el folio, quién pidió, cuántos materiales y el <b>costo estimado</b> — para que sepas cuánto vale lo que estás autorizando. Si el empleado escribió para qué lo quiere, sale en cursiva.</li>
+    <li><b>Ver detalle:</b> ábrelo <b>antes de autorizar</b>. Ahí ves renglón por renglón qué pidió, cuánto había en existencia y a qué costo.</li>
+  </ul>
+
+  <h3 class="mini">El detalle, renglón por renglón</h3>
+  <div class="figure">
+    <div class="shot">
+      <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">SM-000018 ▸ detalle</span></div>
+      <div class="pane">
+        <table class="m-table">
+          <tr><th>Material</th><th>Código</th><th style="text-align:right">Pedido</th><th style="text-align:right">Existencia</th><th style="text-align:right">Costo</th></tr>
+          <tr><td>ANGULO DE 1/2 X 3"</td><td>ANG160</td><td style="text-align:right">2 PZ</td><td style="text-align:right;color:#b45309;font-weight:700">−3</td><td style="text-align:right">$2,138.10</td></tr>
+          <tr><td>TORNILLO 1/4</td><td>TOR001</td><td style="text-align:right">10 PZ</td><td style="text-align:right">40</td><td style="text-align:right">—</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="cap">Lo que pidió, con existencia y costo de tu sucursal</div>
+  </div>
+
+  <div class="box warn"><span class="t">La existencia en ámbar</span>
+    Cuando un número sale en ámbar quiere decir que <b>pidieron más de lo que había</b>, o que el inventario está en negativo. No te impide autorizar: almacén entrega lo que tenga y lo deja anotado.</div>
+
+  <div class="box danger"><span class="t">Si rechazas, escribe el motivo</span>
+    El motivo le llega al empleado a su celular y lo ve en su lista. Un rechazo sin motivo solo genera que te vaya a buscar para preguntarte.</div>
+
+  <div class="box info"><span class="t">Es todo o nada</span>
+    Autorizas la solicitud <b>completa</b>, no renglón por renglón. Si algo no se te hace correcto, rechaza y dile al empleado que la levante de nuevo bien.</div>
+
+  <div class="box ok"><span class="t">No te toca surtir</span>
+    Una vez que autorizas, la solicitud pasa sola a la pantalla de almacén. Tú ya no tienes que hacer nada más.</div>
+</section>
+
+<!-- ================= 8. REGLAS ================= -->
+<section class="sec">
+  <div class="sec-h"><div class="sec-n">8</div><h2>Reglas importantes</h2></div>
   <table class="ref">
     <tr><th>Regla</th><th>Detalle</th></tr>
     <tr><td><b>Monto fijo</b></td><td>Cada comida vale <b>$120.00</b>, sin excepción. El total es marcados × $120.</td></tr>
@@ -244,6 +332,9 @@
     <tr><td><b>Solo tu sucursal</b></td><td>Solo empleados activos de tu sucursal.</td></tr>
     <tr><td><b>Pago L a S</b></td><td>El pago en caja y los códigos son de lunes a sábado; por eso el aviso dice "el pago se realiza de lunes a sábado".</td></tr>
     <tr><td><b>Revisa el resultado</b></td><td>Después de autorizar, checa el recuadro verde y el rojo antes de darlo por hecho.</td></tr>
+    <tr><td><b>Material: todo o nada</b></td><td>La solicitud se autoriza completa. No se aprueban renglones sueltos.</td></tr>
+    <tr><td><b>Material: motivo al rechazar</b></td><td>El motivo le llega al empleado. Sin motivo, va a ir a buscarte.</td></tr>
+    <tr><td><b>Material: no se deshace</b></td><td>Una vez autorizada o rechazada, no se puede revertir.</td></tr>
   </table>
 
   <div class="box ok" style="margin-top:16px"><span class="t">En resumen</span>Marca a quien comió, revisa la fecha, toca <b>Autorizar</b> y verifica el resultado. Lo demás — código, avisos y pago — lo hace el sistema, el empleado y la cajera.</div>

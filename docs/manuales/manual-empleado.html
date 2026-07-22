@@ -15,7 +15,7 @@
   </div>
   <div class="kicker">Manual de uso</div>
   <h1>Empleado</h1>
-  <div class="sub">Consulta tus vales de comida y saca tu código para cobrar en caja, desde tu celular.</div>
+  <div class="sub">Saca tu código para cobrar tus comidas en caja, y pide el material que necesitas del almacén. Todo desde tu celular.</div>
   <div class="rolechip">App Vales AC · para tu teléfono</div>
   <div class="foot">
     <b>Para:</b> empleados &nbsp;·&nbsp; <b>App:</b> Vales AC (se abre en el celular)<br>
@@ -34,6 +34,7 @@
     <li><b>Tu pantalla principal</b><span>— tus comidas por cobrar</span></li>
     <li><b>Tu código para cobrar</b><span>— cómo usarlo en caja</span></li>
     <li><b>Activa los avisos</b><span>— para no perder tu comida</span></li>
+    <li><b>Pedir material</b><span>— lo que necesitas del almacén</span></li>
     <li><b>Reglas importantes</b><span>— lo que debes saber</span></li>
   </ol>
 </section>
@@ -197,6 +198,11 @@
               <div class="m-btn block anchor">Ver mi código<span class="mk br">3</span></div>
             </div>
           </div>
+          <div class="anchor" style="display:flex;border-top:1px solid #e2e8f0;background:#fff;padding:5px 8px 6px;margin-top:auto">
+            <span class="mk l">4</span>
+            <div style="flex:1;text-align:center;font-size:7.5px;font-weight:800;letter-spacing:.08em;color:#2563eb;background:#eff6ff;border-radius:7px;padding:4px 0">🍽️<br>VALES</div>
+            <div style="flex:1;text-align:center;font-size:7.5px;font-weight:800;letter-spacing:.08em;color:#94a3b8;padding:4px 0">📦<br>MATERIAL</div>
+          </div>
         </div>
       </div>
       <div class="cap">Panel del empleado</div>
@@ -206,6 +212,7 @@
         <li><b>Avisos:</b> el botón para activar las notificaciones (ver sección 7).</li>
         <li><b>Comidas por cobrar:</b> la lista de tus comidas autorizadas ($120 cada una), con la fecha, el monto y el <b>Total a cobrar</b>.</li>
         <li><b>Ver mi código:</b> te muestra el número que le das a la cajera.</li>
+        <li><b>La barra de abajo:</b> te mueve entre las dos partes de la app. <b>Vales</b> es esta pantalla; <b>Material</b> es para pedirle cosas al almacén (ver sección 8). La parte donde estás se pinta de azul.</li>
       </ul>
       <div class="box info"><span class="t">Es dinero a tu favor</span>Lo que ves es lo que <b>la empresa te va a pagar</b> por tus comidas, no una deuda. Cuando lo cobras en caja, deja de aparecer.</div>
       <div class="box ok"><span class="t">Si no tienes nada pendiente</span>Verás: <i>"No tienes comidas por cobrar. Cuando te autoricen una, aparece aquí."</i></div>
@@ -289,8 +296,83 @@
 </section>
 
 <!-- ================= 8. REGLAS ================= -->
+<!-- ================= 8. PEDIR MATERIAL ================= -->
+<section class="sec pagebreak">
+  <div class="sec-h"><div class="sec-n">8</div><h2>Pedir material</h2></div>
+  <p class="lead">Además de tus comidas, en esta app puedes <b>pedir el material que necesitas del almacén</b>. Toca <b>Material</b> en la barra de abajo.</p>
+
+  <div class="box info"><span class="t">Cómo funciona, en corto</span>
+    Tú pides &nbsp;→&nbsp; <b>tu gerente autoriza</b> &nbsp;→&nbsp; <b>almacén te lo entrega</b>. Te llega un aviso al celular en cada paso.</div>
+
+  <div style="display:flex;gap:16px;align-items:flex-start">
+    <div class="figure" style="flex:0 0 auto;margin-top:0">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="scr">
+          <div class="p-head"><div><b>Pedir material</b><small>Aceros del Pacífico</small></div></div>
+          <div class="p-body">
+            <div class="p-card anchor">
+              <span class="mk l">1</span>
+              <b style="font-size:11px;color:#0f2942">NUEVA SOLICITUD</b>
+              <div class="m-input" style="margin:6px 0 4px;font-size:9px;color:#94a3b8">Busca el material (mínimo 3 letras)</div>
+              <div style="border:1px solid #e2e8f0;border-radius:7px;padding:5px 7px;margin-bottom:4px">
+                <div style="font-size:9px;font-weight:700;color:#0f2942">ANGULO DE 1/2 X 3"</div>
+                <div style="font-size:8px;color:#94a3b8">ANG160 · PZ · hay 12</div>
+              </div>
+              <div style="border:1px solid #e2e8f0;border-radius:7px;padding:5px 7px">
+                <div style="font-size:9px;font-weight:700;color:#0f2942">TORNILLO 1/4</div>
+                <div style="font-size:8px;color:#94a3b8">TOR001 · PZ · hay 40</div>
+              </div>
+            </div>
+            <div class="p-card anchor">
+              <span class="mk l">2</span>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:9px">
+                <div><b style="color:#0f2942">TORNILLO 1/4</b><br><span style="color:#94a3b8">TOR001 · PZ</span></div>
+                <div><span class="m-input" style="display:inline-block;padding:1px 6px;width:22px;text-align:center">10</span> <span style="color:#b91c1c">✕</span></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;border-top:1px solid #eef2f6;margin-top:5px;padding-top:5px;font-size:10px"><b>Costo estimado</b><b style="color:#0f2942">$1,240.00</b></div>
+              <div style="height:6px"></div>
+              <div class="m-btn block anchor">Enviar solicitud<span class="mk br">3</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cap">Pantalla de material</div>
+    </div>
+    <div style="flex:1">
+      <ul class="legend">
+        <li><b>Busca el material:</b> escribe al menos <b>3 letras</b> de lo que necesitas y te salen las opciones. Cada una muestra su código, la unidad y cuánto hay en tu sucursal.</li>
+        <li><b>Tu lista:</b> toca un resultado y se agrega. Cambia la cantidad en la casilla, o quítalo con la ✕. Puedes pedir varias cosas en una sola solicitud.</li>
+        <li><b>Enviar solicitud:</b> le llega a tu gerente. Abajo puedes escribir <b>para qué lo necesitas</b>, que ayuda a que te la autoricen más rápido.</li>
+      </ul>
+
+      <div class="box warn"><span class="t">Si dice "No hay en existencia"</span>
+        Puedes pedirlo de todas formas: es solo un aviso de lo que el sistema tenía registrado. Quien decide es almacén cuando va al anaquel.</div>
+    </div>
+  </div>
+
+  <h3 class="mini">Cómo va tu solicitud</h3>
+  <p>Abajo de la pantalla, en <b>Mis solicitudes</b>, ves todas las que has mandado y en qué van:</p>
+
+  <table class="ref">
+    <tr><th>Lo que dice</th><th>Qué significa</th></tr>
+    <tr><td><span class="m-chip chip-amber">Esperando a tu gerente</span></td><td>Ya se mandó. Tu gerente todavía no la ve o no la ha autorizado.</td></tr>
+    <tr><td><span class="m-chip chip-blue">Autorizada</span></td><td>Tu gerente dijo que sí. Ya puedes pasar al almacén por tu material.</td></tr>
+    <tr><td><span class="m-chip chip-green">Entregada</span></td><td>Almacén ya te la surtió y quedó registrada.</td></tr>
+    <tr><td><span class="m-chip chip-red">Rechazada</span></td><td>Tu gerente no la autorizó. Abajo aparece el <b>motivo</b>.</td></tr>
+    <tr><td><span class="m-chip chip-gray">Cancelada</span></td><td>Tú mismo la cancelaste antes de que la autorizaran.</td></tr>
+  </table>
+
+  <div class="box ok"><span class="t">Te puedes arrepentir</span>
+    Mientras diga <b>"Esperando a tu gerente"</b>, puedes cancelarla con la ✕. Una vez autorizada, ya no.</div>
+
+  <div class="box info"><span class="t">Si te entregaron menos de lo que pediste</span>
+    Es normal: almacén entrega lo que hay. En la solicitud queda anotado cuánto te dieron de cada cosa. Si te faltó, <b>levanta otra solicitud</b> por lo que falta.</div>
+</section>
+
+<!-- ================= 9. REGLAS ================= -->
 <section class="sec">
-  <div class="sec-h"><div class="sec-n">8</div><h2>Reglas importantes</h2></div>
+  <div class="sec-h"><div class="sec-n">9</div><h2>Reglas importantes</h2></div>
   <table class="ref">
     <tr><th>Regla</th><th>Detalle</th></tr>
     <tr><td><b>Regístrate una vez</b></td><td>Con teléfono + código de empleado. Después entras solo con teléfono + NIP.</td></tr>
@@ -301,9 +383,12 @@
     <tr><td><b>Cobro de lunes a sábado</b></td><td>Los pagos de comida se hacen de lunes a sábado.</td></tr>
     <tr><td><b>Instala + activa avisos</b></td><td>Sobre todo en iPhone: sin instalar la app, no llegan avisos.</td></tr>
     <tr><td><b>Tus datos los ve la empresa</b></td><td>Si tu teléfono o código no coinciden, avisa a administración.</td></tr>
+    <tr><td><b>El material lo autoriza tu gerente</b></td><td>Tú pides, él decide. Si te la rechazan, viene el motivo.</td></tr>
+    <tr><td><b>Pides de tu sucursal</b></td><td>El material y las existencias que ves son los de la sucursal donde estás dado de alta.</td></tr>
+    <tr><td><b>Cancela a tiempo</b></td><td>Una solicitud solo se cancela mientras siga esperando al gerente.</td></tr>
   </table>
 
-  <div class="box ok" style="margin-top:16px"><span class="t">En pocas palabras</span>Instala la app, activa tus avisos, y cuando tengas comidas por cobrar toca <b>Ver mi código</b> y dáselo a la cajera. ¡Listo!</div>
+  <div class="box ok" style="margin-top:16px"><span class="t">En pocas palabras</span>Instala la app y activa tus avisos. Cuando tengas comidas por cobrar toca <b>Ver mi código</b> y dáselo a la cajera. Y cuando necesites material, pídelo en la pestaña <b>Material</b>. ¡Listo!</div>
 
   <div class="footer"><span>Manual del Empleado · Aceros del Pacífico</span><span>App Vales AC</span></div>
 </section>

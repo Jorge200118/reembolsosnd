@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Manual de Almacén · Aceros Cabos</title>
+<link rel="stylesheet" href="_estilos.css">
+</head>
+<body>
+
+<!-- ================= PORTADA ================= -->
+<section class="cover">
+  <div class="brand">
+    <div class="logo">AC</div>
+    <div><div class="n1">ACEROS CABOS</div><div class="n2">Aceros del Pacífico</div></div>
+  </div>
+  <div class="kicker">Manual de uso</div>
+  <h1>Almacén</h1>
+  <div class="sub">Surte el material que el gerente ya autorizó y deja registrado cuánto entregaste.</div>
+  <div class="rolechip">Perfil: Almacén · Módulo Material</div>
+  <div class="foot">
+    <b>Para:</b> encargados de almacén &nbsp;·&nbsp; <b>Sistema:</b> Aceros Cabos (web)<br>
+    Solo ves las solicitudes de <b>tu sucursal</b> que ya vienen autorizadas. Lo que no está autorizado, no te llega.
+  </div>
+</section>
+
+<!-- ================= ÍNDICE ================= -->
+<section class="toc">
+  <div class="sec-h"><div class="sec-n">i</div><h2>Lo que aprenderás</h2></div>
+  <ol>
+    <li><b>Tu tarea en una frase</b><span>— qué haces y qué no</span></li>
+    <li><b>Entrar y tu menú</b><span>— solo verás "Almacén"</span></li>
+    <li><b>La pantalla Almacén</b><span>— por surtir y entregadas</span></li>
+    <li><b>Surtir una solicitud</b><span>— paso a paso</span></li>
+    <li><b>Cuando no hay todo</b><span>— entregar de menos, que es normal</span></li>
+    <li><b>De dónde viene y a dónde va</b><span>— el circuito completo</span></li>
+    <li><b>Reglas importantes</b><span>— lo que no debes olvidar</span></li>
+  </ol>
+</section>
+
+<!-- ================= 1. TU TAREA ================= -->
+<section class="sec">
+  <div class="sec-h"><div class="sec-n">1</div><h2>Tu tarea en una frase</h2></div>
+  <div class="box info"><span class="t">Todo tu trabajo es esto:</span>
+    <b>Entregar el material y capturar cuánto entregaste de cada cosa.</b> Ni más ni menos.</div>
+
+  <p class="lead">Tú <b>no</b> decides si se autoriza: eso ya lo hizo el gerente antes de que la solicitud llegue a tu pantalla. Tampoco tienes que avisarle al empleado: el sistema le avisa solo.</p>
+
+  <div style="display:flex;gap:14px">
+    <div style="flex:1">
+      <div class="box ok"><span class="t">Sí te toca</span>
+        <ul>
+          <li>Buscar el material que pidieron.</li>
+          <li>Entregárselo al empleado.</li>
+          <li>Capturar <b>cuánto entregaste de verdad</b> de cada renglón.</li>
+          <li>Cerrar la solicitud.</li>
+        </ul>
+      </div>
+    </div>
+    <div style="flex:1">
+      <div class="box warn"><span class="t">No te toca</span>
+        <ul>
+          <li>Autorizar ni rechazar (eso es del gerente).</li>
+          <li>Discutir si le corresponde o no el material.</li>
+          <li>Avisarle al empleado que ya está listo.</li>
+          <li>Dar de baja el material del sistema del ERP.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="box danger"><span class="t">Ojo con esto</span>
+    El sistema <b>no descuenta el material de tu inventario</b>. Aquí solo queda registrado quién pidió, quién autorizó y qué entregaste. La salida en el sistema de inventario la sigues haciendo como siempre.</div>
+</section>
+
+<!-- ================= 2. ENTRAR ================= -->
+<section class="sec">
+  <div class="sec-h"><div class="sec-n">2</div><h2>Entrar y tu menú</h2></div>
+  <p class="lead">Entras con tu <b>correo</b> y tu <b>contraseña</b>, los mismos que te dieron. Al entrar verás una sola opción en el menú de la izquierda: <span class="ui">Almacén</span>.</p>
+
+  <div class="figure">
+    <div class="shot">
+      <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">Almacén · Aceros Cabos</span></div>
+      <div class="app">
+        <aside class="sb">
+          <div class="lg"><i>AC</i><b>ACEROS CABOS<small>Reembolsos</small></b></div>
+          <a class="on"><span class="ic"></span>Almacén</a>
+          <div class="usr"><span class="av">JM</span><span><b>Jesús Morales</b><small>almacen</small></span></div>
+        </aside>
+        <div class="pane">
+          <div class="ph">Almacén</div>
+          <div class="psub">Material autorizado listo para surtir</div>
+          <div class="m-note">↑ Esta es tu única pantalla.</div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">Tu menú tiene una sola opción: Almacén</div>
+  </div>
+
+  <div class="box info"><span class="t">Solo ves tu sucursal</span>
+    Las solicitudes que aparecen son <b>únicamente las de tu sucursal</b>. Si un empleado de otra sucursal pide material, su almacén lo atiende, no tú.</div>
+</section>
+
+<!-- ================= 3. LA PANTALLA ================= -->
+<section class="sec pagebreak">
+  <div class="sec-h"><div class="sec-n">3</div><h2>La pantalla Almacén</h2></div>
+  <p class="lead">Tiene dos pestañas arriba y una tarjeta por cada solicitud.</p>
+
+  <div class="figure">
+    <div class="shot">
+      <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">Menú ▸ Almacén</span></div>
+      <div class="pane">
+        <div class="ph">Almacén</div>
+        <div class="psub">Material autorizado listo para surtir</div>
+
+        <div class="anchor" style="margin:10px 0 8px">
+          <span class="mk l">1</span>
+          <span class="m-btn sm">Por surtir (2)</span>
+          <span class="m-btn sm" style="background:#fff;border:1px solid #cbd5e1;color:#334155">Entregadas</span>
+        </div>
+
+        <div class="m-card anchor" style="border-left:4px solid #2563eb;margin-bottom:8px">
+          <span class="mk">2</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+            <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+              <b style="font-size:11.5px;color:#0f2942">SM-000018</b>
+              <span class="m-chip chip-cyan">TML</span>
+              <span style="font-size:10px;color:#334155">Carlos Ruiz</span>
+              <span style="font-size:10px;color:#64748b">2 materiales</span>
+              <span style="font-size:10px;color:#0f2942"><b>Estimado $4,276.20</b></span>
+              <span style="font-size:9px;color:#94a3b8">22/07/2026</span>
+            </div>
+            <div style="display:flex;gap:6px">
+              <span class="m-btn sm green anchor">Marcar entregado<span class="mk br">3</span></span>
+              <span class="m-btn sm" style="background:#fff;border:1px solid #cbd5e1;color:#334155">Ver detalle</span>
+            </div>
+          </div>
+          <div style="font-size:9.5px;color:#94a3b8;font-style:italic;margin-top:4px">"para la reparación del portón"</div>
+        </div>
+
+        <div class="m-card" style="border-left:4px solid #2563eb">
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+            <b style="font-size:11.5px;color:#0f2942">SM-000019</b>
+            <span class="m-chip chip-cyan">TML</span>
+            <span style="font-size:10px;color:#334155">Pedro Ramírez</span>
+            <span style="font-size:10px;color:#64748b">1 material</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">Pantalla de Almacén con dos solicitudes por surtir</div>
+  </div>
+
+  <ul class="legend">
+    <li><b>Por surtir / Entregadas:</b> la primera pestaña es tu trabajo pendiente. La segunda es el historial de lo que ya cerraste, por si necesitas consultarlo.</li>
+    <li><b>La tarjeta:</b> el <b>folio</b> (SM-000018) es el número con el que se identifica la solicitud, seguido de la sucursal, quién la pidió, cuántos materiales trae y el costo estimado. Si el empleado escribió para qué lo necesita, aparece en cursiva abajo.</li>
+    <li><b>Marcar entregado:</b> el botón para cerrarla. Antes de tocarlo conviene abrir <b>Ver detalle</b>.</li>
+  </ul>
+
+  <div class="box info"><span class="t">El folio sirve para hablar</span>
+    Si el empleado te llama, pídele el folio. Es más rápido que buscar por nombre.</div>
+</section>
+
+<!-- ================= 4. SURTIR ================= -->
+<section class="sec pagebreak">
+  <div class="sec-h"><div class="sec-n">4</div><h2>Surtir una solicitud</h2></div>
+
+  <p class="lead">Toca <span class="ui ghost">Ver detalle</span> y se abre la lista de lo que pidieron.</p>
+
+  <div class="figure">
+    <div class="shot">
+      <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">SM-000018 ▸ detalle</span></div>
+      <div class="pane">
+        <table class="m-table">
+          <tr>
+            <th>Material</th><th>Código</th><th style="text-align:right">Pedido</th>
+            <th style="text-align:right">Existencia</th><th style="text-align:right">Costo</th><th style="text-align:right">Entregar</th>
+          </tr>
+          <tr>
+            <td>ANGULO DE 1/2 X 3"</td><td>ANG160</td><td style="text-align:right">2 PZ</td>
+            <td style="text-align:right;color:#b45309;font-weight:700">−3</td><td style="text-align:right">$2,138.10</td>
+            <td style="text-align:right"><span class="m-input" style="display:inline-block;padding:2px 8px;width:38px;text-align:right">2</span></td>
+          </tr>
+          <tr>
+            <td>TORNILLO 1/4</td><td>TOR001</td><td style="text-align:right">10 PZ</td>
+            <td style="text-align:right">40</td><td style="text-align:right">—</td>
+            <td style="text-align:right"><span class="m-input" style="display:inline-block;padding:2px 8px;width:38px;text-align:right">10</span></td>
+          </tr>
+        </table>
+        <div class="m-note" style="margin-top:8px">La columna <b>Entregar</b> ya viene llena con lo que pidieron. Cámbiala solo si vas a dar menos.</div>
+      </div>
+    </div>
+    <div class="cap">Detalle de la solicitud, con la columna Entregar editable</div>
+  </div>
+
+  <div class="flow">
+    <div><b>1.</b> Abre <span class="ui ghost">Ver detalle</span> y junta el material de la lista.</div>
+    <div><b>2.</b> Entrégaselo al empleado.</div>
+    <div><b>3.</b> Ajusta la columna <b>Entregar</b> si diste menos de lo pedido.</div>
+    <div><b>4.</b> Toca <span class="ui green">Marcar entregado</span> y confirma.</div>
+  </div>
+
+  <div class="box ok"><span class="t">Si entregaste todo completo</span>
+    No toques nada de la columna Entregar: ya viene con la cantidad correcta. Solo toca <span class="ui green">Marcar entregado</span> y confirma.</div>
+
+  <div class="box warn"><span class="t">La columna Existencia es una foto vieja</span>
+    Ese número es lo que había <b>cuando el empleado pidió</b>, no lo que hay ahorita. Sirve de referencia, pero <b>la verdad es lo que ves en el anaquel</b>. Si dice que hay y no hay, manda lo del anaquel.</div>
+
+  <div class="box info"><span class="t">Un número en ámbar o con signo menos</span>
+    Cuando la existencia sale resaltada en ámbar quiere decir que se pidió más de lo que había. Y si trae signo menos (como el <b>−3</b> del ejemplo), el sistema de inventario trae ese producto <b>sobrevendido</b>. No es un error de esta pantalla: es un dato que conviene revisar con tu jefe.</div>
+</section>
+
+<!-- ================= 5. ENTREGA INCOMPLETA ================= -->
+<section class="sec pagebreak">
+  <div class="sec-h"><div class="sec-n">5</div><h2>Cuando no hay todo</h2></div>
+
+  <p class="lead">Es normal y el sistema está hecho para eso. <b>Entrega lo que tengas y captura esa cantidad.</b> No dejes la solicitud abierta esperando a que llegue material.</p>
+
+  <div style="display:flex;gap:16px;align-items:flex-start">
+    <div class="figure" style="flex:1;margin-top:0">
+      <div class="shot">
+        <div class="shot-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="shot-url">Confirmar entrega</span></div>
+        <div class="pane" style="padding:14px">
+          <div class="m-card" style="max-width:280px;margin:0 auto">
+            <b style="font-size:12px;color:#0f2942">Entregar SM-000018</b>
+            <div style="font-size:10px;color:#334155;margin:6px 0 10px">
+              Carlos Ruiz · 2 materiales · <b>1 se surten incompletos</b>
+            </div>
+            <div style="display:flex;gap:6px;justify-content:flex-end">
+              <span class="m-btn sm" style="background:#fff;border:1px solid #cbd5e1;color:#334155">Cancelar</span>
+              <span class="m-btn sm green">Marcar entregado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cap">El sistema te avisa cuántos renglones van incompletos</div>
+    </div>
+    <div style="flex:1">
+      <div class="box info"><span class="t">Antes de cerrar, te lo dice</span>
+        Si capturaste menos de lo pedido en algún renglón, la ventana de confirmación te avisa <b>cuántos van incompletos</b>. Es tu última oportunidad de revisar que no te equivocaste de número.</div>
+
+      <div class="box warn"><span class="t">Si de algo no diste nada</span>
+        Pon <b>0</b> en ese renglón. Queda registrado que se pidió y no se surtió, que es justo lo que hay que saber después.</div>
+
+      <div class="box danger"><span class="t">Un renglón que no captures cuenta como cero</span>
+        Al cerrar la solicitud, todo lo que no hayas capturado se guarda como <b>0 entregado</b>. Por eso conviene revisar la columna completa antes de confirmar.</div>
+    </div>
+  </div>
+
+  <div class="box ok"><span class="t">¿Y si después llega el material?</span>
+    El empleado levanta una <b>solicitud nueva</b> por lo que faltó. Una solicitud cerrada no se reabre, y así queda claro qué se entregó cada vez.</div>
+</section>
+
+<!-- ================= 6. EL CIRCUITO ================= -->
+<section class="sec">
+  <div class="sec-h"><div class="sec-n">6</div><h2>De dónde viene y a dónde va</h2></div>
+
+  <div class="flow">
+    <div><b>1. El empleado pide</b><br><small>Desde su celular, en la app. Escoge el material de una lista y pone cuánto necesita.</small></div>
+    <div><b>2. El gerente autoriza</b><br><small>El gerente de esa sucursal la revisa y la autoriza o la rechaza con un motivo.</small></div>
+    <div><b>3. Tú la surtes</b><br><small>Aparece en tu pantalla. Entregas y capturas lo que diste.</small></div>
+    <div><b>4. El empleado se entera</b><br><small>Le llega un aviso a su celular y ve "Entregada" en su lista.</small></div>
+  </div>
+
+  <div class="box info"><span class="t">Si algo no te aparece</span>
+    Si un empleado te dice que ya pidió y tú no lo ves en <b>Por surtir</b>, casi siempre es porque <b>su gerente todavía no la autoriza</b>. Que le hable a su gerente, no a ti.</div>
+</section>
+
+<!-- ================= 7. REGLAS ================= -->
+<section class="sec">
+  <div class="sec-h"><div class="sec-n">7</div><h2>Reglas importantes</h2></div>
+
+  <div class="box danger"><span class="t">Lo que no se puede deshacer</span>
+    Una vez que tocas <span class="ui green">Marcar entregado</span>, la solicitud se cierra y <b>no se puede reabrir ni corregir</b>. Revisa las cantidades antes de confirmar.</div>
+
+  <div class="box warn"><span class="t">No puedes entregar más de lo pedido</span>
+    Si intentas capturar una cantidad mayor a la que pidieron, el sistema no te deja. Si de verdad hace falta más, que el empleado levante otra solicitud.</div>
+
+  <div class="box ok"><span class="t">Tu nombre queda registrado</span>
+    En cada solicitud queda guardado <b>quién la entregó</b> y a qué hora. No es para vigilarte: es para que si después hay una duda, se sepa a quién preguntarle.</div>
+
+  <div class="box info"><span class="t">Cierra tu sesión</span>
+    Si el equipo lo usan varias personas, usa <span class="ui ghost">Cerrar sesión</span> al terminar. Si no, las entregas quedarán a nombre de quien dejó la sesión abierta.</div>
+</section>
+
+<div class="footer">
+  Aceros del Pacífico · Manual de Almacén · Módulo de Material<br>
+  ¿Dudas? Habla con tu gerente de sucursal.
+</div>
+
+</body>
+</html>
