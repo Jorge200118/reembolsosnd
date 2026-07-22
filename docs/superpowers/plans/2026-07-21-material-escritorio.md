@@ -696,7 +696,7 @@ export function TablaLineas({
 npx vitest run src/components/materiales/TablaLineas.test.tsx
 ```
 
-Esperado: PASS, 4 tests.
+Esperado: PASS, 5 tests.
 
 - [ ] **Step 5: Commit**
 
