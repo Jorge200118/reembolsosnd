@@ -9,6 +9,7 @@ export interface ConfirmDialogProps {
   colorConfirmar?: "verde" | "rojo";    // default verde -> bg-emerald-600; rojo -> bg-red-600
   conMotivo?: boolean;                  // si true, muestra un textarea de motivo opcional
   isPending?: boolean;                  // deshabilita botones y muestra "Procesando…"
+  deshabilitarConfirmar?: boolean;      // además de isPending: falta algo por capturar
   onCancelar: () => void;
   onConfirmar: (motivo?: string) => void; // si conMotivo, pasa el texto (trim); si no, sin arg
 }
@@ -20,6 +21,7 @@ export function ConfirmDialog({
   colorConfirmar = "verde",
   conMotivo = false,
   isPending = false,
+  deshabilitarConfirmar = false,
   onCancelar,
   onConfirmar,
 }: ConfirmDialogProps) {
@@ -73,7 +75,7 @@ export function ConfirmDialog({
           <button
             type="button"
             onClick={confirmar}
-            disabled={isPending}
+            disabled={isPending || deshabilitarConfirmar}
             className={btnConfirmar}
           >
             {isPending ? "Procesando…" : textoConfirmar}
