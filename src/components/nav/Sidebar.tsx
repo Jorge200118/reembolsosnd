@@ -13,6 +13,8 @@ const ETIQUETAS: Record<TabId, string> = {
   "comidas-gerente": "Comidas",
   "pago-comidas": "Pago Comidas",
   "autorizaciones": "Autorizaciones",
+  "materiales-gerente": "Material",
+  "materiales-almacen": "Almacén",
 };
 
 // Íconos SVG inline (stroke, 20px) — sin dependencias externas.
@@ -61,6 +63,19 @@ const ICONOS: Record<TabId, React.ReactNode> = {
     <>
       <path d="M9 12l2 2 4-4" />
       <circle cx="12" cy="12" r="9" />
+    </>
+  ),
+  "materiales-gerente": (
+    <>
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+      <path d="M3.3 7L12 12l8.7-5M12 22V12" />
+    </>
+  ),
+  "materiales-almacen": (
+    <>
+      <path d="M3 21V8l9-5 9 5v13" />
+      <path d="M9 21v-6h6v6" />
+      <path d="M3 21h18" />
     </>
   ),
 };
