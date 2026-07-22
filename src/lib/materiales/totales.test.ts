@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { totalDeLineas, hayFaltantes } from "./totales";
+import { totalDeLineas, hayFaltantes, lineasSinCosto } from "./totales";
 import type { LineaGuardada } from "./totales";
 
 const LINEAS: LineaGuardada[] = [
@@ -14,6 +14,24 @@ describe("totalDeLineas", () => {
 
   it("una solicitud sin líneas vale cero", () => {
     expect(totalDeLineas([])).toBe(0);
+  });
+});
+
+describe("lineasSinCosto", () => {
+  it("cuenta las líneas que el ERP no supo costear", () => {
+    expect(lineasSinCosto(LINEAS)).toBe(1);
+  });
+
+  // En Tamaral casi ningún material tiene fila de inventario: la tarjeta debe
+  // poder decir "sin costo" en vez de enseñar un $0 que parece gratis.
+  it("detecta el caso en que NINGUNA línea trae costo", () => {
+    const ninguna = LINEAS.map((l) => ({ ...l, costo_unitario: null }));
+    expect(lineasSinCosto(ninguna)).toBe(ninguna.length);
+    expect(totalDeLineas(ninguna)).toBe(0);
+  });
+
+  it("no cuenta un costo de cero como desconocido", () => {
+    expect(lineasSinCosto([{ ...LINEAS[0]!, costo_unitario: 0 }])).toBe(0);
   });
 });
 

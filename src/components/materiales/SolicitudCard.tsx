@@ -3,7 +3,7 @@ import { useState, type ReactNode } from "react";
 import { Chip } from "@/components/ui/Chip";
 import { Money } from "@/components/ui/Money";
 import { parseMonto } from "@devoluciones/domain";
-import { totalDeLineas, type SolicitudGuardada } from "@/lib/materiales/totales";
+import { totalDeLineas, lineasSinCosto, type SolicitudGuardada } from "@/lib/materiales/totales";
 
 // Hermana de LoteCard, con el vocabulario de material. No se reusó LoteCard
 // porque tiene "Lote X" y "N reembolsos" escritos a mano.
@@ -30,6 +30,7 @@ export function SolicitudCard({
   const [abierto, setAbierto] = useState(false);
   const s = solicitud;
   const n = s.rnd_material_lineas.length;
+  const sinCosto = lineasSinCosto(s.rnd_material_lineas);
 
   return (
     <div className={`overflow-hidden rounded-xl border border-slate-200 border-l-4 bg-white shadow-sm ${acentoColor}`}>
@@ -41,9 +42,20 @@ export function SolicitudCard({
           <span className="text-sm text-slate-600">
             {n} material{n !== 1 ? "es" : ""}
           </span>
-          <span className="text-sm font-semibold text-slate-900">
-            Estimado <Money monto={parseMonto(totalDeLineas(s.rnd_material_lineas))} />
-          </span>
+          {sinCosto === n ? (
+            // Cero por falta de dato no es cero: decirlo con letras evita que
+            // el gerente autorice creyendo que no cuesta nada.
+            <span className="text-sm font-semibold text-slate-500">Sin costo en el catálogo</span>
+          ) : (
+            <span className="text-sm font-semibold text-slate-900">
+              Estimado <Money monto={parseMonto(totalDeLineas(s.rnd_material_lineas))} />
+              {sinCosto > 0 && (
+                <span className="ml-1 font-normal text-amber-700">
+                  (+{sinCosto} sin costo)
+                </span>
+              )}
+            </span>
+          )}
           <span className="text-xs text-slate-500">
             {new Date(s.creado_en).toLocaleDateString("es-MX")}
           </span>

@@ -84,7 +84,13 @@ export default function MaterialesEmpleado() {
       const res = await fetch("/api/empleado/materiales", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nota: nota.trim() || null, lineas }),
+        // Solo código y cantidad: la descripción y el costo que trae el carrito
+        // son para pintar la pantalla. El servidor los relee del ERP, así que
+        // mandarlos aquí sería sugerir que se le cree al navegador.
+        body: JSON.stringify({
+          nota: nota.trim() || null,
+          lineas: lineas.map((l) => ({ codProd: l.codProd, cantidad: l.cantidad })),
+        }),
       });
       const data = await res.json();
       if (data.ok) {

@@ -33,6 +33,17 @@ export function totalDeLineas(lineas: readonly LineaGuardada[]): number {
   return lineas.reduce((acc, l) => acc + l.cantidad * (l.costo_unitario ?? 0), 0);
 }
 
+/**
+ * Cuántas líneas no traen costo del ERP. Importa para no enseñar "$0" como si
+ * fuera gratis: hay sucursales (Tamaral, p. ej.) donde casi ningún material
+ * tiene fila de inventario, así que el total sale en cero por falta de dato y
+ * no porque no cueste. El gerente autoriza con esa cifra; tiene que saber
+ * cuándo no es una cifra.
+ */
+export function lineasSinCosto(lineas: readonly LineaGuardada[]): number {
+  return lineas.filter((l) => l.costo_unitario === null).length;
+}
+
 /** ¿Alguna línea pide más de lo que había en existencia al momento de pedir?
  *  Existencia desconocida (null) no cuenta como faltante: no sabemos. */
 export function hayFaltantes(lineas: readonly LineaGuardada[]): boolean {
