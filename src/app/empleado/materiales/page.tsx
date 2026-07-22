@@ -45,6 +45,7 @@ export default function MaterialesEmpleado() {
   const [enviando, setEnviando] = useState(false);
   const [solicitudes, setSolicitudes] = useState<SolicitudMia[]>([]);
   const [cargando, setCargando] = useState(true);
+  const [codigos, setCodigos] = useState<Record<string, string>>({});
 
   // Solo trae datos: no toca estado. Así el efecto de abajo puede hacer el
   // setState en su propio callback (y no dentro de una función que lo esconde),
@@ -123,6 +124,13 @@ export default function MaterialesEmpleado() {
     if (data.ok) await cargar();
   }
 
+  async function verCodigo(id: string) {
+    const res = await fetch(`/api/empleado/materiales/codigo?id=${id}`);
+    const data = await res.json();
+    if (data.ok) setCodigos((p) => ({ ...p, [id]: String(data.codigo) }));
+    else mostrar("No se pudo mostrar tu código, vuelve a entrar a la app");
+  }
+
   return (
     <>
       <div className="carnet-topbar">
@@ -183,6 +191,15 @@ export default function MaterialesEmpleado() {
                 <span className={`mat-estado mat-estado-${s.estado}`}>
                   {ETIQUETA_ESTADO[s.estado] ?? s.estado}
                 </span>
+                {s.estado === "autorizada" && (
+                  codigos[s.id] ? (
+                    <span className="mat-codigo">{codigos[s.id]}</span>
+                  ) : (
+                    <button type="button" className="carnet-btn-2 mat-codigo-btn" onClick={() => verCodigo(s.id)}>
+                      Ver mi código para recoger
+                    </button>
+                  )
+                )}
                 {s.motivo_rechazo && <span className="mat-aviso">Motivo: {s.motivo_rechazo}</span>}
               </div>
               {s.estado === "pendiente" && (

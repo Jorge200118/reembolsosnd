@@ -241,3 +241,12 @@
   height: calc(74px + env(safe-area-inset-bottom));
   flex: none;
 }
+
+/* El código de entrega: grande y espaciado, porque se dicta en voz alta
+   en el mostrador y hay que leerlo de un vistazo. */
+.mat-codigo {
+  font-family: var(--font-work), sans-serif;
+  font-size: 30px; font-weight: 800; letter-spacing: 7px;
+  color: var(--azul-hondo); margin-top: 6px;
+}
+.mat-codigo-btn { margin-top: 8px; padding: 9px; font-size: 14px; }
