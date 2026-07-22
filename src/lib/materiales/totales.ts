@@ -24,6 +24,8 @@ export interface SolicitudGuardada {
   motivo_rechazo: string | null;
   entregado_por: string | null;
   fecha_entrega: string | null;
+  evidencia_path: string | null;
+  codigo_usado_en: string | null;
   rnd_material_lineas: LineaGuardada[];
 }
 

@@ -71,7 +71,25 @@ export function SolicitudCard({
           </button>
         </div>
       </div>
-      {abierto && <div className="border-t border-slate-100 bg-slate-50/50 p-4">{detalle}</div>}
+      {abierto && (
+        <div className="border-t border-slate-100 bg-slate-50/50 p-4">
+          {s.evidencia_path && (
+            <p className="mb-2 text-xs text-slate-500">
+              Código verificado{" "}
+              {s.codigo_usado_en ? new Date(s.codigo_usado_en).toLocaleString("es-MX") : ""} ·{" "}
+              <a
+                href={`/api/materiales/evidencia?id=${s.id}&redirigir=1`}
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold text-blue-700 underline"
+              >
+                Ver foto de la entrega
+              </a>
+            </p>
+          )}
+          {detalle}
+        </div>
+      )}
     </div>
   );
 }
