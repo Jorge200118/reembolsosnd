@@ -26,8 +26,8 @@ describe("roles", () => {
     expect(tabs).not.toContain("dashboard");
   });
 
-  it("gerente solo ve comidas-gerente", () => {
-    expect(tabsDeRol("gerente")).toEqual(["comidas-gerente"]);
+  it("gerente ve comidas y material", () => {
+    expect(tabsDeRol("gerente")).toEqual(["comidas-gerente", "materiales-gerente"]);
   });
 });
 
@@ -39,5 +39,27 @@ describe("rol autorizador", () => {
   it("el autorizador solo ve el tab autorizaciones", () => {
     expect(ROL_TABS.autorizador).toEqual(["autorizaciones"]);
     expect(tabsDeRol("autorizador")).toEqual(["autorizaciones"]);
+  });
+});
+
+describe("rol almacen", () => {
+  it("normaliza 'almacen' y su variante con acento", () => {
+    expect(normalizarRol("almacen")).toBe("almacen");
+    expect(normalizarRol("  Almacén ")).toBe("almacen");
+  });
+
+  it("el almacenista solo ve su tab de entrega de material", () => {
+    expect(ROL_TABS.almacen).toEqual(["materiales-almacen"]);
+    expect(tabsDeRol("almacen")).toEqual(["materiales-almacen"]);
+  });
+
+  it("un rol desconocido sigue cayendo a caja_chica (mínimo privilegio)", () => {
+    expect(normalizarRol("intendencia")).toBe("caja_chica");
+  });
+
+  it("admin ve las dos pestañas de material", () => {
+    const tabs = tabsDeRol("admin");
+    expect(tabs).toContain("materiales-gerente");
+    expect(tabs).toContain("materiales-almacen");
   });
 });
