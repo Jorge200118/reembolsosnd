@@ -8,6 +8,12 @@ import { leerTablaMaterial } from "@/lib/materiales/rpc";
 // de SU sucursal: si se aceptara una ruta del bucket a secas, cualquiera con
 // sesión podría ver la evidencia de otra sucursal cambiando la cadena.
 
+// El id se exige UUID antes de usarlo. No es cosmética: alimenta la consulta a
+// PostgREST y, sobre todo, la RUTA del objeto en el bucket (entregas/<id>/...).
+// Un id con "../" podría escribir fuera de su carpeta. Hoy la consulta a la base
+// lo frenaría de rebote, pero eso es defensa por accidente; aquí es explícita.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 async function sucursalDeLaSolicitud(id: string): Promise<{ sucursal: string; path: string | null } | null> {
   const filas = (await leerTablaMaterial(
     `rnd_material_solicitudes?id=eq.${id}&select=sucursal,evidencia_path`,
@@ -27,7 +33,7 @@ export async function POST(req: Request) {
   const form = await req.formData().catch(() => null);
   const id = String(form?.get("solicitudId") ?? "");
   const archivo = form?.get("foto");
-  if (!id || !(archivo instanceof Blob) || archivo.size === 0) {
+  if (!UUID_RE.test(id) || !(archivo instanceof Blob) || archivo.size === 0) {
     return NextResponse.json({ ok: false, error: "Falta la foto" }, { status: 400 });
   }
 
@@ -52,7 +58,7 @@ export async function GET(req: Request) {
   if (!quien.ok) return NextResponse.json({ ok: false, error: quien.error }, { status: quien.status });
 
   const id = new URL(req.url).searchParams.get("id") ?? "";
-  if (!id) return NextResponse.json({ ok: false, error: "Falta la solicitud" }, { status: 400 });
+  if (!UUID_RE.test(id)) return NextResponse.json({ ok: false, error: "Falta la solicitud" }, { status: 400 });
 
   const sol = await sucursalDeLaSolicitud(id);
   if (!sol || !puedeVer(quien.actor.sucursal, sol.sucursal)) {
