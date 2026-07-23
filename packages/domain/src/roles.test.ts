@@ -57,9 +57,9 @@ describe("rol almacen", () => {
     expect(normalizarRol("intendencia")).toBe("caja_chica");
   });
 
-  it("admin ve las dos pestañas de material", () => {
+  it("admin NO ve las pestañas de material (uso interno / almacén)", () => {
     const tabs = tabsDeRol("admin");
-    expect(tabs).toContain("materiales-gerente");
-    expect(tabs).toContain("materiales-almacen");
+    expect(tabs).not.toContain("materiales-gerente");
+    expect(tabs).not.toContain("materiales-almacen");
   });
 });
