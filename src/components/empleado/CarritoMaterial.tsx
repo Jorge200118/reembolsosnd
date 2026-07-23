@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import type { LineaSolicitud } from "@/lib/materiales/tipos";
 import { totalEstimado } from "@/lib/materiales/carrito";
 
@@ -15,6 +16,11 @@ export function CarritoMaterial({
   onCambiarCantidad: (codProd: string, cantidad: number) => void;
   onQuitar: (codProd: string) => void;
 }) {
+  // Borrador de lo que se está tecleando por renglón. Deja que el campo quede
+  // vacío un instante (para reescribir "1" -> "3") sin mandarle un 0 al padre,
+  // que lo interpretaría como "quitar el renglón". Quitar es la ×, no vaciar.
+  const [borrador, setBorrador] = useState<Record<string, string>>({});
+
   if (lineas.length === 0) {
     return <p className="carnet-empty">Busca y agrega el material que necesitas.</p>;
   }
@@ -51,9 +57,26 @@ export function CarritoMaterial({
               type="number"
               min={1}
               inputMode="numeric"
-              value={l.cantidad}
+              value={borrador[l.codProd] ?? String(l.cantidad)}
               aria-label={`Cantidad de ${l.descripcion}`}
-              onChange={(e) => onCambiarCantidad(l.codProd, Number(e.target.value))}
+              onChange={(e) => {
+                const bruto = e.target.value;
+                setBorrador((b) => ({ ...b, [l.codProd]: bruto }));
+                const n = Number(bruto);
+                // Solo se confirma un número positivo. Vacío o 0 se quedan en el
+                // borrador: el renglón no se toca hasta que teclee algo válido.
+                if (Number.isFinite(n) && n > 0) onCambiarCantidad(l.codProd, n);
+              }}
+              // Al salir del campo se suelta el borrador: si lo dejó vacío, vuelve
+              // a mostrar la última cantidad válida en vez de quedarse en blanco.
+              onBlur={() =>
+                setBorrador((b) => {
+                  if (!(l.codProd in b)) return b;
+                  const resto = { ...b };
+                  delete resto[l.codProd];
+                  return resto;
+                })
+              }
             />
             <button
               type="button"

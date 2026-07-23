@@ -60,6 +60,26 @@ describe("CarritoMaterial", () => {
     expect(quitar).toHaveBeenCalledWith("ANG130");
   });
 
+  // El bug: al limpiar el "2" para teclear otro número, el vacío se leía como
+  // cantidad 0 y el padre borraba el renglón. Vaciar el campo para reescribir
+  // no es "quitar" (para eso está la ×): no debe emitir una cantidad inválida
+  // ni rebotar al valor viejo mientras el usuario todavía teclea.
+  it("al vaciar la cantidad para reescribir no manda un valor inválido ni quita el renglón", () => {
+    const cambiar = vi.fn();
+    const quitar = vi.fn();
+    render(<CarritoMaterial lineas={LINEAS} onCambiarCantidad={cambiar} onQuitar={quitar} />);
+    const input = screen.getByLabelText("Cantidad de ANGULO 1/8");
+    fireEvent.change(input, { target: { value: "" } });
+    expect(quitar).not.toHaveBeenCalled();
+    expect(cambiar).not.toHaveBeenCalledWith("ANG130", 0);
+    expect(cambiar).not.toHaveBeenCalledWith("ANG130", Number.NaN);
+    // El campo queda vacío para que reescriba, no rebota al 2 anterior.
+    expect(input).toHaveValue(null);
+    // Y al teclear el número nuevo sí se aplica.
+    fireEvent.change(input, { target: { value: "3" } });
+    expect(cambiar).toHaveBeenCalledWith("ANG130", 3);
+  });
+
   it("con el carrito vacío invita a buscar y no muestra total", () => {
     render(<CarritoMaterial lineas={[]} onCambiarCantidad={() => {}} onQuitar={() => {}} />);
     expect(screen.getByText(/busca y agrega/i)).toBeInTheDocument();
