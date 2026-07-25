@@ -4,18 +4,10 @@ import { CONCEPTOS, AUTORIZADORES } from "@devoluciones/domain";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useCrearReembolso } from "@/lib/hooks/useCrearReembolso";
 import { useGuardedAction } from "@/lib/hooks/useGuardedAction";
+import { useHoyVivo, hoyLocal, maxDesdeHoy } from "@/lib/hooks/useHoyVivo";
 import { SelectorArchivos, validarArchivos } from "@/components/reembolsos/SelectorArchivos";
 import { BeneficiarioAutocomplete } from "@/components/reembolsos/BeneficiarioAutocomplete";
 
-// fecha máxima permitida = hoy + 1 día, en formato YYYY-MM-DD
-function maxFecha(): string {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  return d.toISOString().slice(0, 10);
-}
-function hoyISO(): string {
-  return new Date().toISOString().slice(0, 10);
-}
 
 const labelClass = "mb-1.5 block text-sm font-semibold text-slate-700";
 const inputClass =
@@ -23,9 +15,13 @@ const inputClass =
 
 export function FormNuevoReembolso() {
   const { sesion } = useAuth();
-  const { mutate, isPending, data } = useCrearReembolso();
+  const { mutate, isPending, data, reset } = useCrearReembolso();
+  // Día en curso, revalidado al volver a la pestaña: las cajeras la dejan
+  // abierta varios días y un `max` congelado bloquea la captura.
+  const hoy = useHoyVivo();
+  const maxFecha = maxDesdeHoy(hoy);
   const [nombre, setNombre] = useState("");
-  const [fecha, setFecha] = useState(hoyISO());
+  const [fecha, setFecha] = useState(hoyLocal());
   const [monto, setMonto] = useState("");
   const [autoriza, setAutoriza] = useState("");
   const [concepto, setConcepto] = useState("");
@@ -42,6 +38,15 @@ export function FormNuevoReembolso() {
     [sesion?.rol],
   );
 
+  // El "✅ Reembolso registrado" vive en `data` de React Query y se queda
+  // pegado hasta la siguiente mutación. Verlo mientras se captura otro vale
+  // hace creer que el nuevo ya se guardó (o que el anterior no), y provoca
+  // recapturas: es el origen de buena parte de los vales duplicados.
+  function limpiarResultado() {
+    if (data) reset();
+    if (error) setError("");
+  }
+
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -54,7 +59,7 @@ export function FormNuevoReembolso() {
     if (sesion.rol === "caja_chica" && concepto === "COMIDAS") {
       setError("Las comidas se registran desde el módulo de Comidas, no aquí."); return;
     }
-    if (fecha > maxFecha()) { setError("La fecha no puede ser mayor a mañana"); return; }
+    if (fecha > maxFecha) { setError("La fecha no puede ser mayor a mañana"); return; }
     const errArch = validarArchivos(archivos);
     if (errArch) { setError(errArch); return; }
 
@@ -74,7 +79,7 @@ export function FormNuevoReembolso() {
         onSuccess: (r) => {
           if (r.ok) {
             setNombre(""); setMonto(""); setAutoriza(""); setConcepto(""); setArchivos([]);
-            setFecha(hoyISO());
+            setFecha(hoyLocal());
           } else {
             setError(r.error ?? "Error al registrar");
           }
@@ -87,15 +92,15 @@ export function FormNuevoReembolso() {
   const enviar = useGuardedAction(onSubmit);
 
   return (
-    <form onSubmit={enviar} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <form onSubmit={enviar} onInput={limpiarResultado} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="mb-4">
         <label className={labelClass}>Beneficiario *</label>
-        <BeneficiarioAutocomplete className={inputClass} value={nombre} onChange={setNombre} />
+        <BeneficiarioAutocomplete className={inputClass} value={nombre} onChange={(v) => { limpiarResultado(); setNombre(v); }} />
       </div>
       <div className="mb-4 grid grid-cols-2 gap-3">
         <div>
           <label className={labelClass}>Fecha *</label>
-          <input type="date" max={maxFecha()} className={inputClass} value={fecha} onChange={(e) => setFecha(e.target.value)} />
+          <input type="date" max={maxFecha} className={inputClass} value={fecha} onChange={(e) => setFecha(e.target.value)} />
         </div>
         <div>
           <label className={labelClass}>Monto *</label>
@@ -104,20 +109,20 @@ export function FormNuevoReembolso() {
       </div>
       <div className="mb-4">
         <label className={labelClass}>Concepto *</label>
-        <select className={inputClass} value={concepto} onChange={(e) => setConcepto(e.target.value)}>
+        <select className={inputClass} value={concepto} onChange={(e) => { limpiarResultado(); setConcepto(e.target.value); }}>
           <option value="">Selecciona…</option>
           {conceptosDisponibles.map((c) => <option key={c.concepto} value={c.concepto}>{c.concepto}</option>)}
         </select>
       </div>
       <div className="mb-4">
         <label className={labelClass}>Quién autoriza *</label>
-        <select className={inputClass} value={autoriza} onChange={(e) => setAutoriza(e.target.value)}>
+        <select className={inputClass} value={autoriza} onChange={(e) => { limpiarResultado(); setAutoriza(e.target.value); }}>
           <option value="">Selecciona…</option>
           {AUTORIZADORES.map((a) => <option key={a} value={a}>{a}</option>)}
         </select>
       </div>
       <div className="mb-4">
-        <SelectorArchivos onChange={setArchivos} />
+        <SelectorArchivos onChange={(f) => { limpiarResultado(); setArchivos(f); }} />
       </div>
       {error && <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {data?.ok && <p className="mb-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">✅ Reembolso registrado con {data.archivosSubidos} comprobante(s)</p>}
