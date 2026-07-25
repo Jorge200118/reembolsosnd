@@ -1,3 +1,4 @@
+import { areaDeZona } from "@devoluciones/domain";
 import type { Material } from "./tipos";
 
 // Los campos numéricos del ERP pueden llegar como número, como texto (mssql
@@ -30,6 +31,9 @@ export function normalizarMateriales(crudo: unknown): Material[] {
       unidad: aTexto(f.unidad) || null,
       existencia: aNumero(f.existencia),
       costo: aNumero(f.costo),
+      // aTexto devuelve "" para cualquier cosa que no sea string, y areaDeZona
+      // trata "" como "sin zona": una zona numérica o un objeto no se cuelan.
+      area: areaDeZona(aTexto(f.zona)),
     });
   }
   return out;

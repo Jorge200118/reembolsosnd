@@ -1,3 +1,5 @@
+import type { Area } from "@devoluciones/domain";
+
 /** Un material del catálogo del ERP, ya normalizado para la app. */
 export interface Material {
   codProd: string;
@@ -8,6 +10,12 @@ export interface Material {
   existencia: number | null;
   /** Costo promedio en la sucursal. Null = no hay dato. */
   costo: number | null;
+  /**
+   * Área que lo entrega, derivada de la zona de inventario del ERP.
+   * Null = el producto no está dado de alta en el censo, así que nadie puede
+   * entregarlo: no se deja pedir.
+   */
+  area: Area | null;
 }
 
 /** Una línea de la solicitud, tal como la arma el empleado antes de enviarla. */
