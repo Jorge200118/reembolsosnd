@@ -69,9 +69,20 @@ describe("actorDeMaterial", () => {
     expect(await actorDeMaterial("materiales-almacen")).toMatchObject({ ok: false, status: 403 });
   });
 
+  // Desde aa161a3 el admin ya no ve las pestañas de material, así que su acceso
+  // se corta en el permiso antes de llegar a la sucursal. Esto es lo que se
+  // quiere: el permiso se deriva de ROL_TABS, y el admin no tiene esos tabs.
+  it("el admin ya no entra a las pantallas de material", async () => {
+    await conSesion({ rol: "admin", rolCrudo: "admin", sucursal: "LMM" });
+    expect(await actorDeMaterial("materiales-gerente")).toMatchObject({ ok: false, status: 403 });
+    expect(await actorDeMaterial("materiales-almacen")).toMatchObject({ ok: false, status: 403 });
+  });
+
+  // El comodín sigue vivo para las pantallas que el admin sí tiene: no está
+  // amarrado a una sucursal y las ve todas.
   it("el admin actúa sobre todas las sucursales con el comodín", async () => {
     await conSesion({ rol: "admin", rolCrudo: "admin", sucursal: "LMM" });
-    const r = await actorDeMaterial("materiales-gerente");
+    const r = await actorDeMaterial("revision");
     expect(r).toMatchObject({ ok: true, actor: { sucursal: "*" } });
   });
 
