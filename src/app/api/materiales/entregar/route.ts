@@ -36,7 +36,13 @@ export async function POST(req: Request) {
     p_sucursal: quien.actor.sucursal,
     p_codigo: typeof codigo === "string" ? codigo : "",
     p_evidencia_path: typeof evidenciaPath === "string" ? evidenciaPath : "",
+    // Del actor, jamás del body: el área es lo que decide qué partidas puede
+    // marcar entregadas, así que es una credencial, no un dato de formulario.
+    p_area: quien.actor.area,
   });
-  if (r.ok) await avisarEmpleado(id, "material_entregada");
+  // El aviso "ya está listo" solo cuando cerró de verdad. Si todavía faltan
+  // áreas, mandarlo haría que el empleado fuera por material que no está.
+  const cerrada = r.cerrada === true;
+  if (r.ok && cerrada) await avisarEmpleado(id, "material_entregada");
   return NextResponse.json(r, { status: r.ok ? 200 : 400 });
 }
