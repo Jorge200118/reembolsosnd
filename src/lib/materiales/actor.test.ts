@@ -18,6 +18,7 @@ const BASE: Sesion = {
   rol: "gerente",
   rolCrudo: "gerente",
   sucursal: "LMM",
+  area: null,
 };
 
 async function conSesion(s: Partial<Sesion>) {
@@ -45,7 +46,7 @@ describe("actorDeMaterial", () => {
   it("el gerente puede autorizar y queda amarrado a su sucursal", async () => {
     await conSesion({ nombre: "Francisco Armenta", sucursal: "LMM" });
     const r = await actorDeMaterial("materiales-gerente");
-    expect(r).toEqual({ ok: true, actor: { nombre: "Francisco Armenta", sucursal: "LMM" } });
+    expect(r).toEqual({ ok: true, actor: { nombre: "Francisco Armenta", sucursal: "LMM", area: null } });
   });
 
   it("el gerente NO puede entregar (esa es la pantalla de almacén)", async () => {
@@ -58,7 +59,7 @@ describe("actorDeMaterial", () => {
     await conSesion({ rol: "almacen", rolCrudo: "almacen", nombre: "Jesús Pérez", sucursal: "LMM" });
     expect(await actorDeMaterial("materiales-almacen")).toEqual({
       ok: true,
-      actor: { nombre: "Jesús Pérez", sucursal: "LMM" },
+      actor: { nombre: "Jesús Pérez", sucursal: "LMM", area: null },
     });
     expect(await actorDeMaterial("materiales-gerente")).toMatchObject({ ok: false, status: 403 });
   });
@@ -91,5 +92,51 @@ describe("actorDeMaterial", () => {
     await conSesion({ sucursal: null });
     const r = await actorDeMaterial("materiales-gerente");
     expect(r).toMatchObject({ ok: false, status: 409 });
+  });
+});
+
+describe("actorDeMaterial — área", () => {
+  beforeEach(() => {
+    process.env.EMP_SESION_SECRET = SECRET;
+    estado.cookie = "";
+  });
+
+  it("lleva el área de la sesión al actor", async () => {
+    await conSesion({ rol: "almacen", rolCrudo: "almacen", sucursal: "LMM", area: "NAVE2" });
+    const r = await actorDeMaterial("materiales-almacen");
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.actor.area).toBe("NAVE2");
+  });
+
+  it("deja el área en null cuando el usuario no tiene (sucursal sin áreas)", async () => {
+    await conSesion({ rol: "almacen", rolCrudo: "almacen", sucursal: "FTE", area: null });
+    const r = await actorDeMaterial("materiales-almacen");
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.actor.area).toBeNull();
+  });
+
+  // Un área inventada en la sesión no debe convertirse en permiso.
+  it("descarta un área que no está en el catálogo", async () => {
+    await conSesion({
+      rol: "almacen",
+      rolCrudo: "almacen",
+      sucursal: "LMM",
+      area: "PATIO" as never,
+    });
+    const r = await actorDeMaterial("materiales-almacen");
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.actor.area).toBeNull();
+  });
+
+  // Compatibilidad hacia atrás: una cookie emitida antes de que existieran las
+  // áreas no trae el campo. Debe valer como "sin área" (entrega todo), no
+  // invalidar la sesión: si no, todo el personal quedaría fuera al desplegar.
+  it("una sesión vieja sin el campo area sigue siendo válida", async () => {
+    const vieja: Record<string, unknown> = { ...BASE, rol: "almacen", rolCrudo: "almacen" };
+    delete vieja.area;
+    estado.cookie = await firmarSesion(vieja as unknown as Sesion, SECRET);
+    const r = await actorDeMaterial("materiales-almacen");
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.actor.area).toBeNull();
   });
 });

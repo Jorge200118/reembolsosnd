@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { normalizarRol } from "@devoluciones/domain";
+import { esArea, normalizarRol } from "@devoluciones/domain";
 import { firmarSesion, NOMBRE_COOKIE, type Sesion } from "@/lib/auth/sesionEscritorio";
 
 // El login del personal pasa por aquí y no por el navegador, porque la cookie
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Config faltante en el servidor" }, { status: 500 });
   }
 
-  let datos: { ok?: boolean; usuario?: { email: string; nombre: string; rol: string; sucursal: string | null }; error?: string };
+  let datos: { ok?: boolean; usuario?: { email: string; nombre: string; rol: string; sucursal: string | null; area?: string | null }; error?: string };
   try {
     const res = await fetch(`${url}/functions/v1/login-comida`, {
       method: "POST",
@@ -48,6 +48,9 @@ export async function POST(req: Request) {
     rol: normalizarRol(datos.usuario.rol),
     rolCrudo: datos.usuario.rol,
     sucursal: datos.usuario.sucursal,
+    // Un área que no sea una de las cuatro vale lo mismo que no tener área:
+    // no se firma un valor que después nadie va a poder interpretar.
+    area: esArea(datos.usuario.area) ? datos.usuario.area : null,
   };
 
   const resp = NextResponse.json({ ok: true, sesion });

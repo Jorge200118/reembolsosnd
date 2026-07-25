@@ -9,7 +9,7 @@
 //
 // El dato firmado lleva el prefijo "rnd." para que un token de escritorio y uno
 // de empleado nunca puedan intercambiarse aunque compartan el secreto.
-import { normalizarRol, type Rol } from "@devoluciones/domain";
+import { esArea, normalizarRol, type Area, type Rol } from "@devoluciones/domain";
 import { b64urlEncode, b64urlToBytes, hmac, timingSafeEqual } from "@/lib/auth/firma";
 
 export interface Sesion {
@@ -18,6 +18,8 @@ export interface Sesion {
   rol: Rol; // ya normalizado
   rolCrudo: string; // el rol tal cual vino de la BD
   sucursal: string | null;
+  /** Área del encargado de almacén. null = entrega todas las partidas. */
+  area: Area | null;
 }
 
 const DOMINIO = "rnd.";
@@ -52,6 +54,11 @@ export async function verificarSesion(token: string, secret: string): Promise<Se
       rol: normalizarRol(obj.rol),
       rolCrudo: typeof obj.rolCrudo === "string" ? obj.rolCrudo : obj.rol,
       sucursal: obj.sucursal ?? null,
+      // Se valida contra el catálogo al leer, igual que el rol se re-normaliza:
+      // un área inventada en un token viejo vale lo mismo que no tener área.
+      // Las sesiones emitidas antes de este cambio no traen el campo: quedan en
+      // null y entregan todo, que es el comportamiento que ya tenían.
+      area: esArea(obj.area) ? obj.area : null,
     };
   } catch {
     return null;

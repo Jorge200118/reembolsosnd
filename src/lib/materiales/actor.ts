@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { tabsDeRol, type TabId } from "@devoluciones/domain";
+import { tabsDeRol, esArea, type TabId, type Area } from "@devoluciones/domain";
 import { verificarSesion, NOMBRE_COOKIE } from "@/lib/auth/sesionEscritorio";
 
 // Quién está haciendo la operación, sacado de la cookie FIRMADA y de ningún
@@ -11,6 +11,12 @@ export interface Actor {
   nombre: string;
   /** Abreviatura (LMM, FTE…) o '*' para admin, que ve todas. */
   sucursal: string;
+  /**
+   * Área que le toca entregar. Null = entrega todas las partidas, que es como
+   * funcionan las sucursales sin áreas. Sale de la sesión firmada y de ningún
+   * otro lado: si viniera del body, cualquiera diría ser de Ferretería.
+   */
+  area: Area | null;
 }
 
 export type ResultadoActor = { ok: true; actor: Actor } | { ok: false; error: string; status: number };
@@ -37,5 +43,10 @@ export async function actorDeMaterial(tab: TabId): Promise<ResultadoActor> {
     return { ok: false, error: "Tu usuario no tiene sucursal asignada, avisa a sistemas", status: 409 };
   }
 
-  return { ok: true, actor: { nombre: sesion.nombre, sucursal } };
+  // esArea filtra cualquier valor que no sea una de las cuatro: un área
+  // desconocida vale lo mismo que no tener área (entrega todo), nunca un
+  // permiso nuevo.
+  const area = esArea(sesion.area) ? sesion.area : null;
+
+  return { ok: true, actor: { nombre: sesion.nombre, sucursal, area } };
 }

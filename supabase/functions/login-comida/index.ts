@@ -32,7 +32,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: usuarios, error } = await supabase
       .from("rnd_usuarios")
-      .select("email, password, nombre, rol, sucursal, activo")
+      .select("email, password, nombre, rol, sucursal, area, activo")
       .eq("email", email.trim())
       .eq("activo", true);
     if (error) throw error;
@@ -50,6 +50,11 @@ Deno.serve(async (req: Request) => {
         nombre: String(u.nombre),
         rol: String(u.rol),
         sucursal: u.sucursal ? String(u.sucursal) : null,
+        // Área del encargado de almacén (solo Los Mochis la usa). null =
+        // entrega todas las partidas, que es como funcionan las demás
+        // sucursales. Viaja en la cookie firmada porque decide qué puede
+        // marcar entregado: es una credencial, no un dato de formulario.
+        area: u.area ? String(u.area) : null,
       },
     }), { headers: CORS_HEADERS });
 
