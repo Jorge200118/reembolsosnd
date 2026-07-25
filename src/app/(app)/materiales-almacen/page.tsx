@@ -17,6 +17,9 @@ const BTN_OK = "rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text
 export default function MaterialesAlmacenPage() {
   const { sesion } = useAuth();
   const sucursal = sesion?.rol === "admin" ? null : (sesion?.sucursal ?? null);
+  // Null = encargado sin área (sucursales que no las usan): captura todo, que
+  // es el comportamiento anterior a las áreas.
+  const areaUsuario = sesion?.area ?? null;
 
   const autorizadasQ = useSolicitudesMaterial({ sucursal, estados: ["autorizada"] });
   const entregadasQ = useSolicitudesMaterial({ sucursal, estados: ["entregada"], limite: 30 });
@@ -48,7 +51,18 @@ export default function MaterialesAlmacenPage() {
   async function confirmarEntrega(s: SolicitudGuardada) {
     if (!foto) { setMsg("⚠ Falta la foto de la entrega"); return; }
     const capturado = capturas[s.id] ?? {};
-    const entregas = s.rnd_material_lineas.map((l) => ({
+    // Solo lo de su área y solo lo que no está entregado. Mandar de más lo
+    // rechaza la RPC, pero es mejor no pedírselo.
+    const mias = s.rnd_material_lineas.filter(
+      (l) =>
+        l.cantidad_entregada === null &&
+        (areaUsuario === null || l.area === null || l.area === areaUsuario),
+    );
+    if (mias.length === 0) {
+      setMsg("⚠ No hay materiales de tu área pendientes en esta solicitud");
+      return;
+    }
+    const entregas = mias.map((l) => ({
       lineaId: l.id,
       cantidadEntregada: capturado[l.id] ?? l.cantidad,
     }));
@@ -71,8 +85,13 @@ export default function MaterialesAlmacenPage() {
         { id: s.id, entregas, codigo, evidenciaPath: sub.path },
         {
           onSuccess: (r) => {
-            setMsg(r.ok ? `✅ ${s.folio} entregada` : `⚠ ${r.error}`);
-            if (r.ok) { setConfirmar(null); setFoto(null); setCodigo(""); }
+            if (!r.ok) { setMsg(`⚠ ${r.error}`); return; }
+            setMsg(
+              r.cerrada === true
+                ? `✅ ${s.folio} entregada completa`
+                : `✅ Lo tuyo de ${s.folio} quedó entregado. Faltan ${Number(r.pendientes ?? 0)} materiales de otras áreas.`,
+            );
+            setConfirmar(null); setFoto(null); setCodigo("");
           },
         },
       );
@@ -130,6 +149,7 @@ export default function MaterialesAlmacenPage() {
                   capturable={!verEntregadas}
                   entregas={capturas[s.id] ?? {}}
                   onCambiar={(lineaId, cantidad) => cambiar(s.id, lineaId, cantidad)}
+                  areaDelUsuario={areaUsuario}
                 />
               }
             />
@@ -140,16 +160,19 @@ export default function MaterialesAlmacenPage() {
       {confirmar && (() => {
         const s = confirmar;
         const capturado = capturas[s.id] ?? {};
-        const incompletas = s.rnd_material_lineas.filter(
-          (l) => (capturado[l.id] ?? l.cantidad) < l.cantidad,
-        ).length;
+        const mias = s.rnd_material_lineas.filter(
+          (l) =>
+            l.cantidad_entregada === null &&
+            (areaUsuario === null || l.area === null || l.area === areaUsuario),
+        );
+        const incompletas = mias.filter((l) => (capturado[l.id] ?? l.cantidad) < l.cantidad).length;
         return (
           <ConfirmDialog
             titulo={`Entregar ${s.folio}`}
             mensaje={
               <>
                 <span>
-                  {s.empleado_nombre} · {s.rnd_material_lineas.length} materiales
+                  {s.empleado_nombre} · {mias.length} materiales de tu área
                   {incompletas > 0 && (<>{" · "}<strong>{incompletas}</strong> se surten incompletos</>)}
                 </span>
                 <CapturaEntrega

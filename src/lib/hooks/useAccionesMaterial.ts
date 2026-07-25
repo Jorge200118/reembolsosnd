@@ -5,6 +5,11 @@ interface Resultado {
   error?: string;
   estado?: string;
   folio?: string;
+  /** Solo en entregar: true cuando ya entregaron todas las áreas y la
+   *  solicitud cerró. False = falta al menos otra área. */
+  cerrada?: boolean;
+  /** Solo en entregar: partidas que siguen sin capturar, de otras áreas. */
+  pendientes?: number;
 }
 
 async function postear(ruta: string, cuerpo: unknown): Promise<Resultado> {
