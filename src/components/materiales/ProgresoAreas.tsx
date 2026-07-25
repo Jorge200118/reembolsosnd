@@ -5,6 +5,11 @@ import type { AvanceArea } from "@/lib/materiales/totales";
 // "2 de 3 áreas entregadas", con el detalle de cuál falta. Sin esto, una
 // solicitud a medio surtir se ve igual que una intacta y nadie sabe a quién
 // apurar.
+//
+// Va en la cabecera de la tarjeta, dentro de su flex de chips: por eso usa un
+// Fragment y no un div propio, y por eso no trae márgenes. El objetivo es
+// barrer la lista y ver de un golpe a quién le falta entregar; metido en el
+// detalle obligaría a abrir tarjeta por tarjeta, que es el trabajo que ahorra.
 
 export function ProgresoAreas({ avance }: { avance: AvanceArea[] }) {
   if (avance.length <= 1) return null; // una sola área: no hay nada que repartir
@@ -12,7 +17,7 @@ export function ProgresoAreas({ avance }: { avance: AvanceArea[] }) {
   const listas = avance.filter((a) => a.completa).length;
 
   return (
-    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+    <>
       <span className="text-xs font-medium text-slate-600">
         {listas} de {avance.length} áreas entregadas
       </span>
@@ -29,6 +34,6 @@ export function ProgresoAreas({ avance }: { avance: AvanceArea[] }) {
           {a.completa ? "✓" : "○"} {etiquetaArea(a.area)}
         </span>
       ))}
-    </div>
+    </>
   );
 }
