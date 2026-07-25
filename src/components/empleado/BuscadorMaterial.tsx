@@ -67,6 +67,7 @@ export function BuscadorMaterial({ onElegir }: { onElegir: (m: Material) => void
   }, []);
 
   function elegir(m: Material) {
+    if (m.area === null) return; // sin área no se puede pedir; el aviso ya está en la lista
     onElegir(m);
     ultima.current++;
     setTexto("");
@@ -93,13 +94,26 @@ export function BuscadorMaterial({ onElegir }: { onElegir: (m: Material) => void
         <ul className="mat-resultados">
           {resultados.map((m) => (
             <li key={m.codProd}>
-              <button type="button" className="mat-resultado" onClick={() => elegir(m)}>
+              <button
+                type="button"
+                className="mat-resultado"
+                onClick={() => elegir(m)}
+                disabled={m.area === null}
+                title={
+                  m.area === null
+                    ? "No tiene área asignada en el inventario, avisa a inventarios"
+                    : undefined
+                }
+              >
                 <span className="mat-desc">{m.descripcion}</span>
                 <span className="mat-meta">
                   {m.codProd}
                   {m.unidad ? ` · ${m.unidad}` : ""}
                   {m.existencia === null ? "" : ` · hay ${m.existencia}`}
                 </span>
+                {m.area === null && (
+                  <span className="mat-sin-area">Sin área asignada · no se puede pedir</span>
+                )}
               </button>
             </li>
           ))}

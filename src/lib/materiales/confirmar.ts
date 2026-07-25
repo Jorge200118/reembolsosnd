@@ -1,3 +1,4 @@
+import type { Area } from "@devoluciones/domain";
 import type { Material } from "@/lib/materiales/tipos";
 
 // Del carrito del empleado solo se cree el CÓDIGO y la CANTIDAD. La descripción,
@@ -22,6 +23,8 @@ export interface LineaConfirmada {
   cantidad: number;
   costo_unitario: number | null;
   existencia_al_pedir: number | null;
+  /** Área que la entrega. Nunca null: sin área la solicitud ni se crea. */
+  area: Area;
 }
 
 export type Confirmacion =
@@ -76,6 +79,20 @@ export async function confirmarConElErp(
     };
   }
 
+  // Sin área no hay quién lo entregue. El área sale de la zona de inventario
+  // del ERP; si el producto no está dado de alta en el censo, la solicitud no
+  // se crea, porque cerrarla exigiría que un encargado valide partidas que no
+  // son de nadie. El alta la hace inventarios en BMS y esto se destraba solo.
+  const sinArea = distintos.filter((c) => !catalogo.get(c)!.area);
+  if (sinArea.length > 0) {
+    return {
+      ok: false,
+      error:
+        `${sinArea.join(", ")} no tiene área asignada en el inventario, ` +
+        `así que nadie puede entregarlo. Pide a inventarios que lo dé de alta.`,
+    };
+  }
+
   return {
     ok: true,
     lineas: limpias.map((l) => {
@@ -87,6 +104,7 @@ export async function confirmarConElErp(
         cantidad: l.cantidad,
         costo_unitario: m.costo,
         existencia_al_pedir: m.existencia,
+        area: m.area!, // garantizado por la verificación de arriba
       };
     }),
   };

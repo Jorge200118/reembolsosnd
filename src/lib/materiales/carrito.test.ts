@@ -4,9 +4,11 @@ import type { Material, LineaSolicitud } from "./tipos";
 
 const ANGULO: Material = {
   codProd: "ANG130", descripcion: "ANGULO 1/8 X 1 1/4", unidad: "PZ", existencia: 40, costo: 180.5,
+  area: "FERRETERIA",
 };
 const TORNILLO: Material = {
   codProd: "TOR001", descripcion: "TORNILLO 1/4", unidad: "PZ", existencia: null, costo: null,
+  area: "FERRETERIA",
 };
 
 describe("carrito de materiales", () => {

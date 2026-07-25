@@ -8,6 +8,7 @@ const CAJA: Material = {
   unidad: "CJ",
   existencia: 5,
   costo: 387.74,
+  area: "FERRETERIA",
 };
 const BOLSA: Material = {
   codProd: "TRU47373",
@@ -15,6 +16,7 @@ const BOLSA: Material = {
   unidad: "PZ",
   existencia: 24,
   costo: 12.0496,
+  area: "FERRETERIA",
 };
 
 /** ERP de mentiras: devuelve lo que coincida parcialmente, como el de verdad. */
@@ -37,6 +39,7 @@ describe("confirmarConElErp", () => {
           cantidad: 2,
           costo_unitario: 387.74,
           existencia_al_pedir: 5,
+          area: "FERRETERIA",
         },
       ],
     });
@@ -108,5 +111,57 @@ describe("confirmarConElErp", () => {
     expect(await confirmarConElErp([{ codProd: "TRU47364", cantidad: 0 }], buscar)).toMatchObject({ ok: false });
     expect(await confirmarConElErp([{ codProd: "", cantidad: 1 }], buscar)).toMatchObject({ ok: false });
     expect(buscar).not.toHaveBeenCalled();
+  });
+});
+
+describe("confirmarConElErp — área", () => {
+  const conArea = (over: Partial<Material> = {}): Material => ({
+    codProd: "FER001",
+    descripcion: 'PIJA 2"',
+    unidad: "PZ",
+    existencia: 100,
+    costo: 3,
+    area: "FERRETERIA",
+    ...over,
+  });
+
+  it("congela el área en la línea confirmada", async () => {
+    const buscar = async () => [conArea({ codProd: "VAR001", area: "NAVE2" })];
+    const r = await confirmarConElErp([{ codProd: "VAR001", cantidad: 2 }], buscar);
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.lineas[0]!.area).toBe("NAVE2");
+  });
+
+  it("rechaza un material sin área y lo nombra", async () => {
+    const buscar = async () => [conArea({ codProd: "PRI010", descripcion: "KITOX BLANCO", area: null })];
+    const r = await confirmarConElErp([{ codProd: "PRI010", cantidad: 1 }], buscar);
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.error).toContain("PRI010");
+      expect(r.error).toContain("no tiene área");
+    }
+  });
+
+  // Si el área la mandara el cliente podría elegir quién le entrega. Solo cuenta
+  // lo que dice el ERP.
+  it("ignora el área que venga del carrito y usa la del ERP", async () => {
+    const buscar = async () => [conArea({ codProd: "FER001", area: "FERRETERIA" })];
+    const pedidas = [{ codProd: "FER001", cantidad: 1, area: "NAVE3" } as never];
+    const r = await confirmarConElErp(pedidas, buscar);
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.lineas[0]!.area).toBe("FERRETERIA");
+  });
+
+  it("nombra todos los materiales sin área, no solo el primero", async () => {
+    const buscar = async (q: string) => [conArea({ codProd: q, area: null })];
+    const r = await confirmarConElErp(
+      [{ codProd: "PRI010", cantidad: 1 }, { codProd: "TRU123", cantidad: 1 }],
+      buscar,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.error).toContain("PRI010");
+      expect(r.error).toContain("TRU123");
+    }
   });
 });
