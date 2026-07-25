@@ -13,8 +13,8 @@ afterEach(() => {
 });
 
 const LINEAS: LineaGuardada[] = [
-  { id: "l1", orden: 0, cod_prod: "ANG130", descripcion: "ANGULO 1/8", unidad: "PZ", cantidad: 2, costo_unitario: 180.5, existencia_al_pedir: 40, cantidad_entregada: null },
-  { id: "l2", orden: 1, cod_prod: "TOR001", descripcion: "TORNILLO 1/4", unidad: "PZ", cantidad: 10, costo_unitario: null, existencia_al_pedir: 3, cantidad_entregada: null },
+  { id: "l1", orden: 0, cod_prod: "ANG130", descripcion: "ANGULO 1/8", unidad: "PZ", cantidad: 2, costo_unitario: 180.5, existencia_al_pedir: 40, cantidad_entregada: null, area: null },
+  { id: "l2", orden: 1, cod_prod: "TOR001", descripcion: "TORNILLO 1/4", unidad: "PZ", cantidad: 10, costo_unitario: null, existencia_al_pedir: 3, cantidad_entregada: null, area: null },
 ];
 
 describe("TablaLineas", () => {

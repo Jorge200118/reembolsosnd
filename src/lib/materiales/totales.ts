@@ -1,3 +1,5 @@
+import { AREAS, type Area } from "@devoluciones/domain";
+
 /** Una línea tal como viene de la base (nombres de columna, no camelCase). */
 export interface LineaGuardada {
   id: string;
@@ -9,6 +11,8 @@ export interface LineaGuardada {
   costo_unitario: number | null;
   existencia_al_pedir: number | null;
   cantidad_entregada: number | null;
+  /** Área que la entrega. Null = la entrega cualquiera (sucursal sin áreas). */
+  area: Area | null;
 }
 
 export interface SolicitudGuardada {
@@ -50,4 +54,35 @@ export function lineasSinCosto(lineas: readonly LineaGuardada[]): number {
  *  Existencia desconocida (null) no cuenta como faltante: no sabemos. */
 export function hayFaltantes(lineas: readonly LineaGuardada[]): boolean {
   return lineas.some((l) => l.existencia_al_pedir !== null && l.cantidad > l.existencia_al_pedir);
+}
+
+export interface AvanceArea {
+  area: Area;
+  /** Partidas de esa área en la solicitud. */
+  total: number;
+  /** Cuántas ya tienen cantidad capturada. */
+  entregadas: number;
+  completa: boolean;
+}
+
+/**
+ * Avance de la entrega, área por área. Sirve para "2 de 3 áreas entregadas".
+ *
+ * `cantidad_entregada = 0` cuenta como entregada: el encargado capturó que no
+ * había, y eso es una entrega hecha, no una pendiente. Lo pendiente es null.
+ */
+export function resumenPorArea(lineas: readonly LineaGuardada[]): AvanceArea[] {
+  const out: AvanceArea[] = [];
+  for (const area of AREAS) {
+    const suyas = lineas.filter((l) => l.area === area);
+    if (suyas.length === 0) continue;
+    const entregadas = suyas.filter((l) => l.cantidad_entregada !== null).length;
+    out.push({
+      area,
+      total: suyas.length,
+      entregadas,
+      completa: entregadas === suyas.length,
+    });
+  }
+  return out;
 }

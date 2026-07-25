@@ -5,7 +5,7 @@ const CAMPOS =
   "id,folio,empleado_nombre,sucursal,nota,estado,creado_en," +
   "autorizado_por,fecha_autorizacion,motivo_rechazo,entregado_por,fecha_entrega," +
   "evidencia_path,codigo_usado_en," +
-  "rnd_material_lineas(id,orden,cod_prod,descripcion,unidad,cantidad,costo_unitario,existencia_al_pedir,cantidad_entregada)";
+  "rnd_material_lineas(id,orden,cod_prod,descripcion,unidad,cantidad,costo_unitario,existencia_al_pedir,cantidad_entregada,area)";
 
 export interface FiltroSolicitudes {
   /** Abreviatura de sucursal (LMM, FTE...). `null` = todas (solo admin). */
