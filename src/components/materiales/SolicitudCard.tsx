@@ -3,7 +3,13 @@ import { useState, type ReactNode } from "react";
 import { Chip } from "@/components/ui/Chip";
 import { Money } from "@/components/ui/Money";
 import { parseMonto } from "@devoluciones/domain";
-import { totalDeLineas, lineasSinCosto, type SolicitudGuardada } from "@/lib/materiales/totales";
+import { ProgresoAreas } from "@/components/materiales/ProgresoAreas";
+import {
+  totalDeLineas,
+  lineasSinCosto,
+  resumenPorArea,
+  type SolicitudGuardada,
+} from "@/lib/materiales/totales";
 
 // Hermana de LoteCard, con el vocabulario de material. No se reusó LoteCard
 // porque tiene "Lote X" y "N reembolsos" escritos a mano.
@@ -31,6 +37,7 @@ export function SolicitudCard({
   const s = solicitud;
   const n = s.rnd_material_lineas.length;
   const sinCosto = lineasSinCosto(s.rnd_material_lineas);
+  const avance = resumenPorArea(s.rnd_material_lineas);
 
   return (
     <div className={`overflow-hidden rounded-xl border border-slate-200 border-l-4 bg-white shadow-sm ${acentoColor}`}>
@@ -87,6 +94,7 @@ export function SolicitudCard({
               </a>
             </p>
           )}
+          <ProgresoAreas avance={avance} />
           {detalle}
         </div>
       )}
