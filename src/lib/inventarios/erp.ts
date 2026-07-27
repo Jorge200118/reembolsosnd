@@ -184,3 +184,64 @@ export async function aplicarEnErp(
   // Cualquier otra cosa (502, 500, 504…) pudo haber dejado el folio a medias.
   return { estado: "desconocido", error: `El ERP respondió ${res.status}` };
 }
+
+export type ResultadoCancelar =
+  | { estado: "ok"; folio: string; yaEstaba: boolean }
+  | { estado: "rechazado"; codigo: string; error: string }
+  | { estado: "desconocido"; error: string };
+
+/**
+ * Cancela en BMS un folio de uso interno: devuelve el inventario y da de baja
+ * la póliza. Mismos tres finales que `aplicarEnErp` y por la misma razón — aquí
+ * "no sé si se canceló" tampoco se puede tratar como "no se canceló".
+ */
+export async function cancelarEnErp(
+  codEstab: number,
+  folio: string,
+  usuario: string,
+  motivo: string,
+): Promise<ResultadoCancelar> {
+  const base = process.env.CENSOS_API_URL;
+  const llave = process.env.CENSOS_API_KEY;
+  if (!base || !llave) return { estado: "rechazado", codigo: "SIN_CONFIG", error: "ERP no configurado" };
+
+  let res: Response;
+  try {
+    res = await fetch(`${base.replace(/\/$/, "")}/api/inventario/cancelar`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": llave,
+        "ngrok-skip-browser-warning": "true",
+      },
+      body: JSON.stringify({ codEstab, folio, usuario, equipo: "APP", motivo }),
+      signal: AbortSignal.timeout(TIMEOUT_APLICAR_MS),
+      cache: "no-store",
+    });
+  } catch (e) {
+    return { estado: "desconocido", error: e instanceof Error ? e.message : "Sin respuesta del ERP" };
+  }
+
+  let data: Record<string, unknown>;
+  try {
+    data = (await res.json()) as Record<string, unknown>;
+  } catch {
+    return { estado: "desconocido", error: `El ERP respondió ${res.status} sin JSON` };
+  }
+
+  if (res.ok && data.ok === true) {
+    return {
+      estado: "ok",
+      folio: String(data.folio ?? folio),
+      yaEstaba: data.yaEstaba === true,
+    };
+  }
+  if (res.status === 409 || res.status === 400) {
+    return {
+      estado: "rechazado",
+      codigo: String(data.codigo ?? "RECHAZADO"),
+      error: String(data.error ?? "El ERP rechazó la cancelación"),
+    };
+  }
+  return { estado: "desconocido", error: `El ERP respondió ${res.status}` };
+}

@@ -192,4 +192,24 @@ describe("totalesDe", () => {
     );
     expect(totalesDe(evaluadas).costo).toBe(14);
   });
+
+  // BMS guarda el precio unitario redondeado a 2 decimales y multiplica DESPUÉS
+  // (verificado en el folio A687: costo 0.8461 x 100 quedó como $85.00, no
+  // $84.61). El preview tiene que mostrar lo mismo que va a quedar registrado,
+  // o el usuario compara contra BMS y no le cuadra.
+  it("redondea el costo unitario a 2 decimales antes de multiplicar, como el ERP", () => {
+    const evaluadas = evaluarPartidas(
+      [partida({ cantidad: 100, costoUnitario: 0.8461 })],
+      [erp({ existencia: 1841, costo: 0.8461 })],
+    );
+    expect(totalesDe(evaluadas).costo).toBe(85);
+  });
+
+  it("el redondeo del unitario también aplica hacia abajo", () => {
+    const evaluadas = evaluarPartidas(
+      [partida({ cantidad: 100, costoUnitario: 0.8449 })],
+      [erp({ existencia: 500, costo: 0.8449 })],
+    );
+    expect(totalesDe(evaluadas).costo).toBe(84);
+  });
 });

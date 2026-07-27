@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { HistorialFolios } from "@/components/inventarios/HistorialFolios";
 import { totalesDe } from "@/lib/inventarios/evaluar";
 import type { PartidaEvaluada, EstadoPartida } from "@/lib/inventarios/tipos";
 
@@ -65,6 +66,7 @@ export default function InventariosPage() {
   const [confirmar, setConfirmar] = useState<SucursalPreview | null>(null);
   const [aplicando, setAplicando] = useState(false);
   const [aviso, setAviso] = useState<{ tipo: "ok" | "error"; texto: string } | null>(null);
+  const [pestana, setPestana] = useState<"pendientes" | "historial">("pendientes");
 
   // El estado se aplica SIEMPRE dentro de un .then, nunca en el cuerpo del
   // efecto: hacerlo de forma síncrona ahí encadena renders (regla
@@ -145,10 +147,43 @@ export default function InventariosPage() {
     [sucursales],
   );
 
+  const tab = (id: "pendientes" | "historial", texto: string) => (
+    <button
+      type="button"
+      onClick={() => setPestana(id)}
+      className={`border-b-2 px-1 pb-2 text-sm font-medium transition-colors ${
+        pestana === id
+          ? "border-emerald-600 text-emerald-700"
+          : "border-transparent text-slate-500 hover:text-slate-700"
+      }`}
+    >
+      {texto}
+    </button>
+  );
+
+  const encabezado = (
+    <>
+      <PageHeader
+        titulo="Inventarios"
+        subtitulo="Uso interno entregado y su descarga del ERP"
+      />
+      <div className="mb-5 flex gap-6 border-b border-slate-200">
+        {tab("pendientes", "Por descargar")}
+        {tab("historial", "Historial")}
+      </div>
+    </>
+  );
+
+  // El historial se monta aparte: trae sus propios datos y no depende de la
+  // consulta al ERP, así que se puede ver aunque el ERP esté caído.
+  if (pestana === "historial") {
+    return <div>{encabezado}<HistorialFolios /></div>;
+  }
+
   if (cargando) {
     return (
       <div>
-        <PageHeader titulo="Inventarios" subtitulo="Cargando entregas…" />
+        {encabezado}
         <Card className="p-8 text-center text-sm text-slate-500">Consultando el ERP…</Card>
       </div>
     );
@@ -156,10 +191,7 @@ export default function InventariosPage() {
 
   return (
     <div>
-      <PageHeader
-        titulo="Inventarios"
-        subtitulo="Uso interno entregado que todavía no se descarga del ERP"
-      />
+      {encabezado}
 
       {/* El resultado de aplicar va arriba y se queda: es la única constancia
           del folio que se generó, y hay que poder anotarlo. */}

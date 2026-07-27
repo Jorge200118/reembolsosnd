@@ -84,6 +84,16 @@ export function evaluarPartidas(
 /**
  * Totales del folio que se armaría. Cuenta la cantidad APLICABLE, no la
  * entregada: es lo que BMS realmente bajaría.
+ *
+ * El costo se calcula como lo hace el ERP: **el unitario se redondea a 2
+ * decimales y se multiplica después**. No es un detalle cosmético — en el folio
+ * A687, un costo de 0.8461 por 100 piezas quedó registrado en BMS como $85.00,
+ * no como $84.61. Si aquí se multiplicara sin redondear, el preview y el folio
+ * no cuadrarían y crecería con la cantidad.
+ *
+ * La valuación del inventario NO usa este número: `modifica_inventario`
+ * reescribe el costo con el costo_promedio real para las salidas. Esto es solo
+ * el importe que queda escrito en la cabecera y las partidas.
  */
 export function totalesDe(partidas: readonly PartidaEvaluada[]): TotalesPreview {
   let unidades = 0;
@@ -95,7 +105,8 @@ export function totalesDe(partidas: readonly PartidaEvaluada[]): TotalesPreview 
     unidades += p.cantidadAplicable;
     // El costo congelado al pedir manda; si la partida no lo trae, se usa el
     // costo promedio de hoy. Cero solo cuando no hay ninguno de los dos.
-    costo += p.cantidadAplicable * (p.costoUnitario ?? p.costoErp ?? 0);
+    const unitario = p.costoUnitario ?? p.costoErp ?? 0;
+    costo += p.cantidadAplicable * Math.round(unitario * 100) / 100;
   }
   return { partidas: cuenta, unidades, costo };
 }
