@@ -1,4 +1,4 @@
-export const ROLES = ["admin", "caja_chica", "gerente", "autorizador", "almacen"] as const;
+export const ROLES = ["admin", "caja_chica", "gerente", "autorizador", "almacen", "inventarios"] as const;
 export type Rol = (typeof ROLES)[number];
 
 export type TabId =
@@ -11,7 +11,8 @@ export type TabId =
   | "pago-comidas"
   | "autorizaciones"
   | "materiales-gerente"
-  | "materiales-almacen";
+  | "materiales-almacen"
+  | "inventarios";
 
 /**
  * Normaliza el rol crudo de rnd_usuarios. 'administracion' era un rol roto
@@ -24,6 +25,7 @@ export function normalizarRol(raw: string): Rol {
   if (r === "gerente") return "gerente";
   if (r === "autorizador") return "autorizador";
   if (r === "almacen" || r === "almacén") return "almacen";
+  if (r === "inventarios" || r === "inventario") return "inventarios";
   return "caja_chica";
 }
 
@@ -39,6 +41,9 @@ export const ROL_TABS: Record<Rol, readonly TabId[]> = {
   gerente: ["comidas-gerente", "materiales-gerente"],
   autorizador: ["autorizaciones"],
   almacen: ["materiales-almacen"],
+  // Aparte de almacén a propósito: quien surte el material no es quien lo
+  // descarga del ERP. Separarlos deja el rastro de quién afectó el inventario.
+  inventarios: ["inventarios"],
 };
 
 export function tabsDeRol(rol: Rol): readonly TabId[] {

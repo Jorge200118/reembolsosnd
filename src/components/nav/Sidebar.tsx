@@ -15,6 +15,7 @@ const ETIQUETAS: Record<TabId, string> = {
   "autorizaciones": "Autorizaciones",
   "materiales-gerente": "Uso interno",
   "materiales-almacen": "Almacén",
+  "inventarios": "Inventarios",
 };
 
 // Íconos SVG inline (stroke, 20px) — sin dependencias externas.
@@ -78,10 +79,17 @@ const ICONOS: Record<TabId, React.ReactNode> = {
       <path d="M3 21h18" />
     </>
   ),
+  "inventarios": (
+    <>
+      <path d="M20 7H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1z" />
+      <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+      <path d="M8 13l3 3 5-5" />
+    </>
+  ),
 };
 
 // Solo estas rutas existen hoy; las demás del rol se muestran deshabilitadas.
-const RUTAS_EXISTENTES: Set<TabId> = new Set(["dashboard", "revision", "reportes", "comidas-gerente", "pago-comidas", "nuevo-reembolso", "entregas", "autorizaciones", "materiales-gerente", "materiales-almacen"]);
+const RUTAS_EXISTENTES: Set<TabId> = new Set(["dashboard", "revision", "reportes", "comidas-gerente", "pago-comidas", "nuevo-reembolso", "entregas", "autorizaciones", "materiales-gerente", "materiales-almacen", "inventarios"]);
 
 function Icono({ tab }: { tab: TabId }) {
   return (

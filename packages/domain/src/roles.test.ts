@@ -57,9 +57,32 @@ describe("rol almacen", () => {
     expect(normalizarRol("intendencia")).toBe("caja_chica");
   });
 
+  it("almacen NO ve la pestaña de inventarios (descargar de BMS es otro puesto)", () => {
+    expect(tabsDeRol("almacen")).not.toContain("inventarios");
+  });
+
   it("admin NO ve las pestañas de material (uso interno / almacén)", () => {
     const tabs = tabsDeRol("admin");
     expect(tabs).not.toContain("materiales-gerente");
     expect(tabs).not.toContain("materiales-almacen");
+  });
+});
+
+describe("rol inventarios", () => {
+  it("normaliza 'inventarios' y su variante en singular", () => {
+    expect(normalizarRol("inventarios")).toBe("inventarios");
+    expect(normalizarRol("  Inventarios ")).toBe("inventarios");
+    expect(normalizarRol("inventario")).toBe("inventarios");
+  });
+
+  it("solo ve su tab: descargar de BMS no se mezcla con capturar entregas", () => {
+    expect(ROL_TABS.inventarios).toEqual(["inventarios"]);
+    expect(tabsDeRol("inventarios")).toEqual(["inventarios"]);
+  });
+
+  it("ningún otro rol ve la pestaña de inventarios", () => {
+    for (const rol of ["admin", "caja_chica", "gerente", "autorizador", "almacen"] as const) {
+      expect(tabsDeRol(rol)).not.toContain("inventarios");
+    }
   });
 });
