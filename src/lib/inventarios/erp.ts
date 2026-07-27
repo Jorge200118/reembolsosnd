@@ -80,3 +80,107 @@ export async function existenciasEnErp(
 
   return { productos, permiteNegativo: data.permiteNegativo === true };
 }
+
+// ── Aplicar ──────────────────────────────────────────────────────────────────
+
+/** Cuánto se espera del ERP al escribir. Aplicar es más pesado que consultar. */
+const TIMEOUT_APLICAR_MS = 60000;
+
+export interface PartidaAplicada {
+  codProd: string;
+  cantidadSolicitada: number;
+  cantidadAplicada: number;
+}
+
+export type ResultadoAplicar =
+  | { estado: "ok"; folio: string; partidas: PartidaAplicada[] }
+  /** El ERP rechazó explícitamente. NO escribió nada: se puede reintentar. */
+  | { estado: "rechazado"; codigo: string; error: string; detalle?: PartidaAplicada[] }
+  /**
+   * No se sabe si el ERP escribió (se cayó la red, timeout, respuesta ilegible).
+   * Quien llame NO debe liberar las partidas ni reintentar a ciegas: hay que
+   * mirar en BMS si el folio existe. Reintentar aquí es descargar dos veces.
+   */
+  | { estado: "desconocido"; error: string };
+
+/**
+ * Manda a BMS un movimiento de uso interno (transacción 40, razón 17).
+ *
+ * A diferencia del resto del módulo, esta función NO lanza: convierte cada
+ * final posible en un estado explícito. La razón es que aquí la diferencia
+ * entre "falló y no escribió" y "no sé si escribió" cambia lo que hay que hacer
+ * después, y un `throw` los hace ver iguales.
+ */
+export async function aplicarEnErp(
+  codEstab: number,
+  usuario: string,
+  partidas: readonly { codProd: string; cantidad: number }[],
+): Promise<ResultadoAplicar> {
+  const base = process.env.CENSOS_API_URL;
+  const llave = process.env.CENSOS_API_KEY;
+  if (!base || !llave) return { estado: "rechazado", codigo: "SIN_CONFIG", error: "ERP no configurado" };
+
+  let res: Response;
+  try {
+    res = await fetch(`${base.replace(/\/$/, "")}/api/inventario/aplicar`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": llave,
+        "ngrok-skip-browser-warning": "true",
+      },
+      body: JSON.stringify({ codEstab, usuario, equipo: "APP", partidas }),
+      signal: AbortSignal.timeout(TIMEOUT_APLICAR_MS),
+      cache: "no-store",
+    });
+  } catch (e) {
+    // La petición nunca volvió. El ERP pudo haber alcanzado a grabar.
+    return { estado: "desconocido", error: e instanceof Error ? e.message : "Sin respuesta del ERP" };
+  }
+
+  let data: Record<string, unknown>;
+  try {
+    data = (await res.json()) as Record<string, unknown>;
+  } catch {
+    return { estado: "desconocido", error: `El ERP respondió ${res.status} sin JSON` };
+  }
+
+  if (res.ok && data.ok === true && typeof data.folio === "string") {
+    return {
+      estado: "ok",
+      folio: data.folio,
+      partidas: (Array.isArray(data.partidas) ? data.partidas : []).map((p) => {
+        const o = p as Record<string, unknown>;
+        return {
+          codProd: String(o.codProd ?? "").trim().toUpperCase(),
+          cantidadSolicitada: Number(o.cantidadSolicitada),
+          cantidadAplicada: Number(o.cantidadAplicada),
+        };
+      }),
+    };
+  }
+
+  // 409 = el ERP rechazó por estado (recorte, catálogo). Nada quedó escrito.
+  if (res.status === 409) {
+    return {
+      estado: "rechazado",
+      codigo: String(data.codigo ?? "RECHAZADO"),
+      error: String(data.error ?? "El ERP rechazó el movimiento"),
+      detalle: Array.isArray(data.detalle)
+        ? (data.detalle as Record<string, unknown>[]).map((d) => ({
+            codProd: String(d.codProd ?? "").trim().toUpperCase(),
+            cantidadSolicitada: Number(d.cantidadSolicitada),
+            cantidadAplicada: Number(d.cantidadAplicada),
+          }))
+        : undefined,
+    };
+  }
+
+  // 400 es culpa nuestra (petición mal armada) y tampoco escribió.
+  if (res.status === 400) {
+    return { estado: "rechazado", codigo: "PETICION_INVALIDA", error: String(data.error ?? "Petición inválida") };
+  }
+
+  // Cualquier otra cosa (502, 500, 504…) pudo haber dejado el folio a medias.
+  return { estado: "desconocido", error: `El ERP respondió ${res.status}` };
+}

@@ -28,9 +28,10 @@ describe("existenciasEnErp", () => {
   });
 
   it("manda la llave y el cuerpo al endpoint correcto", async () => {
-    const fetchMock = vi.fn((_url: string, _opciones: RequestInit) =>
-      respuesta({ ok: true, productos: [], permiteNegativo: false }),
-    );
+    const fetchMock = vi.fn((...args: [string, RequestInit]) => {
+      void args;
+      return respuesta({ ok: true, productos: [], permiteNegativo: false });
+    });
     vi.stubGlobal("fetch", fetchMock);
     await existenciasEnErp(["TRU1"], 3);
 

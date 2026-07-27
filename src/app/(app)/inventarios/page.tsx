@@ -1,12 +1,13 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { totalesDe } from "@/lib/inventarios/evaluar";
 import type { PartidaEvaluada, EstadoPartida } from "@/lib/inventarios/tipos";
 
-// FASE 1: pantalla de SOLO LECTURA. Muestra lo entregado que aún no se descarga
-// del ERP y arma el preview del folio que se generaría. No escribe nada.
+// Pantalla del rol INVENTARIOS: lo entregado en uso interno que todavía no se
+// descarga del ERP, y el botón que genera el folio de transacción 40.
 
 interface SucursalPreview {
   sucursal: string;
@@ -29,6 +30,22 @@ const ETIQUETA: Record<EstadoPartida, { texto: string; clase: string }> = {
   servicio:       { texto: "Es servicio",      clase: "bg-slate-100 text-slate-600 ring-slate-500/20" },
 };
 
+type RespuestaPreview =
+  | { ok: true; sucursales: SucursalPreview[] }
+  | { ok: false; error: string };
+
+/** Trae el preview. Fuera del componente y sin tocar estado: solo datos. */
+async function pedirPreview(): Promise<RespuestaPreview> {
+  try {
+    const res = await fetch("/api/inventarios", { cache: "no-store" });
+    const data = await res.json();
+    if (!data.ok) return { ok: false, error: String(data.error ?? "No se pudo cargar") };
+    return { ok: true, sucursales: data.sucursales as SucursalPreview[] };
+  } catch {
+    return { ok: false, error: "No se pudo conectar con el servidor" };
+  }
+}
+
 function Etiqueta({ estado }: { estado: EstadoPartida }) {
   const e = ETIQUETA[estado];
   return (
@@ -42,38 +59,77 @@ export default function InventariosPage() {
   const [sucursales, setSucursales] = useState<SucursalPreview[]>([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
-  // Selección por sucursal: lineaId -> marcada. Arranca con lo que se descarga
-  // completo; lo que tiene pero se puede marcar a mano y a conciencia.
+  // Selección por sucursal: lineaId -> marcada. Solo entra lo que se descarga
+  // completo; el resto ni se puede marcar (regla de todo o nada).
   const [sel, setSel] = useState<Record<string, Set<string>>>({});
+  const [confirmar, setConfirmar] = useState<SucursalPreview | null>(null);
+  const [aplicando, setAplicando] = useState(false);
+  const [aviso, setAviso] = useState<{ tipo: "ok" | "error"; texto: string } | null>(null);
+
+  // El estado se aplica SIEMPRE dentro de un .then, nunca en el cuerpo del
+  // efecto: hacerlo de forma síncrona ahí encadena renders (regla
+  // react-hooks/set-state-in-effect). Por eso `pedirPreview` vive fuera del
+  // componente y no sabe nada de React.
+  const asentar = useCallback((r: RespuestaPreview) => {
+    setCargando(false);
+    if (!r.ok) {
+      setError(r.error);
+      setSucursales([]);
+      return;
+    }
+    setError("");
+    setSucursales(r.sucursales);
+    const inicial: Record<string, Set<string>> = {};
+    for (const s of r.sucursales) {
+      inicial[s.sucursal] = new Set(
+        s.partidas.filter((p) => p.seleccionablePorDefecto).map((p) => p.lineaId),
+      );
+    }
+    setSel(inicial);
+  }, []);
 
   useEffect(() => {
     let vivo = true;
-    (async () => {
-      try {
-        const res = await fetch("/api/inventarios", { cache: "no-store" });
-        const data = await res.json();
-        if (!vivo) return;
-        if (!data.ok) {
-          setError(data.error ?? "No se pudo cargar");
-        } else {
-          const subs = data.sucursales as SucursalPreview[];
-          setSucursales(subs);
-          const inicial: Record<string, Set<string>> = {};
-          for (const s of subs) {
-            inicial[s.sucursal] = new Set(
-              s.partidas.filter((p) => p.seleccionablePorDefecto).map((p) => p.lineaId),
-            );
-          }
-          setSel(inicial);
-        }
-      } catch {
-        if (vivo) setError("No se pudo conectar con el servidor");
-      } finally {
-        if (vivo) setCargando(false);
-      }
-    })();
+    void pedirPreview().then((r) => { if (vivo) asentar(r); });
     return () => { vivo = false; };
-  }, []);
+  }, [asentar]);
+
+  const recargar = useCallback(() => pedirPreview().then(asentar), [asentar]);
+
+  const aplicar = async (s: SucursalPreview) => {
+    const ids = [...(sel[s.sucursal] ?? [])];
+    setAplicando(true);
+    setAviso(null);
+    try {
+      const res = await fetch("/api/inventarios/aplicar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sucursal: s.sucursal, lineaIds: ids }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setAviso({
+          tipo: "ok",
+          texto: `Folio ${data.folio} generado en el ERP: ${data.partidas} ${data.partidas === 1 ? "partida" : "partidas"}, ${data.unidades} uds.`,
+        });
+      } else {
+        // El detalle importa: "no alcanzó" necesita decir de qué producto, o
+        // quien lo lee no sabe qué revisar.
+        const det = Array.isArray(data.detalle) && data.detalle.length
+          ? " (" + data.detalle.map((d: { codProd?: string }) => d.codProd).filter(Boolean).join(", ") + ")"
+          : "";
+        setAviso({ tipo: "error", texto: (data.error ?? "No se pudo aplicar") + det });
+      }
+    } catch {
+      setAviso({ tipo: "error", texto: "No se pudo conectar con el servidor" });
+    } finally {
+      setAplicando(false);
+      setConfirmar(null);
+      // Se recarga pase lo que pase: si salió bien, esas partidas ya no van; si
+      // salió mal, las existencias que se ven pudieron haber cambiado.
+      void recargar();
+    }
+  };
 
   const alternar = (sucursal: string, lineaId: string) => {
     setSel((prev) => {
@@ -105,14 +161,26 @@ export default function InventariosPage() {
         subtitulo="Uso interno entregado que todavía no se descarga del ERP"
       />
 
-      {/* Que quede claro que todavía no escribe nada: alguien podría pensar que
-          ya afectó BMS y dejar de capturarlo a mano. */}
-      <div className="mb-5 rounded-lg border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
-        <strong className="font-semibold">Vista previa.</strong> Aquí ves el folio que se
-        generaría en el ERP (transacción 40, razón <em>Uso Interno</em>), pero todavía
-        <strong> no se aplica nada</strong>. Sigue capturándolo en BMS como hasta ahora y
-        compara los números con esta pantalla.
-      </div>
+      {/* El resultado de aplicar va arriba y se queda: es la única constancia
+          del folio que se generó, y hay que poder anotarlo. */}
+      {aviso && (
+        <div
+          className={`mb-5 flex items-start justify-between gap-4 rounded-lg border px-4 py-3 text-sm ${
+            aviso.tipo === "ok"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+              : "border-rose-200 bg-rose-50 text-rose-800"
+          }`}
+        >
+          <span>{aviso.texto}</span>
+          <button
+            type="button"
+            onClick={() => setAviso(null)}
+            className="shrink-0 text-xs underline opacity-70 hover:opacity-100"
+          >
+            cerrar
+          </button>
+        </div>
+      )}
 
       {error && (
         <div className="mb-5 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
@@ -241,12 +309,14 @@ export default function InventariosPage() {
               )}
 
               <div className="flex items-center justify-end gap-3 border-t border-slate-200 bg-slate-50 px-4 py-3">
-                <span className="text-xs text-slate-500">Aplicar a BMS se habilita en la siguiente fase</span>
+                {totales.partidas === 0 && !s.bloqueo && (
+                  <span className="text-xs text-slate-500">Selecciona al menos una partida</span>
+                )}
                 <button
                   type="button"
-                  disabled
-                  className="cursor-not-allowed rounded-lg bg-slate-300 px-4 py-2 text-sm font-semibold text-white"
-                  title="Todavía no disponible: esta fase es solo de verificación"
+                  onClick={() => setConfirmar(s)}
+                  disabled={aplicando || totales.partidas === 0 || Boolean(s.bloqueo)}
+                  className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                 >
                   Aplicar a BMS
                 </button>
@@ -255,6 +325,36 @@ export default function InventariosPage() {
           );
         })}
       </div>
+
+      {/* Afectar inventario del ERP no se deshace con un botón: hay que
+          cancelar el folio. Por eso se confirma, y el mensaje dice exactamente
+          qué va a pasar y cuánto. */}
+      {confirmar && (() => {
+        const marcadas = sel[confirmar.sucursal] ?? new Set<string>();
+        const t = totalesDe(confirmar.partidas.filter((p) => marcadas.has(p.lineaId)));
+        return (
+          <ConfirmDialog
+            titulo={`Aplicar a BMS — ${confirmar.sucursal}`}
+            mensaje={
+              <>
+                Se va a generar un folio de <strong>disminución de inventario</strong>{" "}
+                (transacción 40, razón <em>Uso Interno</em>) en el establecimiento{" "}
+                <strong>{confirmar.codEstab}</strong> con{" "}
+                <strong>{t.partidas} {t.partidas === 1 ? "partida" : "partidas"}</strong> y{" "}
+                <strong>{t.unidades} unidades</strong>, por {PESOS.format(t.costo)}.
+                <br />
+                <br />
+                El inventario del ERP baja de inmediato. Para revertirlo hay que cancelar
+                el folio en BMS.
+              </>
+            }
+            textoConfirmar="Aplicar"
+            isPending={aplicando}
+            onCancelar={() => setConfirmar(null)}
+            onConfirmar={() => void aplicar(confirmar)}
+          />
+        );
+      })()}
     </div>
   );
 }
