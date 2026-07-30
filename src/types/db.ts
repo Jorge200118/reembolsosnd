@@ -1886,8 +1886,8 @@ export type Database = {
           fecha_entrega: string | null
           folio: string
           id: string
+          motivo: string
           motivo_rechazo: string | null
-          nota: string | null
           sucursal: string
         }
         Insert: {
@@ -1902,8 +1902,8 @@ export type Database = {
           fecha_entrega?: string | null
           folio?: string
           id?: string
+          motivo: string
           motivo_rechazo?: string | null
-          nota?: string | null
           sucursal: string
         }
         Update: {
@@ -1918,8 +1918,8 @@ export type Database = {
           fecha_entrega?: string | null
           folio?: string
           id?: string
+          motivo?: string
           motivo_rechazo?: string | null
-          nota?: string | null
           sucursal?: string
         }
         Relationships: []
@@ -2760,7 +2760,7 @@ export type Database = {
         Returns: Json
       }
       material_crear: {
-        Args: { p_empleado_id: number; p_lineas: Json; p_nota: string }
+        Args: { p_empleado_id: number; p_lineas: Json; p_motivo: string }
         Returns: Json
       }
       material_entregar: {

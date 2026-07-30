@@ -20,7 +20,7 @@ interface LineaMia {
   cantidad: number; cantidad_entregada: number | null;
 }
 interface SolicitudMia {
-  id: string; folio: string; estado: string; nota: string | null; creado_en: string;
+  id: string; folio: string; estado: string; motivo: string; creado_en: string;
   motivo_rechazo: string | null;
   rnd_material_lineas: LineaMia[];
 }
@@ -41,7 +41,7 @@ export default function MaterialesEmpleado() {
   const router = useRouter();
   const { mostrar } = useToast();
   const [lineas, setLineas] = useState<LineaSolicitud[]>([]);
-  const [nota, setNota] = useState("");
+  const [motivo, setMotivo] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [solicitudes, setSolicitudes] = useState<SolicitudMia[]>([]);
   const [cargando, setCargando] = useState(true);
@@ -84,6 +84,10 @@ export default function MaterialesEmpleado() {
 
   async function enviar() {
     if (lineas.length === 0 || enviando) return;
+    if (!motivo.trim()) {
+      mostrar("Escribe para qué necesitas el material");
+      return;
+    }
     setEnviando(true);
     try {
       const res = await fetch("/api/empleado/materiales", {
@@ -93,7 +97,7 @@ export default function MaterialesEmpleado() {
         // son para pintar la pantalla. El servidor los relee del ERP, así que
         // mandarlos aquí sería sugerir que se le cree al navegador.
         body: JSON.stringify({
-          nota: nota.trim() || null,
+          motivo: motivo.trim(),
           lineas: lineas.map((l) => ({ codProd: l.codProd, cantidad: l.cantidad })),
         }),
       });
@@ -101,7 +105,7 @@ export default function MaterialesEmpleado() {
       if (data.ok) {
         mostrar(`Solicitud ${data.folio} enviada`);
         setLineas([]);
-        setNota("");
+        setMotivo("");
         await cargar();
       } else {
         mostrar(String(data.error ?? "No se pudo enviar"));
@@ -154,14 +158,15 @@ export default function MaterialesEmpleado() {
               <input
                 className="carnet-input"
                 type="text"
-                value={nota}
+                value={motivo}
                 maxLength={200}
-                onChange={(e) => setNota(e.target.value)}
-                placeholder="¿Para qué lo necesitas? (opcional)"
-                aria-label="Nota"
+                onChange={(e) => setMotivo(e.target.value)}
+                placeholder="¿Para qué lo necesitas?"
+                aria-label="Motivo de la solicitud"
+                required
               />
             </div>
-            <button className="carnet-btn" type="button" style={{ marginTop: 12 }} disabled={enviando} onClick={enviar}>
+            <button className="carnet-btn" type="button" style={{ marginTop: 12 }} disabled={enviando || !motivo.trim()} onClick={enviar}>
               {enviando ? "Enviando…" : "Enviar solicitud"}
             </button>
           </>

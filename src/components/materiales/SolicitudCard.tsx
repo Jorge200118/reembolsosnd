@@ -66,7 +66,7 @@ export function SolicitudCard({
           <span className="text-xs text-slate-500">
             {new Date(s.creado_en).toLocaleDateString("es-MX")}
           </span>
-          {s.nota && <span className="text-xs italic text-slate-500">“{s.nota}”</span>}
+          <span className="text-xs italic text-slate-500">“{s.motivo}”</span>
           {/* En la cabecera y no en el detalle: sirve para decidir a quién
               apurar, y eso hay que verlo de un vistazo en la lista, sin abrir
               tarjeta por tarjeta. Se dibuja solo si hay más de un área. */}

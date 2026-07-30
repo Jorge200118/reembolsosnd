@@ -22,12 +22,22 @@ export async function POST(req: Request) {
   const sesion = await sesionDe();
   if (!sesion) return NextResponse.json({ ok: false, error: "No autorizado" }, { status: 401 });
 
-  const body = (await req.json().catch(() => ({}))) as { nota?: unknown; lineas?: unknown };
+  const body = (await req.json().catch(() => ({}))) as { motivo?: unknown; lineas?: unknown };
   const entrantes = Array.isArray(body.lineas) ? (body.lineas as Record<string, unknown>[]) : [];
   const pedidas: LineaPedida[] = entrantes.map((l) => ({
     codProd: String(l.codProd ?? ""),
     cantidad: Number(l.cantidad),
   }));
+
+  // El motivo es obligatorio: es lo único que le dice al gerente por qué se
+  // pide el material, y sin él la autorización se vuelve a ciegas.
+  const motivo = typeof body.motivo === "string" ? body.motivo.trim() : "";
+  if (!motivo) {
+    return NextResponse.json(
+      { ok: false, error: "Escribe para qué necesitas el material" },
+      { status: 400 },
+    );
+  }
 
   if (!erpConfigurado()) {
     return NextResponse.json(
@@ -63,7 +73,7 @@ export async function POST(req: Request) {
 
   const r = await llamarRpcMaterial("material_crear", {
     p_empleado_id: sesion.empleadoId,
-    p_nota: typeof body.nota === "string" ? body.nota : null,
+    p_motivo: motivo,
     p_lineas: confirmadas.lineas,
   });
   return NextResponse.json(r, { status: r.ok ? 200 : 400 });
@@ -74,7 +84,7 @@ export async function GET() {
   if (!sesion) return NextResponse.json({ ok: false, error: "No autorizado" }, { status: 401 });
 
   const campos =
-    "id,folio,estado,nota,creado_en,fecha_autorizacion,motivo_rechazo,fecha_entrega," +
+    "id,folio,estado,motivo,creado_en,fecha_autorizacion,motivo_rechazo,fecha_entrega," +
     "rnd_material_lineas(id,orden,cod_prod,descripcion,unidad,cantidad,cantidad_entregada,costo_unitario)";
   const consulta =
     `rnd_material_solicitudes?empleado_id=eq.${sesion.empleadoId}` +

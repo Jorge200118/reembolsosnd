@@ -20,7 +20,7 @@ export interface SolicitudGuardada {
   folio: string;
   empleado_nombre: string;
   sucursal: string;
-  nota: string | null;
+  motivo: string;
   estado: string;
   creado_en: string;
   autorizado_por: string | null;
