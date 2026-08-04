@@ -4,7 +4,7 @@ import { CONCEPTOS, AUTORIZADORES } from "@devoluciones/domain";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useCrearReembolso } from "@/lib/hooks/useCrearReembolso";
 import { useGuardedAction } from "@/lib/hooks/useGuardedAction";
-import { useHoyVivo, hoyLocal, maxDesdeHoy } from "@/lib/hooks/useHoyVivo";
+import { useHoyVivo, useFechaDelDia, maxDesdeHoy } from "@/lib/hooks/useHoyVivo";
 import { SelectorArchivos, validarArchivos } from "@/components/reembolsos/SelectorArchivos";
 import { BeneficiarioAutocomplete } from "@/components/reembolsos/BeneficiarioAutocomplete";
 
@@ -21,7 +21,9 @@ export function FormNuevoReembolso() {
   const hoy = useHoyVivo();
   const maxFecha = maxDesdeHoy(hoy);
   const [nombre, setNombre] = useState("");
-  const [fecha, setFecha] = useState(hoyLocal());
+  // El valor también sigue al día: con el `max` vivo pero la fecha congelada,
+  // el vale se registraba con el día en que se abrió la pestaña.
+  const [fecha, setFecha] = useFechaDelDia(hoy);
   const [monto, setMonto] = useState("");
   const [autoriza, setAutoriza] = useState("");
   const [concepto, setConcepto] = useState("");
@@ -79,7 +81,7 @@ export function FormNuevoReembolso() {
         onSuccess: (r) => {
           if (r.ok) {
             setNombre(""); setMonto(""); setAutoriza(""); setConcepto(""); setArchivos([]);
-            setFecha(hoyLocal());
+            setFecha(hoy);
           } else {
             setError(r.error ?? "Error al registrar");
           }

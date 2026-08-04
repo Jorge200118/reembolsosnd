@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCrearComidasLote, type ResultadoComidaLote } from "@/lib/hooks/useCrearComidasLote";
 import { useReembolsos } from "@/lib/hooks/useReembolsos";
 import { useGuardedAction } from "@/lib/hooks/useGuardedAction";
+import { useHoyVivo, useFechaDelDia, ZONA_COMIDAS } from "@/lib/hooks/useHoyVivo";
 import { empleadosPorSucursal } from "@/lib/supabase/queries/empleadosPorSucursal";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -15,12 +16,6 @@ type Fila = Record<string, unknown>;
 type Emp = { id: number; nombre: string; sucursal: string | null; tieneTelefono: boolean };
 
 const MONTO_COMIDA = 120;
-
-// Hoy en Mazatlán como "YYYY-MM-DD". No sirve toISOString() aquí: da UTC, y
-// después de las 5pm local ya devuelve el día siguiente.
-function hoyMazatlan(): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Mazatlan" }).format(new Date());
-}
 
 // Normaliza para búsqueda: minúsculas + sin acentos.
 function norm(s: string): string {
@@ -55,8 +50,12 @@ export default function ComidasGerentePage() {
   // Normalmente hoy. Se puede echar para atrás si a un gerente se le pasó
   // capturar un vale de un día pasado. Futuras no: el input las corta y la
   // edge function las rechaza.
-  const hoy = useMemo(() => hoyMazatlan(), []);
-  const [fecha, setFecha] = useState(hoy);
+  //
+  // Día VIVO, no calculado una sola vez al montar: los gerentes dejan la app
+  // abierta en el celular durante días y el selector se quedaba pegado (con su
+  // `max`) en la fecha en que la abrieron.
+  const hoy = useHoyVivo(ZONA_COMIDAS);
+  const [fecha, setFecha] = useFechaDelDia(hoy);
   const esRetroactiva = fecha !== hoy;
 
   // Empleados de la sucursal del gerente.

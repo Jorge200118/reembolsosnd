@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useComidasPendientes } from "@/lib/hooks/useComidasPendientes";
 import { OtpCapturaModal } from "@/components/comidas/OtpCapturaModal";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { useHoyVivo, ZONA_COMIDAS } from "@/lib/hooks/useHoyVivo";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
@@ -16,7 +17,11 @@ export default function PagoComidasPage() {
   const queryClient = useQueryClient();
   const { data: comidas, isLoading } = useComidasPendientes(sesion?.sucursal ?? undefined);
 
-  const diaSemana = new Date().getDay();
+  // Del día VIVO, no de un new Date() del render: la cajera deja la pestaña
+  // abierta y el bloqueo del domingo seguía puesto el lunes por la mañana.
+  // Mediodía al parsear para que la zona horaria no corra el día.
+  const hoy = useHoyVivo(ZONA_COMIDAS);
+  const diaSemana = new Date(`${hoy}T12:00:00`).getDay();
   const esDiaHabil = diaSemana >= 1 && diaSemana <= 6; // lunes a sábado (0 = domingo)
   const lista = comidas ?? [];
   const totalGeneral = lista.reduce((s, c) => s + Number(c.total), 0);
