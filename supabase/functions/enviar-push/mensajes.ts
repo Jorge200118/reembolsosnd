@@ -36,7 +36,9 @@ export function mensaje(tipo: Tipo, row: SubRow): { title: string; body: string;
     // siguen diciendo material porque cambiarlos rompería los avisos ya
     // suscritos y no le sirve a nadie.
     case "material_autorizada":
-      return { title: "Vales AC", body: "Tu gerente autorizó tu uso interno. Ya tienes tu código para recoger en almacén.", url: "/empleado/materiales", tag };
+      // Sin puesto: autoriza el gerente o inventarios. Quién firmó queda en
+      // autorizado_por y se ve en el historial de la solicitud.
+      return { title: "Vales AC", body: "Ya autorizaron tu uso interno. Ya tienes tu código para recoger en almacén.", url: "/empleado/materiales", tag };
     case "material_rechazada":
       return { title: "Vales AC", body: "Tu solicitud de uso interno fue rechazada, revísala.", url: "/empleado/materiales", tag };
     case "material_entregada":

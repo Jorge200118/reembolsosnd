@@ -40,6 +40,14 @@ describe("mensajes de material", () => {
     }
   });
 
+  // El aviso ya no puede decir "tu gerente": inventarios también autoriza.
+  // Quién lo hizo queda en autorizado_por y se ve en el historial.
+  it("el aviso de autorización no le atribuye la firma a un puesto", () => {
+    const m = mensaje("material_autorizada", { empleado_id: 7, endpoint: "e", p256dh: "p", auth: "a" });
+    expect(m.body).not.toMatch(/gerente/i);
+    expect(m.body).toContain("código");
+  });
+
   it("los tags de material son cortos y distintos entre sí", () => {
     const tags = new Set(
       (["material_autorizada", "material_rechazada", "material_entregada"] as const)

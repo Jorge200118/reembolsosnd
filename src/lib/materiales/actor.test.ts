@@ -64,6 +64,22 @@ describe("actorDeMaterial", () => {
     expect(await actorDeMaterial("materiales-gerente")).toMatchObject({ ok: false, status: 403 });
   });
 
+  // Inventarios autoriza uso interno además de descargar de BMS, pero sigue
+  // amarrado a su sucursal: el comodín '*' es solo del admin.
+  it("inventarios puede autorizar y queda amarrado a su sucursal", async () => {
+    await conSesion({ rol: "inventarios", rolCrudo: "inventarios", nombre: "Gisela Armenta", sucursal: "LMM" });
+    expect(await actorDeMaterial("materiales-gerente")).toEqual({
+      ok: true,
+      actor: { nombre: "Gisela Armenta", sucursal: "LMM", area: null },
+    });
+    expect(await actorDeMaterial("inventarios")).toMatchObject({ ok: true });
+  });
+
+  it("inventarios NO puede entregar: surtir es de almacén", async () => {
+    await conSesion({ rol: "inventarios", rolCrudo: "inventarios", sucursal: "LMM" });
+    expect(await actorDeMaterial("materiales-almacen")).toMatchObject({ ok: false, status: 403 });
+  });
+
   it("la cajera no puede ninguna de las dos", async () => {
     await conSesion({ rol: "caja_chica", rolCrudo: "caja_chica" });
     expect(await actorDeMaterial("materiales-gerente")).toMatchObject({ ok: false, status: 403 });

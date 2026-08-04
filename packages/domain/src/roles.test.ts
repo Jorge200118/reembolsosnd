@@ -75,9 +75,21 @@ describe("rol inventarios", () => {
     expect(normalizarRol("inventario")).toBe("inventarios");
   });
 
-  it("solo ve su tab: descargar de BMS no se mezcla con capturar entregas", () => {
-    expect(ROL_TABS.inventarios).toEqual(["inventarios"]);
-    expect(tabsDeRol("inventarios")).toEqual(["inventarios"]);
+  it("también autoriza uso interno, además de descargar de BMS", () => {
+    expect(ROL_TABS.inventarios).toEqual(["inventarios", "materiales-gerente"]);
+    expect(tabsDeRol("inventarios")).toContain("materiales-gerente");
+  });
+
+  // El middleware rebota al primer tab permitido: si "materiales-gerente" se
+  // colara al frente, inventarios aterrizaría en la pantalla equivocada.
+  it("sigue aterrizando en su propia pantalla", () => {
+    expect(tabsDeRol("inventarios")[0]).toBe("inventarios");
+  });
+
+  // Autorizar no es surtir. Quien da el visto bueno no captura la entrega ni
+  // se autoriza a sí mismo el material que luego descarga del ERP.
+  it("NO puede entregar: esa sigue siendo la pantalla de almacén", () => {
+    expect(tabsDeRol("inventarios")).not.toContain("materiales-almacen");
   });
 
   it("ningún otro rol ve la pestaña de inventarios", () => {
