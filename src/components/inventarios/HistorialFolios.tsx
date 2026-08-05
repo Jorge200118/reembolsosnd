@@ -3,6 +3,8 @@ import { useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui/Card";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { FichaSolicitud } from "@/components/inventarios/FichaSolicitud";
+import { Segmentadores, useSegmentadores } from "@/components/ui/Segmentadores";
+import type { ConfigSegmentos } from "@/lib/filtros/segmentar";
 import type { FolioHistorial, PartidaHistorial } from "@/lib/inventarios/historial";
 
 const PESOS = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
@@ -22,6 +24,24 @@ const ESTADO: Record<FolioHistorial["estado"], { texto: string; clase: string }>
   // Se ve distinto a propósito: es lo único que pide acción de alguien.
   en_proceso: { texto: "Sin confirmar", clase: "bg-amber-50 text-amber-800 ring-amber-600/20" },
   fallida:    { texto: "No se aplicó", clase: "bg-rose-50 text-rose-700 ring-rose-600/20" },
+};
+
+// Aquí el estado SÍ es un segmentador propio y no una pestaña: un folio
+// cancelado y uno sin confirmar conviven en la misma lista, y "enséñame los
+// sin confirmar" es justo la pregunta que trae a alguien a esta pantalla.
+const FILTROS_FOLIOS: ConfigSegmentos<FolioHistorial> = {
+  segmentos: [
+    {
+      id: "estado",
+      etiqueta: "Estado",
+      de: (f) => f.estado,
+      orden: ["aplicada", "en_proceso", "cancelada", "fallida"],
+      texto: (v) => ESTADO[v as FolioHistorial["estado"]]?.texto ?? v,
+    },
+    { id: "sucursal", etiqueta: "Sucursal", de: (f) => f.sucursal },
+  ],
+  buscarEn: (f) => `${f.folioBms ?? ""} ${f.foliosSolicitud ?? ""} ${f.aplicadoPor}`,
+  fechaDe: (f) => f.aplicadoEn,
 };
 
 export function HistorialFolios() {
@@ -97,6 +117,13 @@ export function HistorialFolios() {
     } catch { /* el detalle es opcional: si falla, la fila sigue siendo útil */ }
   }, [abierto, detalle]);
 
+  // Antes de los returns tempranos: las reglas de hooks no admiten que un
+  // render se salte esta llamada y el siguiente no.
+  const { estado: filtros, setEstado: setFiltros, filtrados } = useSegmentadores(
+    folios,
+    FILTROS_FOLIOS,
+  );
+
   if (cargando) {
     return <Card className="p-8 text-center text-sm text-slate-500">Cargando historial…</Card>;
   }
@@ -114,6 +141,10 @@ export function HistorialFolios() {
     );
   }
 
+  // El aviso cuenta sobre TODOS los folios, no sobre los filtrados: si alguien
+  // acota a "aplicada", los sin confirmar siguen existiendo y siguen exigiendo
+  // que alguien los revise. Esconder ese aviso por un filtro sería lo peor que
+  // podría hacer esta pantalla.
   const sinConfirmar = folios.filter((f) => f.estado === "en_proceso").length;
 
   return (
@@ -145,7 +176,22 @@ export function HistorialFolios() {
         </div>
       )}
 
-      <Card className="overflow-hidden">
+      <Segmentadores
+        items={folios}
+        config={FILTROS_FOLIOS}
+        estado={filtros}
+        onCambiar={setFiltros}
+        mostrados={filtrados.length}
+        sustantivo="folios"
+      />
+
+      {filtrados.length === 0 && (
+        <Card className="p-8 text-center text-sm text-slate-500">
+          Ningún folio coincide con los filtros.
+        </Card>
+      )}
+
+      <Card className={`overflow-hidden ${filtrados.length === 0 ? "hidden" : ""}`}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -163,7 +209,7 @@ export function HistorialFolios() {
               </tr>
             </thead>
             <tbody>
-              {folios.map((f) => (
+              {filtrados.map((f) => (
                 <FilaFolio
                   key={f.id}
                   folio={f}

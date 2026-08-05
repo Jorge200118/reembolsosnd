@@ -9,7 +9,9 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { SolicitudCard } from "@/components/materiales/SolicitudCard";
 import { TablaLineas } from "@/components/materiales/TablaLineas";
 import { CapturaEntrega } from "@/components/materiales/CapturaEntrega";
+import { Segmentadores, useSegmentadores } from "@/components/ui/Segmentadores";
 import { esCodigoCompleto } from "@/lib/materiales/codigo";
+import { FILTROS_SOLICITUDES } from "@/lib/materiales/filtros";
 import type { SolicitudGuardada } from "@/lib/materiales/totales";
 
 const BTN_OK = "rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-40";
@@ -131,6 +133,13 @@ export default function MaterialesAlmacenPage() {
 
   const lista = pestana === "entregadas" ? entregadas : pestana === "espera" ? enEspera : autorizadas;
   const cargando = pestana === "entregadas" ? entregadasQ.isLoading : autorizadasQ.isLoading;
+  // Los mismos filtros para las tres pestañas: al cambiar de pestaña se
+  // conserva lo tecleado, que es lo que uno espera cuando anda persiguiendo un
+  // folio y no sabe en cuál está.
+  const { estado: filtros, setEstado: setFiltros, filtrados } = useSegmentadores(
+    lista,
+    FILTROS_SOLICITUDES,
+  );
   const vacio =
     pestana === "entregadas"
       ? "Todavía no has entregado material."
@@ -168,13 +177,28 @@ export default function MaterialesAlmacenPage() {
         </button>
       </div>
 
+      {!cargando && lista.length > 0 && (
+        <Segmentadores
+          items={lista}
+          config={FILTROS_SOLICITUDES}
+          estado={filtros}
+          onCambiar={setFiltros}
+          mostrados={filtrados.length}
+          sustantivo="solicitudes"
+        />
+      )}
+
       {cargando ? (
         <Card className="p-6 text-center text-sm text-slate-500">Cargando solicitudes…</Card>
       ) : lista.length === 0 ? (
         <Card className="p-4 text-center text-sm text-slate-400 sm:p-6">{vacio}</Card>
+      ) : filtrados.length === 0 ? (
+        <Card className="p-4 text-center text-sm text-slate-400 sm:p-6">
+          Ninguna solicitud coincide con los filtros.
+        </Card>
       ) : (
         <div className="space-y-3">
-          {lista.map((s) => (
+          {filtrados.map((s) => (
             <SolicitudCard
               key={s.id}
               solicitud={s}

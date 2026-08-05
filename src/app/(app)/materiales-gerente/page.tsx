@@ -8,6 +8,8 @@ import { Card } from "@/components/ui/Card";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { SolicitudCard } from "@/components/materiales/SolicitudCard";
 import { TablaLineas } from "@/components/materiales/TablaLineas";
+import { Segmentadores, useSegmentadores } from "@/components/ui/Segmentadores";
+import { FILTROS_SOLICITUDES } from "@/lib/materiales/filtros";
 import { totalDeLineas, type SolicitudGuardada } from "@/lib/materiales/totales";
 
 const BTN_OK = "rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-40";
@@ -51,6 +53,14 @@ export default function MaterialesGerentePage() {
   const lista = verHistorial ? historial : pendientes;
   const cargando = verHistorial ? historialQ.isLoading : pendientesQ.isLoading;
 
+  // Un solo juego de filtros para las dos pestañas. Se comparte a propósito:
+  // quien busca un folio en Pendientes y no lo halla, cambia a Historial y lo
+  // sigue buscando sin volver a teclear.
+  const { estado: filtros, setEstado: setFiltros, filtrados } = useSegmentadores(
+    lista,
+    FILTROS_SOLICITUDES,
+  );
+
   return (
     <main className="mx-auto max-w-6xl p-4 sm:p-6">
       <PageHeader titulo="Uso interno" subtitulo="Solicitudes de material para uso interno de tu sucursal" />
@@ -71,15 +81,30 @@ export default function MaterialesGerentePage() {
         </button>
       </div>
 
+      {!cargando && lista.length > 0 && (
+        <Segmentadores
+          items={lista}
+          config={FILTROS_SOLICITUDES}
+          estado={filtros}
+          onCambiar={setFiltros}
+          mostrados={filtrados.length}
+          sustantivo="solicitudes"
+        />
+      )}
+
       {cargando ? (
         <Card className="p-6 text-center text-sm text-slate-500">Cargando solicitudes…</Card>
       ) : lista.length === 0 ? (
         <Card className="p-4 text-center text-sm text-slate-400 sm:p-6">
           {verHistorial ? "Todavía no hay solicitudes resueltas." : "No hay solicitudes pendientes."}
         </Card>
+      ) : filtrados.length === 0 ? (
+        <Card className="p-4 text-center text-sm text-slate-400 sm:p-6">
+          Ninguna solicitud coincide con los filtros.
+        </Card>
       ) : (
         <div className="space-y-3">
-          {lista.map((s) => (
+          {filtrados.map((s) => (
             <SolicitudCard
               key={s.id}
               solicitud={s}

@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/Card";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { HistorialFolios } from "@/components/inventarios/HistorialFolios";
 import { FichaSolicitud } from "@/components/inventarios/FichaSolicitud";
+import { Segmentadores, useSegmentadores } from "@/components/ui/Segmentadores";
+import { hayFiltros, type ConfigSegmentos } from "@/lib/filtros/segmentar";
 import { totalesDe } from "@/lib/inventarios/evaluar";
 import type { PartidaEvaluada, EstadoPartida } from "@/lib/inventarios/tipos";
 
@@ -35,6 +37,28 @@ const ETIQUETA: Record<EstadoPartida, { texto: string; clase: string }> = {
 type RespuestaPreview =
   | { ok: true; sucursales: SucursalPreview[] }
   | { ok: false; error: string };
+
+/** Partida con su sucursal encima: la tabla está agrupada, los filtros no. */
+type PartidaConSucursal = PartidaEvaluada & { sucursal: string };
+
+const FILTROS_PENDIENTES: ConfigSegmentos<PartidaConSucursal> = {
+  segmentos: [
+    { id: "sucursal", etiqueta: "Sucursal", de: (p) => p.sucursal },
+    {
+      id: "estado",
+      etiqueta: "Estado",
+      de: (p) => p.estado,
+      orden: ["ok", "insuficiente", "sin_existencia", "sin_catalogo", "servicio"],
+      // El mismo texto de la etiqueta de la tabla: si el filtro dijera
+      // "insuficiente" y la columna "Espera inventario", parecerían dos cosas.
+      texto: (v) => ETIQUETA[v as EstadoPartida]?.texto ?? v,
+    },
+    { id: "area", etiqueta: "Área", de: (p) => p.area, orden: ["FERRETERIA", "NAVE1", "NAVE2", "NAVE3"] },
+  ],
+  buscarEn: (p) =>
+    `${p.codProd} ${p.descripcionErp} ${p.descripcion} ${p.folioSolicitud} ${p.empleadoNombre} ${p.motivo}`,
+  fechaDe: (p) => p.fechaEntrega,
+};
 
 /** Trae el preview. Fuera del componente y sin tocar estado: solo datos. */
 async function pedirPreview(): Promise<RespuestaPreview> {
@@ -103,8 +127,30 @@ export default function InventariosPage() {
 
   const recargar = useCallback(() => pedirPreview().then(asentar), [asentar]);
 
+  // Los filtros trabajan sobre la lista PLANA (una partida es una partida,
+  // venga de la sucursal que venga); la tabla sigue agrupada. Por eso se filtra
+  // plano y luego cada tarjeta se queda con lo suyo.
+  const todasLasPartidas = useMemo(
+    () => sucursales.flatMap((s) => s.partidas.map((p) => ({ ...p, sucursal: s.sucursal }))),
+    [sucursales],
+  );
+  const {
+    estado: filtros,
+    setEstado: setFiltros,
+    filtrados,
+  } = useSegmentadores(todasLasPartidas, FILTROS_PENDIENTES);
+  // Sin filtros esto contiene TODO, así que el resto del código puede usarlo
+  // siempre sin preguntarse si hay filtro activo.
+  const visibles = useMemo(() => new Set(filtrados.map((p) => p.lineaId)), [filtrados]);
+  const filtrando = hayFiltros(filtros);
+
   const aplicar = async (s: SucursalPreview) => {
-    const ids = [...(sel[s.sucursal] ?? [])];
+    // Marcadas Y a la vista. Aplicar a BMS una partida que un filtro está
+    // escondiendo es exactamente cómo se descarga material que nadie revisó.
+    const marcadas = sel[s.sucursal] ?? new Set<string>();
+    const ids = s.partidas
+      .filter((p) => marcadas.has(p.lineaId) && visibles.has(p.lineaId))
+      .map((p) => p.lineaId);
     setAplicando(true);
     setAviso(null);
     try {
@@ -234,10 +280,33 @@ export default function InventariosPage() {
         </Card>
       )}
 
+      {totalPendientes > 0 && (
+        <Segmentadores
+          items={todasLasPartidas}
+          config={FILTROS_PENDIENTES}
+          estado={filtros}
+          onCambiar={setFiltros}
+          mostrados={filtrados.length}
+          sustantivo="partidas"
+        />
+      )}
+
+      {filtrando && filtrados.length === 0 && (
+        <Card className="p-8 text-center text-sm text-slate-500">
+          Ninguna partida coincide con los filtros.
+        </Card>
+      )}
+
       <div className="space-y-6">
-        {sucursales.map((s) => {
+        {sucursales
+          // Con filtros activos, una sucursal sin partidas a la vista no pinta
+          // nada. Sin filtros se deja pasar aunque venga vacía: puede traer un
+          // aviso de bloqueo que sí hay que leer.
+          .filter((s) => !filtrando || s.partidas.some((p) => visibles.has(p.lineaId)))
+          .map((s) => {
           const marcadas = sel[s.sucursal] ?? new Set<string>();
-          const totales = totalesDe(s.partidas.filter((p) => marcadas.has(p.lineaId)));
+          const partidas = s.partidas.filter((p) => visibles.has(p.lineaId));
+          const totales = totalesDe(partidas.filter((p) => marcadas.has(p.lineaId)));
           return (
             <Card key={s.sucursal} className="overflow-hidden">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3">
@@ -249,7 +318,10 @@ export default function InventariosPage() {
                     )}
                   </h2>
                   <p className="mt-0.5 text-xs text-slate-500">
-                    {s.partidas.length} {s.partidas.length === 1 ? "partida" : "partidas"} pendientes
+                    {partidas.length} {partidas.length === 1 ? "partida pendiente" : "partidas pendientes"}
+                    {filtrando && partidas.length !== s.partidas.length && (
+                      <span className="text-slate-400"> · de {s.partidas.length} en total</span>
+                    )}
                   </p>
                 </div>
                 <div className="text-right text-sm">
@@ -275,7 +347,7 @@ export default function InventariosPage() {
                 </div>
               )}
 
-              {s.partidas.length > 0 && (
+              {partidas.length > 0 && (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
@@ -291,7 +363,7 @@ export default function InventariosPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {s.partidas.map((p) => {
+                      {partidas.map((p) => {
                         const marcada = marcadas.has(p.lineaId);
                         // Todo o nada: una partida que no cabe completa espera a
                         // que entre mercancía. Descargar solo lo que alcanza
@@ -378,7 +450,11 @@ export default function InventariosPage() {
           qué va a pasar y cuánto. */}
       {confirmar && (() => {
         const marcadas = sel[confirmar.sucursal] ?? new Set<string>();
-        const t = totalesDe(confirmar.partidas.filter((p) => marcadas.has(p.lineaId)));
+        // Mismo criterio que `aplicar`: marcadas Y a la vista. Si el diálogo
+        // contara las escondidas, diría un número y se aplicaría otro.
+        const t = totalesDe(
+          confirmar.partidas.filter((p) => marcadas.has(p.lineaId) && visibles.has(p.lineaId)),
+        );
         return (
           <ConfirmDialog
             titulo={`Aplicar a BMS — ${confirmar.sucursal}`}
