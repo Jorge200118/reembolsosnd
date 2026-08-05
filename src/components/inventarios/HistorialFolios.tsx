@@ -81,7 +81,7 @@ export function HistorialFolios() {
       });
       const data = await res.json();
       setAviso(data.ok
-        ? { tipo: "ok", texto: `Folio ${data.folio} cancelado en el ERP. El material vuelve a estar por descargar.` }
+        ? { tipo: "ok", texto: `Folio ${data.folio} cancelado en el ERP. El material vuelve a estar por ajustar.` }
         : { tipo: "error", texto: String(data.error ?? "No se pudo cancelar") });
     } catch {
       setAviso({ tipo: "error", texto: "No se pudo conectar con el servidor" });
@@ -142,7 +142,7 @@ export function HistorialFolios() {
   if (folios.length === 0) {
     return (
       <Card className="p-8 text-center">
-        <p className="text-sm font-medium text-slate-700">Todavía no se ha descargado nada del ERP</p>
+        <p className="text-sm font-medium text-slate-700">Todavía no se ha ajustado nada en el ERP</p>
         <p className="mt-1 text-sm text-slate-500">Aquí aparecerán los folios conforme se apliquen.</p>
       </Card>
     );
@@ -245,7 +245,7 @@ export function HistorialFolios() {
               <br />
               <br />
               Las {porCancelar.partidas} {porCancelar.partidas === 1 ? "partida vuelve" : "partidas vuelven"}{" "}
-              a la lista de por descargar, porque el material se entregó igual.
+              a la lista de por ajustar, porque el material se entregó igual.
             </>
           }
           textoConfirmar="Cancelar folio"

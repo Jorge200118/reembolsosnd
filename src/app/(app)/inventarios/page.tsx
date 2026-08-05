@@ -25,7 +25,7 @@ const PESOS = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN
 
 // Cada estado dice qué pasaría en BMS, no solo si está "bien" o "mal".
 const ETIQUETA: Record<EstadoPartida, { texto: string; clase: string }> = {
-  ok:             { texto: "Se descarga",       clase: "bg-emerald-50 text-emerald-700 ring-emerald-600/20" },
+  ok:             { texto: "Se ajusta",         clase: "bg-emerald-50 text-emerald-700 ring-emerald-600/20" },
   // "Espera" y no "alcanza parcial": con la regla de todo o nada, una partida
   // que no cabe completa no descarga nada, se queda hasta que entre mercancía.
   insuficiente:   { texto: "Espera inventario", clase: "bg-amber-50 text-amber-800 ring-amber-600/20" },
@@ -220,10 +220,10 @@ export default function InventariosPage() {
     <>
       <PageHeader
         titulo="Inventarios"
-        subtitulo="Uso interno entregado y su descarga del ERP"
+        subtitulo="Uso interno entregado y su ajuste en el ERP"
       />
       <div className="mb-5 flex gap-6 border-b border-slate-200">
-        {tab("pendientes", "Por descargar")}
+        {tab("pendientes", "Por ajustar")}
         {tab("historial", "Historial")}
       </div>
     </>
@@ -277,7 +277,7 @@ export default function InventariosPage() {
 
       {!error && totalPendientes === 0 && (
         <Card className="p-8 text-center">
-          <p className="text-sm font-medium text-slate-700">No hay nada pendiente de descargar</p>
+          <p className="text-sm font-medium text-slate-700">No hay nada pendiente de ajustar</p>
           <p className="mt-1 text-sm text-slate-500">
             Aquí aparecerá el material de uso interno en cuanto una solicitud quede entregada por completo.
           </p>
@@ -347,7 +347,7 @@ export default function InventariosPage() {
               {s.permiteNegativo && (
                 <div className="border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs text-slate-600">
                   En esta sucursal el ERP permite existencia negativa: dejaría pasar
-                  descargas sin inventario en vez de recortarlas.
+                  ajustes sin inventario en vez de recortarlos.
                 </div>
               )}
 
@@ -361,7 +361,7 @@ export default function InventariosPage() {
                         <th className="px-3 py-2 font-medium">Producto</th>
                         <th className="px-3 py-2 text-right font-medium">Entregado</th>
                         <th className="px-3 py-2 text-right font-medium">Existencia</th>
-                        <th className="px-3 py-2 text-right font-medium">Se descarga</th>
+                        <th className="px-3 py-2 text-right font-medium">Se ajusta</th>
                         <th className="px-3 py-2 font-medium">Estado</th>
                         <th className="px-3 py-2 font-medium">Solicitud</th>
                       </tr>
@@ -402,7 +402,7 @@ export default function InventariosPage() {
                               {p.existencia ?? "—"}
                             </td>
                             {/* Solo lo que va completo llega al ERP, así que
-                                cualquier otro estado descarga cero. Mostrar aquí
+                                cualquier otro estado ajusta cero. Mostrar aquí
                                 lo que "alcanzaría" haría creer que algo se va a
                                 mover cuando no. */}
                             <td className="px-3 py-2 text-right font-semibold tabular-nums text-slate-900">
