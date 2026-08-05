@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui/Card";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { FichaSolicitud } from "@/components/inventarios/FichaSolicitud";
 import type { FolioHistorial, PartidaHistorial } from "@/lib/inventarios/historial";
 
 const PESOS = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
@@ -32,6 +33,9 @@ export function HistorialFolios() {
   const [porCancelar, setPorCancelar] = useState<FolioHistorial | null>(null);
   const [cancelando, setCancelando] = useState(false);
   const [aviso, setAviso] = useState<{ tipo: "ok" | "error"; texto: string } | null>(null);
+  // Folio de solicitud cuya ficha está abierta: quién autorizó y las
+  // evidencias. Sirve para auditar un folio de BMS ya aplicado.
+  const [ficha, setFicha] = useState<string | null>(null);
 
   const recargar = useCallback(async () => {
     const res = await fetch("/api/inventarios/historial", { cache: "no-store" });
@@ -167,6 +171,7 @@ export function HistorialFolios() {
                   partidas={detalle[f.id]}
                   onAlternar={() => void alternar(f.id)}
                   onCancelar={() => setPorCancelar(f)}
+                  onAbrirFicha={setFicha}
                   cancelando={cancelando}
                 />
               ))}
@@ -174,6 +179,8 @@ export function HistorialFolios() {
           </table>
         </div>
       </Card>
+
+      {ficha && <FichaSolicitud key={ficha} folio={ficha} onCerrar={() => setFicha(null)} />}
 
       {porCancelar && (
         <ConfirmDialog
@@ -201,13 +208,14 @@ export function HistorialFolios() {
 }
 
 function FilaFolio({
-  folio: f, abierto, partidas, onAlternar, onCancelar, cancelando,
+  folio: f, abierto, partidas, onAlternar, onCancelar, onAbrirFicha, cancelando,
 }: {
   folio: FolioHistorial;
   abierto: boolean;
   partidas: PartidaHistorial[] | undefined;
   onAlternar: () => void;
   onCancelar: () => void;
+  onAbrirFicha: (folioSolicitud: string) => void;
   cancelando: boolean;
 }) {
   const e = ESTADO[f.estado];
@@ -303,7 +311,18 @@ function FilaFolio({
                           <span className="ml-1 text-rose-700">(se pidió {p.cantidadSolicitada})</span>
                         )}
                       </td>
-                      <td className="py-1 pr-3 font-mono text-slate-500">{p.folioSolicitud}</td>
+                      {/* Sin stopPropagation a propósito: este <tr> es HERMANO
+                          del que abre y cierra el detalle, no su hijo, así que
+                          el clic no burbujea hasta aquel handler. */}
+                      <td className="py-1 pr-3 font-mono text-slate-500">
+                        <button
+                          type="button"
+                          onClick={() => onAbrirFicha(p.folioSolicitud)}
+                          className="text-blue-700 underline underline-offset-2 hover:text-blue-900"
+                        >
+                          {p.folioSolicitud}
+                        </button>
+                      </td>
                       <td className="py-1">{p.empleadoNombre}</td>
                     </tr>
                   ))}

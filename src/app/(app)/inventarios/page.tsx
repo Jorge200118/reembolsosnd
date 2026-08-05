@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { HistorialFolios } from "@/components/inventarios/HistorialFolios";
+import { FichaSolicitud } from "@/components/inventarios/FichaSolicitud";
 import { totalesDe } from "@/lib/inventarios/evaluar";
 import type { PartidaEvaluada, EstadoPartida } from "@/lib/inventarios/tipos";
 
@@ -67,6 +68,10 @@ export default function InventariosPage() {
   const [aplicando, setAplicando] = useState(false);
   const [aviso, setAviso] = useState<{ tipo: "ok" | "error"; texto: string } | null>(null);
   const [pestana, setPestana] = useState<"pendientes" | "historial">("pendientes");
+  // Folio cuya ficha está abierta. Descargar el ERP no se deshace con un botón,
+  // así que hay que poder ver quién autorizó y con qué evidencia se entregó
+  // antes de aplicar.
+  const [ficha, setFicha] = useState<string | null>(null);
 
   // El estado se aplica SIEMPRE dentro de un .then, nunca en el cuerpo del
   // efecto: hacerlo de forma síncrona ahí encadena renders (regla
@@ -329,7 +334,13 @@ export default function InventariosPage() {
                             </td>
                             <td className="px-3 py-2"><Etiqueta estado={p.estado} /></td>
                             <td className="px-3 py-2 text-xs text-slate-500">
-                              <div className="font-mono">{p.folioSolicitud}</div>
+                              <button
+                                type="button"
+                                onClick={() => setFicha(p.folioSolicitud)}
+                                className="font-mono text-blue-700 underline underline-offset-2 hover:text-blue-900"
+                              >
+                                {p.folioSolicitud}
+                              </button>
                               <div>{p.empleadoNombre}</div>
                             </td>
                           </tr>
@@ -357,6 +368,10 @@ export default function InventariosPage() {
           );
         })}
       </div>
+
+      {/* key={ficha}: cambiar de folio remonta y vuelve a pedir, sin resetear
+          estado a mano dentro del efecto. */}
+      {ficha && <FichaSolicitud key={ficha} folio={ficha} onCerrar={() => setFicha(null)} />}
 
       {/* Afectar inventario del ERP no se deshace con un botón: hay que
           cancelar el folio. Por eso se confirma, y el mensaje dice exactamente
