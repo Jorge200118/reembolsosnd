@@ -4,6 +4,7 @@ import { llamarRpcMaterial } from "@/lib/materiales/rpc";
 import { pendientesPorSucursal } from "@/lib/inventarios/pendientes";
 import { existenciasEnErp, aplicarEnErp } from "@/lib/inventarios/erp";
 import { evaluarPartidas } from "@/lib/inventarios/evaluar";
+import { notasParaBms } from "@/lib/inventarios/notas";
 
 // Descarga de BMS lo que ya se entregó. Es la única ruta del módulo que ESCRIBE.
 //
@@ -113,6 +114,10 @@ export async function POST(req: Request) {
     // bitácora de BMS y tiene que ser uno que exista allá.
     process.env.BMS_USUARIO ?? "23",
     evaluadas.map((p) => ({ codProd: p.codProd, cantidad: p.cantidad })),
+    // Los motivos salen de `evaluadas`, no del body: es el mismo criterio que
+    // las cantidades. Si vinieran del navegador, cualquiera escribiría lo que
+    // quisiera en la bitácora del ERP.
+    notasParaBms(evaluadas),
   );
 
   if (bms.estado === "rechazado") {

@@ -16,6 +16,7 @@ interface FilaPendiente {
   unidad: string | null;
   cantidad: number | string;
   costo_unitario: number | string | null;
+  motivo: string | null;
 }
 
 export interface GrupoSucursal {
@@ -65,6 +66,7 @@ export async function pendientesPorSucursal(sucursal: string): Promise<GrupoSucu
       empleadoNombre: f.empleado_nombre,
       area: f.area,
       fechaEntrega: f.fecha_entrega,
+      motivo: f.motivo ?? "",
     });
   }
 

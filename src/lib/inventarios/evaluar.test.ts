@@ -15,6 +15,7 @@ function partida(over: Partial<PartidaPendiente> = {}): PartidaPendiente {
     empleadoNombre: "Juan",
     area: null,
     fechaEntrega: null,
+    motivo: "Mantenimiento",
     ...over,
   };
 }

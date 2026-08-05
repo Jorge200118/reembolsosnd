@@ -115,6 +115,8 @@ export async function aplicarEnErp(
   codEstab: number,
   usuario: string,
   partidas: readonly { codProd: string; cantidad: number }[],
+  /** Motivos de las solicitudes; van al campo `notas` de la cabecera en BMS. */
+  notas = "",
 ): Promise<ResultadoAplicar> {
   const base = process.env.CENSOS_API_URL;
   const llave = process.env.CENSOS_API_KEY;
@@ -129,7 +131,7 @@ export async function aplicarEnErp(
         "x-api-key": llave,
         "ngrok-skip-browser-warning": "true",
       },
-      body: JSON.stringify({ codEstab, usuario, equipo: "APP", partidas }),
+      body: JSON.stringify({ codEstab, usuario, equipo: "APP", partidas, notas }),
       signal: AbortSignal.timeout(TIMEOUT_APLICAR_MS),
       cache: "no-store",
     });
