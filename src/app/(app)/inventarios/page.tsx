@@ -58,7 +58,10 @@ const FILTROS_PENDIENTES: ConfigSegmentos<PartidaConSucursal> = {
   ],
   buscarEn: (p) =>
     `${p.codProd} ${p.descripcionErp} ${p.descripcion} ${p.folioSolicitud} ${p.empleadoNombre} ${p.motivo}`,
+  // La fecha en que almacén le dio el material al empleado, NO la de la
+  // solicitud ni la de la descarga del ERP (esa vive en el historial).
   fechaDe: (p) => p.fechaEntrega,
+  etiquetaFecha: "Entregado",
 };
 
 /** Trae el preview. Fuera del componente y sin tocar estado: solo datos. */

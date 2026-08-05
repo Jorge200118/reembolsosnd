@@ -46,7 +46,9 @@ const FILTROS_FOLIOS: ConfigSegmentos<FolioHistorial> = {
   ],
   buscarEn: (f) =>
     `${f.folioBms ?? ""} ${f.foliosSolicitud ?? ""} ${f.aplicadoPor} ${f.autorizadores.join(" ")}`,
+  // Cuándo se generó el folio en BMS, no cuándo se entregó el material.
   fechaDe: (f) => f.aplicadoEn,
+  etiquetaFecha: "Aplicado",
 };
 
 export function HistorialFolios() {

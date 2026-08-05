@@ -37,5 +37,8 @@ export const FILTROS_SOLICITUDES: ConfigSegmentos<SolicitudGuardada> = {
       s.motivo,
       ...s.rnd_material_lineas.map((l) => `${l.cod_prod} ${l.descripcion}`),
     ].join(" "),
+  // Cuándo el empleado levantó la solicitud, no cuándo se autorizó ni cuándo se
+  // entregó: es la fecha que el usuario recuerda ("la pedí el martes").
   fechaDe: (s) => s.creado_en,
+  etiquetaFecha: "Pedido",
 };

@@ -28,6 +28,15 @@ export interface ConfigSegmentos<T> {
   buscarEn?: (item: T) => string;
   /** Fecha ISO del item para el rango. Sin esto, no se dibujan las fechas. */
   fechaDe?: (item: T) => string | null;
+  /**
+   * Qué fecha es, en una palabra: "Entregado", "Aplicado", "Pedido"…
+   *
+   * Obligatorio en la práctica aunque el tipo lo deje opcional: cada pantalla
+   * filtra por una fecha distinta (entrega al empleado, aplicación en BMS,
+   * creación de la solicitud) y dos cajas de fecha peladas no dicen cuál. Se
+   * agregó justo porque el usuario preguntó "¿fechas de qué?".
+   */
+  etiquetaFecha?: string;
 }
 
 export interface EstadoSegmentos {

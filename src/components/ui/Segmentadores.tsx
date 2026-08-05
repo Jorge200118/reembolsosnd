@@ -204,12 +204,15 @@ export function Segmentadores<T>({
 
       {config.fechaDe && (
         <div className="flex items-center gap-1.5 text-sm text-slate-600">
+          {/* Sin esta palabra, dos cajas de fecha no dicen qué fecha es, y cada
+              pantalla filtra por una distinta. */}
+          <span className="font-medium text-slate-500">{config.etiquetaFecha ?? "Fecha"}</span>
           <input
             type="date"
             value={estado.desde}
             max={estado.hasta || undefined}
             onChange={(e) => onCambiar({ ...estado, desde: e.target.value })}
-            aria-label="Desde"
+            aria-label={`${config.etiquetaFecha ?? "Fecha"} desde`}
             className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm text-slate-700 focus:border-blue-400 focus:outline-none"
           />
           <span className="text-slate-400">a</span>
@@ -218,7 +221,7 @@ export function Segmentadores<T>({
             value={estado.hasta}
             min={estado.desde || undefined}
             onChange={(e) => onCambiar({ ...estado, hasta: e.target.value })}
-            aria-label="Hasta"
+            aria-label={`${config.etiquetaFecha ?? "Fecha"} hasta`}
             className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm text-slate-700 focus:border-blue-400 focus:outline-none"
           />
         </div>
