@@ -24,6 +24,9 @@ export const FILTROS_SOLICITUDES: ConfigSegmentos<SolicitudGuardada> = {
       de: (s) => [...new Set(s.rnd_material_lineas.map((l) => l.area).filter((a): a is NonNullable<typeof a> => a !== null))],
       orden: ["FERRETERIA", "NAVE1", "NAVE2", "NAVE3"],
     },
+    // Null en las pendientes (todavía nadie autoriza), así que en esa pestaña
+    // el desplegable se queda sin opciones y no se dibuja. Se cae solo.
+    { id: "autorizo", etiqueta: "Autorizó", de: (s) => s.autorizado_por },
   ],
   // Se busca también dentro de los renglones: quien pregunta "¿quién pidió
   // cemento?" teclea el producto, no el folio.

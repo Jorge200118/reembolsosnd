@@ -13,6 +13,8 @@ export interface PartidaPendiente {
   fechaEntrega: string | null;
   /** Para qué se pidió. Obligatorio desde la 0040; se escribe en BMS. */
   motivo: string;
+  /** Quién autorizó la solicitud. Null solo en datos viejos o inconsistentes. */
+  autorizadoPor: string | null;
 }
 
 /** Lo que el ERP sabe hoy de un producto en la sucursal. */

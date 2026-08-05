@@ -39,8 +39,13 @@ const FILTROS_FOLIOS: ConfigSegmentos<FolioHistorial> = {
       texto: (v) => ESTADO[v as FolioHistorial["estado"]]?.texto ?? v,
     },
     { id: "sucursal", etiqueta: "Sucursal", de: (f) => f.sucursal },
+    // Multivaluado: un folio agrupa varias solicitudes y cada una la pudo
+    // autorizar alguien distinto. Filtrar por un autorizador tiene que traer el
+    // folio aunque él solo haya autorizado una de las tres solicitudes.
+    { id: "autorizo", etiqueta: "Autorizó", de: (f) => f.autorizadores },
   ],
-  buscarEn: (f) => `${f.folioBms ?? ""} ${f.foliosSolicitud ?? ""} ${f.aplicadoPor}`,
+  buscarEn: (f) =>
+    `${f.folioBms ?? ""} ${f.foliosSolicitud ?? ""} ${f.aplicadoPor} ${f.autorizadores.join(" ")}`,
   fechaDe: (f) => f.aplicadoEn,
 };
 

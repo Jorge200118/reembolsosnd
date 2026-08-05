@@ -54,6 +54,7 @@ const FILTROS_PENDIENTES: ConfigSegmentos<PartidaConSucursal> = {
       texto: (v) => ETIQUETA[v as EstadoPartida]?.texto ?? v,
     },
     { id: "area", etiqueta: "Área", de: (p) => p.area, orden: ["FERRETERIA", "NAVE1", "NAVE2", "NAVE3"] },
+    { id: "autorizo", etiqueta: "Autorizó", de: (p) => p.autorizadoPor },
   ],
   buscarEn: (p) =>
     `${p.codProd} ${p.descripcionErp} ${p.descripcion} ${p.folioSolicitud} ${p.empleadoNombre} ${p.motivo}`,

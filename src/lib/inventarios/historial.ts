@@ -18,6 +18,7 @@ interface FilaHistorial {
   motivo_cancelacion: string | null;
   partidas_con_diferencia: number | string;
   folios_solicitud: string | null;
+  autorizadores: string | null;
 }
 
 export interface FolioHistorial {
@@ -40,6 +41,11 @@ export interface FolioHistorial {
   partidasConDiferencia: number;
   /** Solicitudes de uso interno que alimentaron el folio (SUI-000050, …). */
   foliosSolicitud: string | null;
+  /**
+   * Quién autorizó las solicitudes del folio. Es una LISTA porque un folio
+   * agrupa varias solicitudes y cada una pudo autorizarla alguien distinto.
+   */
+  autorizadores: string[];
 }
 
 function aNumero(v: number | string | null | undefined): number {
@@ -83,6 +89,12 @@ export async function historialDeFolios(sucursal: string, limite = 100): Promise
     motivoCancelacion: f.motivo_cancelacion,
     partidasConDiferencia: aNumero(f.partidas_con_diferencia),
     foliosSolicitud: f.folios_solicitud,
+    // La vista los junta con '|' (ver migración 0042). Se parten aquí para que
+    // el segmentador reciba nombres sueltos y no una cadena.
+    autorizadores: (f.autorizadores ?? "")
+      .split("|")
+      .map((n) => n.trim())
+      .filter(Boolean),
   }));
 }
 
